@@ -7,7 +7,7 @@
     "output": "architecture.html",
     "quality_profile": "showcase",
     "views": [
-      { "id": "ml-path", "label": "ML pipeline", "focus": ["normal", "dataset", "preproc", "train", "eval", "registry"], "note": "Normal-road corpora pre-train the models; RoadAnomaly stays a held-out anomaly benchmark." },
+      { "id": "ml-path", "label": "Deep learning pipeline", "focus": ["normal", "dataset", "preproc", "train", "eval", "registry"], "note": "Normal-road corpora pre-train the models; RoadAnomaly stays a held-out anomaly benchmark." },
       { "id": "serving-path", "label": "Serving path", "focus": ["registry", "api", "web"], "note": "Exported artifacts load into FastAPI, which serves masks and heatmaps to the dashboard." },
       { "id": "delivery-path", "label": "Delivery path", "focus": ["cicd", "ghcr", "api"], "note": "CI gates every pull request; version tags publish the images the stack runs." }
     ]
@@ -25,7 +25,7 @@
     { "id": "ghcr", "type": "cloud", "label": "GHCR", "sublabel": "pinned image tags", "pos": [830, 534], "size": [160, 62] }
   ],
   "boundaries": [
-    { "kind": "region", "label": "ML pipeline · ml/", "wraps": ["normal", "dataset", "preproc", "train", "eval", "registry"] },
+    { "kind": "region", "label": "Deep learning pipeline · dl/", "wraps": ["normal", "dataset", "preproc", "train", "eval", "registry"] },
     { "kind": "region", "label": "Serving stack · docker-compose", "wraps": ["api", "web"] },
     { "kind": "region", "label": "Delivery · CI/CD", "wraps": ["cicd", "ghcr"] }
   ],

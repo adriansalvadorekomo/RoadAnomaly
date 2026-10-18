@@ -43,7 +43,7 @@ jobs:
         run: ruff format --check .
 
       - name: Mypy
-        run: mypy ml backend tests
+        run: mypy dl backend tests
 
       - name: Dataset integrity tests
         run: pytest -q

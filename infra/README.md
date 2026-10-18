@@ -24,7 +24,7 @@ make down
 ## Container rules
 
 - **No torch in the API image.** Trained weights are exported to ONNX by
-  `ml/export/`; shipping torch would triple the image for no benefit.
+  `dl/export/`; shipping torch would triple the image for no benefit.
 - **Non-root user** in both images.
 - **Pinned base tags**, not `latest`, so a rebuild next week builds the same
   thing.

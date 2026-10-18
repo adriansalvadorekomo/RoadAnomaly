@@ -88,7 +88,7 @@ jobs:
   smoke-train:
     name: Training smoke test
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('ml/training/train.py') != '' }}
+    if: ${{ hashFiles('dl/training/train.py') != '' }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -99,15 +99,15 @@ jobs:
           cache: pip
           cache-dependency-path: requirements/*.txt
 
-      - name: Install CPU-only ML dependencies
+      - name: Install CPU-only deep-learning dependencies
         run: |
           pip install -r requirements/dev.txt
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
       - name: Train two steps on a two-image subset
         run: |
-          python -m ml.training.train \
-            --config ml/configs/smoke.yaml \
+          python -m dl.training.train \
+            --config dl/configs/smoke.yaml \
             --limit-images 2 \
             --max-steps 2 \
             --output-dir artifacts/smoke

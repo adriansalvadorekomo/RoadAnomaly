@@ -8,7 +8,7 @@ Six people, three weeks, one deadline. This file exists so nobody has to ask
 ```bash
 git clone https://github.com/adriansalvadorekomo/RoadAnomaly.git
 cd RoadAnomaly
-make install                 # .venv + dev, ML and API dependencies
+make install                 # .venv + dev, deep learning and API dependencies
 make data-check              # confirms the dataset is intact
 nbstripout --install         # strips notebook outputs on commit
 ```
@@ -39,7 +39,7 @@ contribution, and an abandoned branch is not a failure.
    [ADR-0001](docs/adr/0001-evaluation-only-benchmark.md). This is not a style
    preference; a model trained on the evaluation set produces numbers that mean
    nothing and would have to be withdrawn.
-3. **Metrics are defined once, in `ml/evaluation/metrics.py`.** If your model
+3. **Metrics are defined once, in `dl/evaluation/metrics.py`.** If your model
    needs a new one, add it there so all three models get it.
 4. **A reported number needs an experiment file.** Anything in the README or the
    report must trace to `docs/experiments/NNNN-*.md` with the commit, config and

@@ -1,10 +1,10 @@
 cff-version: 1.2.0
-title: RoadAnomaly — pixel-level road anomaly detection
+title: RoadAnomaly — deep learning for pixel-level road anomaly detection
 abstract: >-
-  Comparative study of anomaly segmentation on the RoadAnomaly benchmark:
-  autoencoder reconstruction error, image resynthesis (Lis et al., ICCV 2019)
-  and transfer-learned segmentation, served through a FastAPI inference
-  service with a Next.js dashboard.
+  Comparative study of deep learning approaches to anomaly segmentation on the
+  RoadAnomaly benchmark: autoencoder reconstruction error, image resynthesis
+  (Lis et al., ICCV 2019) and transfer-learned segmentation, served through a
+  FastAPI inference service with a Next.js dashboard.
 message: >-
   If you use this code, please cite it and the RoadAnomaly dataset paper
   listed under references.

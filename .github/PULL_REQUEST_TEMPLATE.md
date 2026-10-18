@@ -34,7 +34,7 @@ $ make test
 
 - [ ] `make lint` and `make type` pass locally
 - [ ] `make test` passes locally
-- [ ] Dataset assumptions still hold (`make data-check`) if I touched `ml/data/`
+- [ ] Dataset assumptions still hold (`make data-check`) if I touched `dl/data/`
 - [ ] No notebook outputs committed by accident (`nbstripout` applied)
 - [ ] If I added an architecture decision, it is recorded in `docs/adr/`
 - [ ] I did not add a `@ts-ignore`, `# type: ignore`, or a skipped test

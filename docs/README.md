@@ -16,9 +16,9 @@ Every run set gets one file, `docs/experiments/NNNN-short-name.md`:
 
 - Date: 2026-10-29
 - Commit: abc1234
-- Config: ml/configs/resynthesis.yaml
+- Config: dl/configs/resynthesis.yaml
 - Hardware: Colab T4, 41 min
-- Command: make train CONFIG=ml/configs/resynthesis.yaml
+- Command: make train CONFIG=dl/configs/resynthesis.yaml
 
 ## What changed
 One paragraph. One variable.

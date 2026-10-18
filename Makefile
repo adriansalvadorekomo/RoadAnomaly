@@ -20,8 +20,8 @@ venv: ## Create the local virtual environment
 	$(PY) -m venv $(VENV)
 	$(BIN)/pip install --upgrade pip
 
-install: venv ## Install dev + ML + API dependencies
-	$(BIN)/pip install -r requirements/ml.txt -r requirements/api.txt -r requirements/dev.txt
+install: venv ## Install dev + deep learning + API dependencies
+	$(BIN)/pip install -r requirements/dl.txt -r requirements/api.txt -r requirements/dev.txt
 
 lint: ## Ruff lint + format check
 	$(BIN)/ruff check .
@@ -32,7 +32,7 @@ fmt: ## Auto-format and auto-fix
 	$(BIN)/ruff check --fix .
 
 type: ## Static type check
-	$(BIN)/mypy ml backend tests
+	$(BIN)/mypy dl backend tests
 
 test: ## Full test suite
 	$(BIN)/pytest
@@ -43,14 +43,14 @@ test-fast: ## Tests that need no GPU and no training
 data-check: ## Validate the RoadAnomaly checkout (frame <-> label contract)
 	$(BIN)/pytest tests/test_dataset_integrity.py -v
 
-train: ## Train one model. Usage: make train CONFIG=ml/configs/ae.yaml
-	$(BIN)/python -m ml.training.train --config $(CONFIG)
+train: ## Train one model. Usage: make train CONFIG=dl/configs/ae.yaml
+	$(BIN)/python -m dl.training.train --config $(CONFIG)
 
 eval: ## Evaluate a checkpoint. Usage: make eval CKPT=artifacts/best.pt
-	$(BIN)/python -m ml.evaluation.evaluate --ckpt $(CKPT)
+	$(BIN)/python -m dl.evaluation.evaluate --ckpt $(CKPT)
 
 export: ## Export a checkpoint to TorchScript/ONNX for the API
-	$(BIN)/python -m ml.export.to_onnx --ckpt $(CKPT)
+	$(BIN)/python -m dl.export.to_onnx --ckpt $(CKPT)
 
 serve: ## Run the FastAPI inference service on :8000
 	cd backend && ../$(BIN)/uvicorn app.main:app --reload --port 8000

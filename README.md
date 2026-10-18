@@ -2,11 +2,13 @@
 
 # RoadAnomaly — Pixel-Level Road Anomaly Detection
 
+*Deep Learning module project · CNNs, image resynthesis, transfer learning and autoencoders*
+
 **Finding the unexpected on the road: animals, cones, boulders, debris and other
 objects that a driving perception stack was never trained to expect.**
 
-[![CI](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/ci.yml/badge.svg)](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/ci.yml)
-[![CD](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/cd.yml/badge.svg)](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/cd.yml)
+[![CI](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/ci.ydl/badge.svg)](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/ci.yml)
+[![CD](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/cd.ydl/badge.svg)](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/cd.yml)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![Data: CC BY-SA 4.0](https://img.shields.io/badge/annotations-CC%20BY--SA%204.0-lightgrey.svg)](data/credits.txt)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](pyproject.toml)
@@ -21,10 +23,10 @@ objects that a driving perception stack was never trained to expect.**
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/architecture-dark.png">
-  <img alt="RoadAnomaly platform architecture: ML pipeline, serving stack and CI/CD delivery" src="assets/architecture.png" width="100%">
+  <img alt="RoadAnomaly platform architecture: Deep learning pipeline, serving stack and CI/CD delivery" src="assets/architecture.png" width="100%">
 </picture>
 
-Three bands, one system. **ML pipeline** — normal-road corpora pre-train three
+Three bands, one system. **Deep learning pipeline** — normal-road corpora pre-train three
 models, RoadAnomaly is scored held-out. **Serving stack** — exported
 TorchScript/ONNX artifacts load into FastAPI, which returns masks and heatmaps
 to the Next.js dashboard. **Delivery** — GitHub Actions gates every pull
@@ -173,7 +175,7 @@ scores = model.forward(batch)            # -> per-pixel anomaly score map in [0,
 model.save(path); model.load(path)       # -> exportable artifact
 ```
 
-`ml/evaluation/` turns *any* score map plus a ground-truth mask into *the same*
+`dl/evaluation/` turns *any* score map plus a ground-truth mask into *the same*
 metric set. No model can be evaluated more favourably than another, and a metric
 is implemented exactly once, in one file, for all three.
 
@@ -182,7 +184,7 @@ is implemented exactly once, in one file, for all three.
 ## Evaluation
 
 Pixel-level, on the anomaly class, with `0` (normal) as the negative class.
-Every metric is implemented exactly once, in `ml/evaluation/metrics.py`, so all
+Every metric is implemented exactly once, in `dl/evaluation/metrics.py`, so all
 three models are scored by identical code.
 
 | Metric | What it answers | Why it is here |
@@ -235,7 +237,7 @@ directory is real or aspirational.
 | Dataset + integrity tests + CI gates | ✅ **Working** — 6 tests, green on every push and PR |
 | Architecture diagram + decision records | ✅ **Working** |
 | Scaffold, Makefile, PR/issue templates, CODEOWNERS | ✅ **Working** |
-| `ml/data/` loader, EDA notebook, splits | 🚧 Week 1 |
+| `dl/data/` loader, EDA notebook, splits | 🚧 Week 1 |
 | Model A — autoencoder baseline | 🚧 Week 1 |
 | Model B — resynthesis · Model C — segmentation | 🚧 Week 2 |
 | Shared metric harness + comparison | 🚧 Week 2 |
@@ -254,11 +256,11 @@ failing on an empty repository.
 git clone https://github.com/adriansalvadorekomo/RoadAnomaly.git
 cd RoadAnomaly
 
-make install            # venv + dev, ML and API dependencies
+make install            # venv + dev, deep learning and API dependencies
 make data-check         # verify the dataset contract (fast, no GPU)
 make lint type test     # what CI runs
 
-make train CONFIG=ml/configs/ae.yaml      # train one model
+make train CONFIG=dl/configs/ae.yaml      # train one model
 make eval  CKPT=artifacts/best.pt         # score all 60 frames
 make serve                               # FastAPI on :8000
 make ui                                  # dashboard on :3000
@@ -271,7 +273,7 @@ weeks 1–3; [Project status](#project-status) says exactly which.
 
 **Requirements:** Python 3.10+ and, for the dashboard, Node 20+. Training is
 happiest with a GPU, but every model runs CPU-only at reduced throughput;
-`requirements/ml.txt` documents the CPU wheel index.
+`requirements/dl.txt` documents the CPU wheel index.
 
 ---
 
@@ -279,7 +281,7 @@ happiest with a GPU, but every model runs CPU-only at reduced throughput;
 
 ```
 RoadAnomaly/
-├── ml/                 models, training, evaluation, export, notebooks
+├── dl/                 models, training, evaluation, export, notebooks
 │   ├── data/           loader, mask decoding, scene-grouped splits
 │   ├── models/         autoencoder.py · resynthesis.py · segmentation.py
 │   ├── evaluation/     metrics.py — the one place a metric is defined
@@ -342,10 +344,10 @@ by the repository owner (see [`.github/CODEOWNERS`](.github/CODEOWNERS)).
 
 | | Workstream | Scope | Also responsible for |
 |---|---|---|---|
-| **M1** | Data & protocol | `ml/data/`, `tests/`, splits | EDA notebook 01, keeping ADR-0001 true in code |
-| **M2** | Model A — autoencoder | `ml/models/autoencoder.py`, `ml/training/` | Baseline end-to-end in week 1 |
-| **M3** | Model B — resynthesis | `ml/models/resynthesis.py` | Faithfulness to Lis et al. and what we deviate from |
-| **M4** | Model C + metrics | `ml/models/segmentation.py`, `ml/evaluation/` | The shared harness everyone depends on — frozen in week 1 |
+| **M1** | Data & protocol | `dl/data/`, `tests/`, splits | EDA notebook 01, keeping ADR-0001 true in code |
+| **M2** | Model A — autoencoder | `dl/models/autoencoder.py`, `dl/training/` | Baseline end-to-end in week 1 |
+| **M3** | Model B — resynthesis | `dl/models/resynthesis.py` | Faithfulness to Lis et al. and what we deviate from |
+| **M4** | Model C + metrics | `dl/models/segmentation.py`, `dl/evaluation/` | The shared harness everyone depends on — frozen in week 1 |
 | **M5** | Backend & delivery | `backend/`, `infra/`, `.github/workflows/` | Compose stack, images, CI/CD |
 | **M6** | Frontend & report | `frontend/`, `docs/`, `assets/` | Dashboard, README, diagram, report assembly |
 
@@ -377,7 +379,7 @@ Deadline: **8 November 2026**.
 **Risks, named.** *Compute:* three models on limited GPUs — mitigated by model A
 being cheap and C using pretrained backbones. *Scope:* the demo layer is week 3
 work and is the first thing to be cut to a single Streamlit page if week 2
-slips; the graded deliverable is the ML work and the report. *Data:* 60
+slips; the graded deliverable is the deep learning work and the report. *Data:* 60
 evaluation frames mean every metric has a wide confidence interval, so we report
 distributions and never argue over differences smaller than the spread.
 
@@ -387,8 +389,8 @@ distributions and never argue over differences smaller than the spread.
 
 ```bash
 # Every published number must be reproducible from these three things:
-#   1. the commit          2. the config in ml/configs/     3. this command
-make train CONFIG=ml/configs/<name>.yaml
+#   1. the commit          2. the config in dl/configs/     3. this command
+make train CONFIG=dl/configs/<name>.yaml
 make eval  CKPT=artifacts/<name>.pt
 ```
 

@@ -1,6 +1,6 @@
 # `backend/` — inference API
 
-Owner: **M5**. Stack: FastAPI + ONNX Runtime (CPU), same language as `ml/` so a
+Owner: **M5**. Stack: FastAPI + ONNX Runtime (CPU), same language as `dl/` so a
 model bug never requires switching ecosystems.
 
 ```
@@ -28,7 +28,7 @@ changing a field here means regenerating them there.
 
 ## Serving notes
 
-- Artifacts are **exported** by `ml/export/`, not trained here. The API never
+- Artifacts are **exported** by `dl/export/`, not trained here. The API never
   imports torch in production; it runs ONNX.
 - Threshold is a request parameter, not a constant, because ADR-0001 makes the
   operating point an explicit experimental choice.

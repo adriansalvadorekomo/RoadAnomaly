@@ -5,13 +5,13 @@
 # without pulling ~2 GB of PyTorch for a lint job:
 #
 #   requirements/dev.txt  lint, types, tests, dataset integrity  (fast, no torch)
-#   requirements/ml.txt   training, evaluation, notebooks
+#   requirements/dl.txt   training, evaluation, notebooks
 #   requirements/api.txt  FastAPI inference service
 
 [project]
 name = "roadanomaly"
 version = "0.1.0"
-description = "Pixel-level road anomaly detection on the RoadAnomaly dataset"
+description = "Deep learning for pixel-level road anomaly detection on the RoadAnomaly dataset"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -32,7 +32,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["ml", "backend", "tests"]
+known-first-party = ["dl", "backend", "tests"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -60,7 +60,7 @@ markers = [
 
 # ---------------------------------------------------------------- coverage
 [tool.coverage.run]
-source = ["ml", "backend"]
+source = ["dl", "backend"]
 omit = ["*/__init__.py", "*/conftest.py"]
 
 [tool.coverage.report]

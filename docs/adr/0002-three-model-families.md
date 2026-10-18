@@ -43,7 +43,7 @@ the MSP baseline is the yardstick that the more elaborate methods must beat
 to justify themselves.
 
 All three emit the same object: a per-pixel anomaly score map. The shared
-harness in `ml/evaluation/` turns any score map plus a ground-truth mask into
+harness in `dl/evaluation/` turns any score map plus a ground-truth mask into
 the same metric set, so no model can be evaluated more favourably than another.
 
 ## Alternatives considered
@@ -63,7 +63,7 @@ comparison table with an ablation story.
 
 **What gets harder.** Three training pipelines to keep green in CI, three
 inference paths behind the API, and the demo UI must show all three without
-becoming a settings screen. Shared code in `ml/data/` and `ml/evaluation/`
+becoming a settings screen. Shared code in `dl/data/` and `dl/evaluation/`
 becomes a coordination point: breaking it breaks everyone.
 
 **How we would know this was wrong.** If by the end of week 2 two of the three

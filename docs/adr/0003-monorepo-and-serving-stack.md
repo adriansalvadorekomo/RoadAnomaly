@@ -16,13 +16,13 @@ whoever has the least time that week.
 
 ## Decision
 
-**One repository** containing `ml/`, `backend/`, `frontend/`, `infra/` and
+**One repository** containing `dl/`, `backend/`, `frontend/`, `infra/` and
 `docs/`, with the dataset committed directly to git (15 MB — small enough that
 a clone reproduces the project, and the dataset is the subject of the report,
 so it belongs in the history).
 
 **Backend: FastAPI** serving `POST /predict`, with models loaded from exported
-TorchScript/ONNX artifacts. Same language as the ML code, so a model bug never
+TorchScript/ONNX artifacts. Same language as the model code, so a model bug never
 requires switching ecosystems, and the OpenAPI schema documents the contract
 for the frontend for free.
 
@@ -41,7 +41,7 @@ report is published to GitHub Pages. Deployment target is a local
 
 | Option | Why not |
 |---|---|
-| Separate repos for ML, API, frontend | Three remotes, three CI configurations, and version skew between a model artifact and the API that loads it — for a project whose whole point is that the pieces line up |
+| Separate repos for the models, API and frontend | Three remotes, three CI configurations, and version skew between a model artifact and the API that loads it — for a project whose whole point is that the pieces line up |
 | Streamlit/Gradio instead of a Next.js dashboard | Far less work, and honest about where the value is; rejected because the deliverable includes a real frontend and the team has the capacity |
 | TorchServe/Triton as a model server | More production-realistic, but an extra service to operate; FastAPI + ONNX Runtime covers a single-user demo |
 | Git LFS or DVC for the dataset | Adds a dependency and a failure mode for 15 MB that git handles without complaint |
