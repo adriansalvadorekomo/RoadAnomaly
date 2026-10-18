@@ -1,0 +1,9 @@
+# FastAPI inference service.
+# CPU inference: ONNX Runtime serves the exported models without torch.
+fastapi>=0.111
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+pydantic>=2.7
+onnxruntime>=1.18
+numpy>=1.26
+pillow>=10.3

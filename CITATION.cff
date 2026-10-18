@@ -1,0 +1,46 @@
+cff-version: 1.2.0
+# TODO(team): replace the placeholder author list with the six group members
+# before submission. Add `orcid:` and `affiliation:` where you have them.
+title: RoadAnomaly — pixel-level road anomaly detection
+abstract: >-
+  Comparative study of anomaly segmentation on the RoadAnomaly benchmark:
+  autoencoder reconstruction error, image resynthesis (Lis et al., ICCV 2019)
+  and transfer-learned segmentation, served through a FastAPI inference
+  service with a Next.js dashboard.
+message: >-
+  If you use this code, please cite it and the RoadAnomaly dataset paper
+  listed under references.
+type: software
+license: MIT
+repository-code: https://github.com/adriansalvadorekomo/RoadAnomaly
+keywords:
+  - anomaly detection
+  - semantic segmentation
+  - road scenes
+  - autonomous driving
+  - deep learning
+authors:
+  - alias: adriansalvadorekomo
+    # TODO(team): add the remaining five members here
+    given-names: Adrian
+    family-names: Salvatore
+references:
+  - type: conference-paper
+    title: Detecting the Unexpected via Image Resynthesis
+    year: 2019
+    authors:
+      - family-names: Lis
+        given-names: Krzysztof
+      - family-names: Nakka
+        given-names: Krishna
+      - family-names: Fua
+        given-names: Pascal
+      - family-names: Salzmann
+        given-names: Mathieu
+    conference:
+      name: International Conference on Computer Vision (ICCV)
+    url: https://arxiv.org/abs/1904.07595
+notes: >-
+  The repository code is MIT licensed. The bundled dataset is not: see LICENSE
+  and data/credits.txt for per-image attribution and the CC BY-SA 4.0 terms
+  that apply to the annotations.

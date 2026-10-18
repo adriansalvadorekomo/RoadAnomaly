@@ -1,0 +1,13 @@
+# Training, evaluation, notebooks.
+# Install with:  pip install -r requirements/ml.txt
+#
+# CPU-only machines: replace the torch line with the CPU wheel index, e.g.
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2
+torchvision>=0.17
+numpy>=1.26
+pillow>=10.3
+scikit-learn>=1.4
+matplotlib>=3.8
+tqdm>=4.66
+pyyaml>=6.0

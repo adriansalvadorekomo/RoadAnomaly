@@ -1,0 +1,9 @@
+# Lint, type-check, test. Deliberately excludes torch so CI stays fast.
+ruff>=0.6
+mypy>=1.11
+pytest>=8.2
+pytest-cov>=5.0
+
+# Needed by tests/test_dataset_integrity.py (dataset + mask inspection)
+numpy>=1.26
+pillow>=10.3

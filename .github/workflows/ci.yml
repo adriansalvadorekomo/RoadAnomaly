@@ -1,0 +1,112 @@
+name: CI
+
+# Fast, deterministic gates. No secrets and no GPU are required, so every
+# fork and every pull request runs the same checks the main branch does.
+#
+# Jobs that depend on code which does not exist yet (frontend, Docker images)
+# are gated on the relevant files being present. They activate automatically
+# as those files land instead of failing on an empty repository.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, types, tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+
+      - name: Install dev dependencies
+        run: pip install -r requirements/dev.txt
+
+      - name: Ruff lint
+        run: ruff check --output-format=github .
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+      - name: Mypy
+        run: mypy ml backend tests
+
+      - name: Dataset integrity tests
+        run: pytest -q
+
+      - name: Coverage report (non-blocking until models land)
+        run: |
+          python -m pytest --cov --cov-report=term-missing --cov-fail-under=0
+        continue-on-error: true
+
+  frontend:
+    name: Dashboard build
+    runs-on: ubuntu-latest
+    if: ${{ hashFiles('frontend/package.json') != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint --if-present
+
+      - name: Type check
+        working-directory: frontend
+        run: npx --yes tsc --noEmit
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+  containers:
+    name: Container build
+    runs-on: ubuntu-latest
+    if: ${{ hashFiles('infra/Dockerfile.backend') != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/Dockerfile.backend
+          push: false
+          tags: roadanomaly-api:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build dashboard image
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          file: infra/Dockerfile.frontend
+          push: false
+          tags: roadanomaly-web:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

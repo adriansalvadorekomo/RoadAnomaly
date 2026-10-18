@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "RoadAnomaly Platform Architecture",
+    "locale": "en",
+    "output": "architecture.html",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "ml-path", "label": "ML pipeline", "focus": ["normal", "dataset", "preproc", "train", "eval", "registry"], "note": "Normal-road corpora pre-train the models; RoadAnomaly stays a held-out anomaly benchmark." },
+      { "id": "serving-path", "label": "Serving path", "focus": ["registry", "api", "web"], "note": "Exported artifacts load into FastAPI, which serves masks and heatmaps to the dashboard." },
+      { "id": "delivery-path", "label": "Delivery path", "focus": ["cicd", "ghcr", "api"], "note": "CI gates every pull request; version tags publish the images the stack runs." }
+    ]
+  },
+  "components": [
+    { "id": "normal", "type": "external", "label": "Normal-road corpora", "sublabel": "Cityscapes / BDD100K", "pos": [60, 90], "size": [180, 62] },
+    { "id": "dataset", "type": "database", "label": "RoadAnomaly dataset", "sublabel": "60 frames · 1280×720", "pos": [60, 222], "size": [180, 62], "tag": "eval-only" },
+    { "id": "preproc", "type": "backend", "label": "Preprocessing", "sublabel": "mask decode · resize", "pos": [320, 156], "size": [170, 62] },
+    { "id": "train", "type": "backend", "label": "Training", "sublabel": "PyTorch", "pos": [580, 156], "size": [160, 62], "tag": "3 architectures" },
+    { "id": "eval", "type": "backend", "label": "Evaluation", "sublabel": "IoU · Dice · F1 · AUPRC", "pos": [830, 156], "size": [170, 62] },
+    { "id": "registry", "type": "database", "label": "Model registry", "sublabel": "TorchScript / ONNX", "pos": [1080, 156], "size": [180, 62] },
+    { "id": "api", "type": "backend", "label": "FastAPI inference", "sublabel": ":8000 POST /predict", "pos": [830, 372], "size": [160, 62] },
+    { "id": "web", "type": "frontend", "label": "Next.js dashboard", "sublabel": ":3000 · overlay + heatmap", "pos": [1080, 372], "size": [180, 62] },
+    { "id": "cicd", "type": "cloud", "label": "GitHub Actions", "sublabel": "CI per PR · CD per tag", "pos": [580, 534], "size": [160, 62] },
+    { "id": "ghcr", "type": "cloud", "label": "GHCR", "sublabel": "pinned image tags", "pos": [830, 534], "size": [160, 62] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "ML pipeline · ml/", "wraps": ["normal", "dataset", "preproc", "train", "eval", "registry"] },
+    { "kind": "region", "label": "Serving stack · docker-compose", "wraps": ["api", "web"] },
+    { "kind": "region", "label": "Delivery · CI/CD", "wraps": ["cicd", "ghcr"] }
+  ],
+  "connections": [
+    { "id": "normal-to-preproc", "from": "normal", "to": "preproc", "label": "pretraining" },
+    { "id": "dataset-to-preproc", "from": "dataset", "to": "preproc", "label": "frames + GT" },
+    { "id": "preproc-to-train", "from": "preproc", "to": "train", "label": "batches" },
+    { "id": "train-to-eval", "from": "train", "to": "eval", "label": "checkpoints" },
+    { "id": "eval-to-registry", "from": "eval", "to": "registry", "label": "best model" },
+    { "id": "registry-to-api", "from": "registry", "to": "api", "label": "loads model", "fromSide": "bottom", "toSide": "top", "via": [[1170, 323], [910, 323]] },
+    { "id": "api-to-web", "from": "api", "to": "web", "label": "mask + heatmap" },
+    { "id": "cicd-to-train", "from": "cicd", "to": "train", "label": "smoke test", "variant": "dashed", "fromSide": "top", "toSide": "bottom", "labelAt": [660, 400] },
+    { "id": "cicd-to-ghcr", "from": "cicd", "to": "ghcr", "label": "build & push", "variant": "dashed" },
+    { "id": "ghcr-to-api", "from": "ghcr", "to": "api", "label": "deploy", "variant": "dashed", "fromSide": "top", "toSide": "bottom" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Data", "items": ["60 frames, one anomaly class, eval-only", "14 semantic-only frames in the loader", "CI guards the frame ↔ label contract"] },
+    { "dot": "emerald", "title": "Models", "items": ["Autoencoder reconstruction error", "Image resynthesis (Lis et al. 2019)", "Transfer-learned DeepLabv3+ / SegFormer"] },
+    { "dot": "violet", "title": "Platform", "items": ["FastAPI returns mask, heatmap, scores", "Dashboard compares all three methods", "Compose stack pinned to GHCR tags"] }
+  ]
+}

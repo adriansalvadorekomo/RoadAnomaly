@@ -1,0 +1,68 @@
+# RoadAnomaly — Deep Learning module project
+#
+# This file holds *tool configuration only*. Dependencies live in
+# requirements/*.txt so that CI can install a light dev environment
+# without pulling ~2 GB of PyTorch for a lint job:
+#
+#   requirements/dev.txt  lint, types, tests, dataset integrity  (fast, no torch)
+#   requirements/ml.txt   training, evaluation, notebooks
+#   requirements/api.txt  FastAPI inference service
+
+[project]
+name = "roadanomaly"
+version = "0.1.0"
+description = "Pixel-level road anomaly detection on the RoadAnomaly dataset"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+# Markdown is excluded because `ruff format` would rewrite the illustrative
+# Python snippets in README.md and docs/, losing the aligned comments that make
+# them readable. Those snippets are documentation, not code.
+extend-exclude = ["data", "node_modules", "frontend", ".venv", "*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
+ignore = [
+    "E501", # line length is enforced by the formatter
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ml", "backend", "tests"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ---------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+check_untyped_defs = true
+ignore_missing_imports = true
+exclude = ["^data/", "^frontend/", "^node_modules/"]
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "slow: needs a GPU or a full training run (deselected in CI)",
+    "dataset: validates the local RoadAnomaly checkout",
+]
+
+# ---------------------------------------------------------------- coverage
+[tool.coverage.run]
+source = ["ml", "backend"]
+omit = ["*/__init__.py", "*/conftest.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

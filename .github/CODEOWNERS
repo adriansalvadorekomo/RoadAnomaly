@@ -1,0 +1,44 @@
+# CODEOWNERS — who must review what.
+#
+# GitHub reads this file from the default branch. Reviews are requested
+# automatically when a pull request touches a matching path.
+#
+# TODO(team): replace the workstream placeholders below with the real GitHub
+# handles. One line per member keeps this file readable:
+#
+#   @member-data      M1  ml/data, tests, dataset integrity
+#   @member-ae        M2  ml/models/autoencoder.py
+#   @member-resynth   M3  ml/models/resynthesis.py
+#   @member-seg       M4  ml/models/segmentation.py, ml/evaluation
+#   @member-backend   M5  backend/, infra/, .github/workflows
+#   @member-frontend  M6  frontend/, README.md, assets/, docs/
+#
+# Until then, the repository owner is the fallback reviewer for everything.
+
+*                               @adriansalvadorekomo
+
+# --- M1: data and evaluation protocol -------------------------------------
+/ml/data/                       @adriansalvadorekomo
+/tests/                         @adriansalvadorekomo
+/data/frame_list.json           @adriansalvadorekomo
+
+# --- M2/M3/M4: models and metrics -----------------------------------------
+/ml/models/                     @adriansalvadorekomo
+/ml/training/                   @adriansalvadorekomo
+/ml/evaluation/                 @adriansalvadorekomo
+/ml/configs/                    @adriansalvadorekomo
+
+# --- M5: service, containers, pipeline ------------------------------------
+/backend/                       @adriansalvadorekomo
+/infra/                         @adriansalvadorekomo
+/.github/workflows/             @adriansalvadorekomo
+
+# --- M6: dashboard, README, report, diagrams ------------------------------
+/frontend/                      @adriansalvadorekomo
+/assets/                        @adriansalvadorekomo
+/docs/                          @adriansalvadorekomo
+
+# --- Shared contract: every change to these needs two reviewers -----------
+/README.md                      @adriansalvadorekomo
+/pyproject.toml                 @adriansalvadorekomo
+/requirements/                  @adriansalvadorekomo

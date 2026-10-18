@@ -1,0 +1,23 @@
+# Force LF in the repository, regardless of contributor OS.
+* text=auto eol=lf
+
+# --- Notebooks: strip outputs on commit so diffs stay readable -------------
+*.ipynb diff=jupyter
+*.ipynb filter=nbstripout
+
+# --- Binary and media: never attempt line-ending or diff normalisation -----
+*.webp binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.pt binary
+*.pth binary
+*.onnx binary
+*.ckpt binary
+*.npy binary
+
+# --- Large generated artefacts: exclude from language statistics ----------
+data/frames/** linguist-vendored
+assets/*.png linguist-documentation
+docs/assets/*.html linguist-generated
