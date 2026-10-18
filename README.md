@@ -323,11 +323,24 @@ reasoning for that, and for the rest of the stack, is in
 
 ## Team
 
-Six workstreams, one owner each. Path ownership is enforced by
-[`.github/CODEOWNERS`](.github/CODEOWNERS) — reviews are requested
-automatically.
+**Six contributors**, equal contribution — the list order below is not a
+ranking.
 
-| | Workstream | Owns | Also responsible for |
+| Contributor |
+|---|
+| Emna Trabelsi |
+| Ines Trabelsi |
+| Hejer Mnejja |
+| Walid Fehry |
+| Khaled Gannoun |
+| Adrian Salvador Ekomo Mesi Obono |
+
+The project is split into six workstreams so that each has exactly one owner
+and no file has two. **Owners are assigned at the kickoff meeting** — until
+then the table describes the roles, not the people, and every path is reviewed
+by the repository owner (see [`.github/CODEOWNERS`](.github/CODEOWNERS)).
+
+| | Workstream | Scope | Also responsible for |
 |---|---|---|---|
 | **M1** | Data & protocol | `ml/data/`, `tests/`, splits | EDA notebook 01, keeping ADR-0001 true in code |
 | **M2** | Model A — autoencoder | `ml/models/autoencoder.py`, `ml/training/` | Baseline end-to-end in week 1 |
@@ -339,6 +352,15 @@ automatically.
 Everyone writes their own section of the report. **M4's harness is the critical
 path**: it is the interface the other two models plug into, so its signature is
 frozen in week 1 and changes to it need M2, M3 and M4 to agree.
+
+### After the kickoff meeting
+
+Two edits turn review routing on, and they are the only place a name appears:
+
+1. add one name per workstream in the table above;
+2. replace the placeholder `@handles` in `.github/CODEOWNERS` with each
+   member's GitHub username — that is what makes GitHub request the right
+   reviewer on the right path.
 
 ---
 

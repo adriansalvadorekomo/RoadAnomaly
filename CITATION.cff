@@ -1,6 +1,4 @@
 cff-version: 1.2.0
-# TODO(team): replace the placeholder author list with the six group members
-# before submission. Add `orcid:` and `affiliation:` where you have them.
 title: RoadAnomaly — pixel-level road anomaly detection
 abstract: >-
   Comparative study of anomaly segmentation on the RoadAnomaly benchmark:
@@ -20,10 +18,22 @@ keywords:
   - autonomous driving
   - deep learning
 authors:
-  - alias: adriansalvadorekomo
-    # TODO(team): add the remaining five members here
-    given-names: Adrian
-    family-names: Salvatore
+  # Deep Learning module project, 2026. List order is not a ranking —
+  # this is equal-contribution coursework.
+  # TODO(team): add `orcid:` and `affiliation:` for each author.
+  - given-names: Emna
+    family-names: Trabelsi
+  - given-names: Ines
+    family-names: Trabelsi
+  - given-names: Hejer
+    family-names: Mnejja
+  - given-names: Walid
+    family-names: Fehry
+  - given-names: Khaled
+    family-names: Gannoun
+  - given-names: Adrian Salvador
+    family-names: Ekomo Mesi Obono
+    alias: adriansalvadorekomo
 references:
   - type: conference-paper
     title: Detecting the Unexpected via Image Resynthesis
@@ -39,7 +49,7 @@ references:
         given-names: Mathieu
     conference:
       name: International Conference on Computer Vision (ICCV)
-    url: https://arxiv.org/abs/1904.07595
+    url: https://infoscience.epfl.ch/record/269093?ln=en
 notes: >-
   The repository code is MIT licensed. The bundled dataset is not: see LICENSE
   and data/credits.txt for per-image attribution and the CC BY-SA 4.0 terms

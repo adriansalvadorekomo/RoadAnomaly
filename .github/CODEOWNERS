@@ -1,19 +1,25 @@
 # CODEOWNERS — who must review what.
 #
-# GitHub reads this file from the default branch. Reviews are requested
-# automatically when a pull request touches a matching path.
+# GitHub reads this file from the default branch and requests the listed
+# reviewers automatically when a pull request touches a matching path.
 #
-# TODO(team): replace the workstream placeholders below with the real GitHub
-# handles. One line per member keeps this file readable:
+# STATUS: workstream ownership is assigned at the kickoff meeting, so every
+# path currently routes to the repository owner. Nothing here is a statement
+# about who does what yet.
 #
-#   @member-data      M1  ml/data, tests, dataset integrity
-#   @member-ae        M2  ml/models/autoencoder.py
-#   @member-resynth   M3  ml/models/resynthesis.py
-#   @member-seg       M4  ml/models/segmentation.py, ml/evaluation
-#   @member-backend   M5  backend/, infra/, .github/workflows
-#   @member-frontend  M6  frontend/, README.md, assets/, docs/
+# When the kickoff assigns owners, replace the handle on each line below with
+# the member's GitHub username. One handle per workstream is enough; the
+# workstream definitions are in the README "Team" section.
 #
-# Until then, the repository owner is the fallback reviewer for everything.
+#   M1  data & protocol         ml/data, tests
+#   M2  model A autoencoder     ml/models/autoencoder.py, ml/training
+#   M3  model B resynthesis     ml/models/resynthesis.py
+#   M4  model C + metrics       ml/models/segmentation.py, ml/evaluation
+#   M5  backend & delivery      backend, infra, .github/workflows
+#   M6  frontend & report       frontend, docs, assets
+#
+# GitHub usernames only — a name that is not a real account is ignored
+# (or reported as an error on the pull request), it does not fall back.
 
 *                               @adriansalvadorekomo
 
@@ -38,7 +44,7 @@
 /assets/                        @adriansalvadorekomo
 /docs/                          @adriansalvadorekomo
 
-# --- Shared contract: every change to these needs two reviewers -----------
+# --- Shared contract: every change to these needs a second pair of eyes ---
 /README.md                      @adriansalvadorekomo
 /pyproject.toml                 @adriansalvadorekomo
 /requirements/                  @adriansalvadorekomo
