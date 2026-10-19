@@ -260,7 +260,7 @@ make install            # venv + dev, deep learning and API dependencies
 make data-check         # verify the dataset contract (fast, no GPU)
 make lint type test     # what CI runs
 
-make train CONFIG=dl/configs/ae.yaml      # train one model
+make train CONFIG=configs/ae.yaml      # train one model
 make eval  CKPT=artifacts/best.pt         # score all 60 frames
 make serve                               # FastAPI on :8000
 make ui                                  # dashboard on :3000
@@ -281,14 +281,15 @@ happiest with a GPU, but every model runs CPU-only at reduced throughput;
 
 ```
 RoadAnomaly/
-├── dl/                 models, training, evaluation, export, notebooks
+├── dl/                 models, training, evaluation, inference, notebooks
 │   ├── data/           loader, mask decoding, scene-grouped splits
 │   ├── models/         autoencoder.py · resynthesis.py · segmentation.py
 │   ├── evaluation/     metrics.py — the one place a metric is defined
 │   └── notebooks/      EDA and result narratives (no model logic)
+├── configs/            one YAML per experiment (ae.yaml, smoke.yaml)
 ├── backend/            FastAPI inference service (ONNX Runtime, no torch)
 ├── frontend/           Next.js dashboard: upload → overlay → compare
-├── infra/              Dockerfiles + docker-compose
+├── infra/              docker/ + compose/ (container files land in week 3)
 ├── data/               60 frames + labels + credits (tracked, 15 MB)
 ├── tests/              dataset integrity and model tests
 ├── docs/
@@ -389,8 +390,8 @@ distributions and never argue over differences smaller than the spread.
 
 ```bash
 # Every published number must be reproducible from these three things:
-#   1. the commit          2. the config in dl/configs/     3. this command
-make train CONFIG=dl/configs/<name>.yaml
+#   1. the commit          2. the config in configs/     3. this command
+make train CONFIG=configs/<name>.yaml
 make eval  CKPT=artifacts/<name>.pt
 ```
 

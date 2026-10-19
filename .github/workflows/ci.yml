@@ -37,7 +37,7 @@ jobs:
         name: Check for optional files
         run: |
           echo "frontend=$(test -f frontend/package.json && echo true || echo false)" >> "$GITHUB_OUTPUT"
-          echo "containers=$(test -f infra/Dockerfile.backend && test -f infra/Dockerfile.frontend && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "containers=$(test -f infra/docker/Dockerfile.backend && test -f infra/docker/Dockerfile.frontend && echo true || echo false)" >> "$GITHUB_OUTPUT"
 
   quality:
     name: Lint, types, tests
@@ -115,7 +115,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: infra/Dockerfile.backend
+          file: infra/docker/Dockerfile.backend
           push: false
           tags: roadanomaly-api:ci
           cache-from: type=gha
@@ -125,7 +125,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: frontend
-          file: infra/Dockerfile.frontend
+          file: infra/docker/Dockerfile.frontend
           push: false
           tags: roadanomaly-web:ci
           cache-from: type=gha

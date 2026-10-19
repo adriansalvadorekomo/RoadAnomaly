@@ -32,7 +32,8 @@
 /dl/models/                     @adriansalvadorekomo
 /dl/training/                   @adriansalvadorekomo
 /dl/evaluation/                 @adriansalvadorekomo
-/dl/configs/                    @adriansalvadorekomo
+/dl/inference/                  @adriansalvadorekomo
+/configs/                       @adriansalvadorekomo
 
 # --- M5: service, containers, pipeline ------------------------------------
 /backend/                       @adriansalvadorekomo

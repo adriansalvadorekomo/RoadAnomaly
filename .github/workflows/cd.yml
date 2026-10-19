@@ -40,7 +40,7 @@ jobs:
       - id: detect
         name: Check for optional files
         run: |
-          echo "images=$(test -f infra/Dockerfile.backend && test -f infra/Dockerfile.frontend && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "images=$(test -f infra/docker/Dockerfile.backend && test -f infra/docker/Dockerfile.frontend && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "smoke=$(test -f dl/training/train.py && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "report=$(test -f docs/report/_quarto.yml && echo true || echo false)" >> "$GITHUB_OUTPUT"
 
@@ -77,7 +77,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: infra/Dockerfile.backend
+          file: infra/docker/Dockerfile.backend
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api:${{ github.ref_name }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -88,7 +88,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: frontend
-          file: infra/Dockerfile.frontend
+          file: infra/docker/Dockerfile.frontend
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-web:${{ github.ref_name }}
           cache-from: type=gha
@@ -128,7 +128,7 @@ jobs:
       - name: Train two steps on a two-image subset
         run: |
           python -m dl.training.train \
-            --config dl/configs/smoke.yaml \
+            --config configs/smoke.yaml \
             --limit-images 2 \
             --max-steps 2 \
             --output-dir artifacts/smoke
