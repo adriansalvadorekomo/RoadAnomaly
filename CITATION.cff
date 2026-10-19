@@ -4,7 +4,7 @@ abstract: >-
   Comparative study of deep learning approaches to anomaly segmentation on the
   RoadAnomaly benchmark: autoencoder reconstruction error, image resynthesis
   (Lis et al., ICCV 2019) and transfer-learned segmentation, served through a
-  FastAPI inference service with a Next.js dashboard.
+  FastAPI inference service with an Astro landing page and a Streamlit prototype.
 message: >-
   If you use this code, please cite it and the RoadAnomaly dataset paper
   listed under references.

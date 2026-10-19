@@ -40,7 +40,7 @@
 /infra/                         @adriansalvadorekomo
 /.github/workflows/             @adriansalvadorekomo
 
-# --- M6: dashboard, README, report, diagrams ------------------------------
+# --- M6: landing page, prototype, README, report, diagrams ------------------
 /frontend/                      @adriansalvadorekomo
 /assets/                        @adriansalvadorekomo
 /docs/                          @adriansalvadorekomo

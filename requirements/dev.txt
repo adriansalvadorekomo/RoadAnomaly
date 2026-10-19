@@ -1,4 +1,4 @@
-# Lint, type-check, test. Deliberately excludes torch so CI stays fast.
+# Lint, type-check, test. Deliberately excludes TensorFlow so CI stays fast.
 ruff>=0.6
 mypy>=1.11
 pytest>=8.2

@@ -11,9 +11,9 @@
 *.jpg binary
 *.jpeg binary
 *.pdf binary
-*.pt binary
-*.pth binary
-*.onnx binary
+*.keras binary
+*.h5 binary
+*.tflite binary
 *.ckpt binary
 *.npy binary
 

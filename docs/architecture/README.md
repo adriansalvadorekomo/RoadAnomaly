@@ -16,12 +16,18 @@ The high-level picture is generated from
 [`architecture.json`](architecture.json) with
 [archify](https://github.com/tt-a1i/archify); open
 [`architecture.html`](architecture.html) for the interactive version. The PNGs
-embedded in the README are exported from the same spec at 2× (2660 × 1368).
+embedded in the README are exported from the same spec at 2×.
 
-The spec is titled **RoadAnomaly Target Architecture**. It labels the serving
-band `Compose → Vercel + K8s` and the delivery band `CI/CD + Argo CD`: compose
-is the local developer path, while Vercel, Kubernetes and Argo CD are the demo
-target. The diagram is a target, not a claim that those components are running.
+The map is intentionally tall (1090 × 1090) so five stages and twelve components
+stay legible at README width. The interactive viewer scrolls on a laptop instead
+of shrinking the labels below reading size; that is a deliberate trade-off, not
+a missing responsive layout.
+
+The spec is titled **RoadAnomaly End-to-End System Map**. It places RoadAnomaly
+in the evaluation stage, not in the training data, and shows the serving split:
+FastAPI is cluster-internal, Streamlit is the public interactive prototype and
+the Astro landing page on Vercel links to it. The diagram is a target, not a
+claim that those components are running.
 
 ## Current architecture (implemented)
 
@@ -49,31 +55,54 @@ What runs today:
 
 ```mermaid
 flowchart LR
-  subgraph data["Data"]
-    N["Normal-road corpora<br/>Cityscapes / BDD100K"]
-    R["RoadAnomaly<br/>evaluation-only"]
+  subgraph data["1 · Data — normal-road only"]
+    NP["Normal-road pipeline<br/>Cityscapes / BDD100K · tf.data · train/val"]
   end
 
-  subgraph dl["Deep learning pipeline — planned"]
-    P["Preprocessing"] --> TR["Training<br/>A · autoencoder<br/>B · resynthesis<br/>C · segmentation"]
-    TR --> EV["Evaluation<br/>shared metric harness"]
-    EV --> REG["Model registry<br/>TorchScript / ONNX"]
+  subgraph modeling["2 · Modeling — TensorFlow/Keras"]
+    A["A · Autoencoder<br/>reconstruction error"]
+    B["B · Resynthesis<br/>synthesize → residual"]
+    C["C · Segmentation<br/>DeepLabV3+ / U-Net · MSP"]
   end
 
-  N --> P
-  R --> EV
-  REG --> API["FastAPI inference<br/>planned"]
-  API --> WEB["Next.js dashboard<br/>planned"]
+  subgraph evaluation["3 · Evaluation & promotion — eval-only"]
+    RA["RoadAnomaly<br/>60 frames · never trained"]
+    EV["Shared evaluation harness<br/>metrics · threshold CV"]
+    REG["Model registry<br/>SavedModel + manifest"]
+  end
 
-  CI["GitHub Actions CI/CD"] --> GHCR["GHCR image tags"]
-  GHCR --> K8S["Kubernetes / Minikube<br/>planned"]
-  ARGO["Argo CD<br/>planned"] -. "syncs manifests" .-> K8S
+  subgraph serving["4 · Serving & experience — Minikube + Vercel"]
+    API["FastAPI inference<br/>POST /predict · cluster-internal"]
+    ST["Streamlit prototype<br/>public ingress · interactive demo"]
+    WEB["Astro landing page<br/>Vercel · static · no API call"]
+  end
+
+  subgraph delivery["5 · Delivery — GitHub Actions + Argo CD"]
+    CI["GitHub Actions<br/>tests · GHCR images"]
+    K8S["Minikube + Argo CD<br/>syncs API and prototype"]
+  end
+
+  NP --> A
+  NP --> B
+  NP --> C
+  A --> EV
+  B --> EV
+  C --> EV
+  RA --> EV
+  EV --> REG
+  REG --> API
+  ST --> API
+  API --> ST
+  WEB -. "demo link" .-> ST
+  CI --> K8S
   K8S --> API
-  WEB -. "deployed to" .-> VERCEL["Vercel<br/>planned"]
+  K8S -. "deploys" .-> ST
 ```
 
-The deep learning pipeline is described in
-[ADR-0002](../adr/0002-three-model-families.md); the deployment target in
+The model families are described in
+[ADR-0002](../adr/0002-three-model-families.md), the TensorFlow choice in
+[ADR-0005](../adr/0005-tensorflow-framework.md), and the frontend split in
+[ADR-0006](../adr/0006-astro-and-streamlit-frontend.md). The deployment target is
 [ADR-0004](../adr/0004-vercel-and-gitops-deployment.md).
 
 ## Component responsibilities
@@ -82,18 +111,19 @@ The deep learning pipeline is described in
 |---|---|---|
 | `data/` | The evaluation benchmark: 60 frames, semantic/instance labels, per-image credits | implemented |
 | `tests/dataset/` | Guards the frame ↔ label contract and every number published in the README | implemented |
-| `dl/data/` | Loading, mask decoding, transforms, scene-grouped folds | missing |
+| `dl/data/` | Normal-road loading, mask decoding, transforms, scene-grouped folds | missing |
 | `dl/models/` | Autoencoder, resynthesis and segmentation models behind one interface | missing |
-| `dl/training/` | One training loop for all three families | missing |
-| `dl/evaluation/` | The single implementation of every metric | missing |
-| `dl/inference/` | Artifact export (TorchScript/ONNX) and shared scoring helpers | missing |
+| `dl/training/` | One TensorFlow/Keras training loop for all three families | missing |
+| `dl/evaluation/` | The single implementation of every metric; framework-free | missing |
+| `dl/inference/` | SavedModel export and shared scoring helpers | missing |
 | `configs/` | One YAML per run, shared by training and evaluation | missing |
-| `backend/` | FastAPI service, ONNX Runtime, `POST /predict` | missing |
-| `frontend/` | Next.js dashboard: upload, overlay, heatmap, comparison | missing |
-| `infra/docker/` | Backend and frontend images | missing |
-| `infra/compose/` | Local two-service stack | missing |
+| `backend/` | FastAPI service, `tensorflow-cpu`, `POST /predict` | missing |
+| `frontend/landing/` | Astro + Tailwind static landing page on Vercel | missing |
+| `frontend/prototype/` | Streamlit interactive client for FastAPI | missing |
+| `infra/docker/` | API and prototype images | missing |
+| `infra/compose/` | Local two-service stack (API + prototype) | missing |
 | `k8s/`, `argocd/` | Local Kubernetes overlay and GitOps application | missing (documented target only) |
-| `.github/workflows/` | CI on every PR; CD on tags | implemented, with gated jobs |
+| `.github/workflows/` | CI on every PR; CD on tags; Vercel builds the landing page | implemented, with gated jobs |
 
 ## Data flow
 
@@ -105,34 +135,47 @@ The deep learning pipeline is described in
 3. **Threshold tuning**, when reported, uses scene-grouped k-fold over the
    `animals*`, `cones*`, `obstacles*`, `lost_tires*` and `vehicle*` groups. It is
    never mixed with the zero-shot column.
-4. **Serving** loads an exported artifact and returns a score map; the threshold
-   is a request parameter, not a constant.
+4. **Promotion** selects on normal-road validation, then publishes a SavedModel
+   and a manifest: git SHA, config hash, dataset version, TensorFlow version,
+   input spec, validation metrics and default threshold.
+5. **Serving** loads the SavedModel into FastAPI and returns a score map; the
+   threshold is a request parameter, not a constant.
+6. **Experience** keeps the API internal. Streamlit accepts browser traffic and
+   calls the API inside the cluster; the Astro landing page is static, links to
+   the prototype and renders only published results.
 
 ## Inference flow (proposed)
 
 ```mermaid
 sequenceDiagram
   actor U as Reviewer
-  participant W as Next.js dashboard (planned)
-  participant A as FastAPI service (planned)
-  participant R as Model registry (ONNX)
-  U->>W: upload image or pick a bundled sample
-  W->>A: POST /predict (file, model, optional threshold)
-  A->>R: load artifact once at startup
+  participant L as Astro landing (Vercel)
+  participant S as Streamlit prototype (Minikube)
+  participant A as FastAPI service (Minikube, internal)
+  participant R as Model registry (SavedModel)
+  U->>L: open the public page
+  L-->>U: project story + published results
+  L-->>U: demo link
+  U->>S: open the prototype, upload or pick a frame
+  S->>A: POST /predict (file, model, optional threshold)
+  A->>R: load SavedModel + manifest once at startup
   A->>A: preprocess → score map → threshold → mask
-  A-->>W: mask, heatmap, scores, timing
-  W-->>U: overlay and side-by-side comparison
+  A-->>S: mask, heatmap, scores, timing
+  S-->>U: overlay, threshold slider, side-by-side comparison
 ```
 
 ## Frontend/backend boundary
 
 - `POST /predict` accepts `multipart/form-data`: `file`, `model`, optional
   `threshold`.
-- The OpenAPI schema at `/docs` is the source of truth. Frontend types are
-  generated from it; hand-written response shapes are not allowed.
+- The OpenAPI schema at `/docs` is the source of truth. The Streamlit prototype
+  validates the fields it reads; it does not define its own response shapes.
 - `GET /health` and `GET /models` are the only other endpoints.
+- The landing page has no API client: no runtime request, no generated TypeScript
+  types, no API base URL. It links to the prototype instead.
 - Nothing in this boundary exists yet: `backend/app/__init__.py` is the only
-  backend file, and `frontend/` contains a README.
+  backend file, and `frontend/` contains READMEs and the prototype dependency
+  file.
 
 ## CI/CD flow (implemented workflow, gated jobs)
 
@@ -142,9 +185,12 @@ flowchart LR
   CI -->|green| MERGE["merge"]
   MERGE --> TAG["tag v*"]
   TAG --> CD["CD"]
-  CD --> IMG["GHCR images<br/>gated on Dockerfiles"]
+  CD --> IMG["GHCR images<br/>api + prototype<br/>gated on Dockerfiles"]
   CD --> SMOKE["training smoke test<br/>gated on dl/training/train.py"]
   CD --> PAGES["report to Pages<br/>gated on docs/report/_quarto.yml"]
+  MERGE --> VERCEL["Vercel<br/>builds Astro landing"]
+  CI --> LAND["Astro build<br/>gated on landing/package.json"]
+  CI --> PROTO["Streamlit check<br/>gated on prototype/app.py"]
 ```
 
 The gates are computed by a small detection job; the optional jobs skip
@@ -156,10 +202,12 @@ cleanly until their files land.
 flowchart LR
   G["Git repository<br/>k8s/base + k8s/overlays/local"] --> ARGO["Argo CD"]
   ARGO -->|sync| MIN["Minikube cluster"]
-  GHCR["GHCR image tag"] --> MIN
-  MIN --> API["FastAPI inference"]
-  V["Vercel project"] --> WEB["Next.js dashboard"]
-  WEB --> API
+  GHCR["GHCR image tags<br/>api + prototype"] --> MIN
+  MIN --> API["FastAPI inference<br/>ClusterIP"]
+  MIN --> ST["Streamlit prototype<br/>public Ingress"]
+  ST --> API
+  V["Vercel project"] --> WEB["Astro landing page"]
+  WEB -. "demo link" .-> ST
 ```
 
 No manifests, Argo CD application or Vercel project exist yet. The local

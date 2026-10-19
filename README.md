@@ -2,7 +2,7 @@
 
 # RoadAnomaly — Pixel-Level Road Anomaly Detection
 
-*Deep Learning module project · CNNs, image resynthesis, transfer learning and autoencoders*
+*Deep Learning module project · TensorFlow/Keras, CNNs, image resynthesis, transfer learning and autoencoders*
 
 **Finding the unexpected on the road: animals, cones, boulders, debris and other
 objects that a driving perception stack was never trained to expect.**
@@ -12,6 +12,7 @@ objects that a driving perception stack was never trained to expect.**
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![Data: CC BY-SA 4.0](https://img.shields.io/badge/annotations-CC%20BY--SA%204.0-lightgrey.svg)](data/credits.txt)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](pyproject.toml)
+[![TensorFlow 2.21](https://img.shields.io/badge/TensorFlow-2.21-FF6F00?logo=tensorflow&logoColor=white)](docs/adr/0005-tensorflow-framework.md)
 [![Node 20+](https://img.shields.io/badge/node-20%2B-339933.svg)](frontend/)
 [![Code style: ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](pyproject.toml)
 
@@ -45,13 +46,13 @@ when the world stops matching them.
 | O2 | Implement three general model families | A/B/C behind one interface, trained and reproducible | `missing` |
 | O3 | Compare them behind one metric harness | Results table populated from `docs/experiments/` | `missing` |
 | O4 | Explain the selected model (XAI) | Saliency/occlusion maps plus a written justification | `blocked` — no model, no method decision (G1) |
-| O5 | Serve the selected model | FastAPI + Next.js + containers + deployment | `missing` |
+| O5 | Serve the selected model | FastAPI + Streamlit prototype + Astro landing + containers + deployment | `missing` |
 | O6 | Make the commercial case | BMC, 4Ps, teaser, commercial report | `missing` |
 
 ## 2. Current architecture (implemented)
 
 At this commit the repository is a **verified dataset and its guard rails**,
-not a running system. There is no model, API, dashboard or container. The full
+not a running system. There is no model, API, frontend or container. The full
 component view is in [`docs/architecture/README.md`](docs/architecture/README.md).
 
 | Component | State | Evidence |
@@ -59,10 +60,10 @@ component view is in [`docs/architecture/README.md`](docs/architecture/README.md
 | Dataset (60 frames + labels + credits) | `implemented` | `data/`, tracked in git (15 MB) |
 | Dataset contract tests | `implemented` | 6 tests in `tests/dataset/` |
 | Lint, types and test gate | `implemented` | `ruff`, `mypy`, `pytest`; `.github/workflows/ci.yml` |
-| Decision records and protocol | `implemented` | `docs/adr/0001`–`0004` |
+| Decision records and protocol | `implemented` | `docs/adr/0001`–`0006` |
 | Scaffold, Makefile, templates | `implemented` | `Makefile`, `.github/` |
 | Models, training, metrics, inference | `missing` | `dl/` holds directories only |
-| Backend, frontend, containers | `missing` | package stub, README only, no Dockerfiles |
+| Backend, frontend, containers | `missing` | backend stub, frontend READMEs, no Dockerfiles |
 | Deployment (compose, Kubernetes, Vercel) | `missing` | target documented in ADR-0004 |
 
 The only executable pipeline today is CI: lint, type-check and the six dataset
@@ -73,25 +74,37 @@ before any model code existed.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/architecture-dark.png">
-  <img alt="RoadAnomaly target architecture: deep learning pipeline, FastAPI on Kubernetes, Next.js on Vercel, and CI/CD + Argo CD delivery" src="assets/architecture.png" width="100%">
+  <img alt="RoadAnomaly end-to-end system map: normal-road data and three TensorFlow models, shared evaluation, FastAPI serving, a Streamlit prototype, an Astro landing page on Vercel, and GitHub Actions with Argo CD delivery" src="assets/architecture.png" width="100%">
 </picture>
 
-**This is the target, not the current state.** Three bands, one system:
+**This is the target, not the current state.** Five stages, one system:
 
-- **Deep learning pipeline** (`missing`) — normal-road corpora pre-train three
-  models; RoadAnomaly is scored held-out. See
-  [ADR-0002](docs/adr/0002-three-model-families.md).
-- **Serving stack** (`missing`) — exported TorchScript/ONNX artifacts load into
-  FastAPI on Kubernetes, which returns masks and heatmaps to the Next.js
-  dashboard on Vercel.
+- **Data** (`missing`) — normal-road corpora feed a TensorFlow/Keras `tf.data`
+  pipeline with scene-grouped train/validation splits. RoadAnomaly is never a
+  training input. See [ADR-0001](docs/adr/0001-evaluation-only-benchmark.md).
+- **Modeling** (`missing`) — three families are compared behind one interface:
+  A autoencoder, B image resynthesis and C DeepLabV3+ / U-Net. See
+  [ADR-0002](docs/adr/0002-three-model-families.md) and
+  [ADR-0005](docs/adr/0005-tensorflow-framework.md).
+- **Evaluation and promotion** (`missing`) — one metric harness scores all three
+  models, selects on normal-road validation and promotes a TensorFlow SavedModel
+  plus a manifest. The 60 RoadAnomaly frames are scored held-out only, and
+  threshold tuning is reported separately from the zero-shot column.
+- **Serving and experience** (`missing`) — FastAPI loads the SavedModel and
+  exposes `POST /predict`; the Streamlit prototype is the public interactive
+  demo; the Astro landing page on Vercel presents the project, links to the
+  prototype and renders only published results. Streamlit calls FastAPI inside
+  the cluster, so the browser never needs a route to the inference API.
 - **Delivery** (`implemented` workflow, `missing` deployment) — GitHub Actions
-  gates every pull request and publishes tagged images to GHCR. The target
-  deployment is Vercel (frontend) plus Kubernetes/Minikube and Argo CD
-  (inference), recorded in [ADR-0004](docs/adr/0004-vercel-and-gitops-deployment.md).
+  gates every pull request and publishes tagged API and prototype images to
+  GHCR. Argo CD syncs Minikube; Vercel builds the Astro landing page through its
+  Git integration. The target is recorded in
+  [ADR-0004](docs/adr/0004-vercel-and-gitops-deployment.md) and
+  [ADR-0006](docs/adr/0006-astro-and-streamlit-frontend.md).
 
-Read the labels literally: `Compose → Vercel + K8s` is the path from the local
-stack to the demo target, and `CI/CD + Argo CD` is how a tagged image reaches
-the cluster. Neither Vercel nor the cluster exists yet.
+Read the labels literally: the diagram is a target, not a claim that the model,
+API, prototype, landing page or cluster is running. `docker compose` is the
+local path; Minikube, Argo CD and Vercel are the demo target.
 
 The diagram is generated from
 [`docs/architecture/architecture.json`](docs/architecture/architecture.json)
@@ -205,15 +218,18 @@ and rejected alternatives are in
 |---|---|---|---|
 | **A** | **Autoencoder reconstruction error** | per-pixel \|x − x̂\|, thresholded | Needs no anomaly labels at all. Fastest path to a real end-to-end number, and its failure mode is instructive: large smooth anomalies reconstruct too well |
 | **B** | **Image resynthesis** (Lis et al., ICCV 2019) | disagreement between the input and a resynthesis of it | The dataset's own reference method, so we can compare against a published result instead of only against ourselves |
-| **C** | **Transfer-learned segmentation** — DeepLabv3+ / SegFormer | 1 − max softmax (MSP baseline) | Pretrained weights are the most reliable route to a strong pixel-level model with 60 evaluation images; MSP is the yardstick the elaborate methods must beat to justify themselves |
+| **C** | **Transfer-learned segmentation** — DeepLabv3+ / U-Net (TensorFlow-native) | 1 − max softmax (MSP baseline) | Pretrained weights are the most reliable route to a strong pixel-level model with 60 evaluation images; MSP is the yardstick the elaborate methods must beat to justify themselves |
 
 ```python
 # Every model implements the same three-part interface — that is the whole
 # contract that makes the comparison fair.
-model = build(config)                    # -> module
-scores = model.forward(batch)            # -> per-pixel anomaly score map in [0, 1]
-model.save(path); model.load(path)       # -> exportable artifact
+model = build(config)                       # -> keras.Model
+scores = model.predict(batch)               # -> per-pixel anomaly score map in [0, 1]
+model.export(saved_model_dir)               # -> SavedModel with a serving signature
 ```
+
+The API loads the exported SavedModel with `tf.saved_model.load`; there is no
+TorchScript or ONNX step (ADR-0005).
 
 `dl/evaluation/` turns *any* score map plus a ground-truth mask into *the same*
 metric set. No model can be evaluated more favourably than another, and a
@@ -231,29 +247,32 @@ implemented.
 git clone https://github.com/adriansalvadorekomo/RoadAnomaly.git
 cd RoadAnomaly
 
-make install            # venv + dev, deep learning and API dependencies
+make install            # venv + dev, deep learning, API and prototype dependencies
 make data-check         # verify the dataset contract (fast, no GPU)
 make lint type test     # what CI runs
 ```
 
 | Target | Purpose | Status |
 |---|---|---|
-| `make install` | Create `.venv` and install `requirements/*.txt` | `implemented` |
+| `make install` | Create `.venv` and install local dev, training, API and prototype dependencies | `implemented` |
 | `make data-check` | Six dataset integrity tests | `implemented` |
 | `make lint` / `make fmt` | Ruff lint and format | `implemented` |
 | `make type` | Mypy over `dl`, `backend`, `tests` | `implemented` |
 | `make test` | Full pytest suite | `implemented` |
 | `make train CONFIG=configs/ae.yaml` | Training loop | `missing` — `dl/training/train.py` |
-| `make eval CKPT=artifacts/best.pt` | Shared evaluation | `missing` — `dl/evaluation/evaluate.py` |
-| `make export CKPT=artifacts/best.pt` | TorchScript/ONNX export | `missing` — `dl/inference/to_onnx.py` |
+| `make eval CKPT=artifacts/best.keras` | Shared evaluation | `missing` — `dl/evaluation/evaluate.py` |
+| `make export CKPT=artifacts/best.keras` | SavedModel export | `missing` — `dl/inference/export_savedmodel.py` |
 | `make serve` | FastAPI on `:8000` | `missing` — `backend/app/main.py` |
-| `make ui` | Next.js on `:3000` | `missing` — `frontend/package.json` |
-| `make up` / `make down` | Local compose stack | `missing` — `infra/compose/docker-compose.yml` |
+| `make landing` | Astro landing page on `:4321` | `missing` — `frontend/landing/package.json` |
+| `make prototype` | Streamlit prototype on `:8501` | `missing` — `frontend/prototype/app.py` |
+| `make up` / `make down` | Local compose stack (API + prototype) | `missing` — `infra/compose/docker-compose.yml` |
 
 The dataset is already in the repository; there is no download step.
-**Requirements:** Python 3.10+ and, for the dashboard, Node 20+. Training is
-happiest with a GPU, but every model runs CPU-only at reduced throughput;
-`requirements/dl.txt` documents the CPU wheel index.
+**Requirements:** Python 3.10+; Node 20+ only for the Astro landing page.
+Training is happiest with a GPU, but every model runs CPU-only at reduced
+throughput; `requirements/dl.txt` documents the TensorFlow CPU package and
+Apple Silicon note. The local `make install` uses `requirements/api-base.txt`
+instead of `tensorflow-cpu`, so TensorFlow is installed exactly once.
 
 ## 7. Testing and code quality
 
@@ -285,15 +304,17 @@ intended layout is documented in [`infra/README.md`](infra/README.md):
 ```
 infra/
 ├── docker/
-│   ├── Dockerfile.backend    python:3.12-slim, onnxruntime, no torch, non-root
-│   └── Dockerfile.frontend   node:20-alpine -> next build -> standalone runtime
+│   ├── Dockerfile.backend    python:3.12-slim, tensorflow-cpu, non-root
+│   └── Dockerfile.prototype  python:3.12-slim, streamlit, non-root
 └── compose/
-    └── docker-compose.yml    api + web, pinned to GHCR image tags or local builds
+    └── docker-compose.yml    api + prototype, pinned to GHCR tags or local builds
 ```
 
-When the files land, `make up` starts the API on `:8000` and the dashboard on
-`:3000`. The API image is CPU-only and does not ship torch: artifacts are
-exported by `dl/inference/` and served with ONNX Runtime.
+When the files land, `make up` starts the API on `:8000` and the Streamlit
+prototype on `:8501`. The API image is CPU-only and ships only `tensorflow-cpu`:
+the SavedModel is exported by `dl/inference/`, and training dependencies stay out
+of the serving container. The Astro landing page is not containerized for the
+serving path — Vercel builds it, and `make landing` runs it locally on `:4321`.
 
 ## 9. Planned CI/CD workflow with GitHub Actions
 
@@ -303,8 +324,8 @@ missing images and report.** The workflows are in `.github/workflows/`.
 | Trigger | What runs | Status |
 |---|---|---|
 | Every PR and push to `main` | **CI** — ruff lint, ruff format check, mypy, 6 dataset-integrity tests | `implemented` |
-| Every PR and push to `main` | Dashboard build and container builds, gated on `frontend/package.json` and the Dockerfiles | `blocked` — files missing, jobs skip cleanly |
-| Tag `v*` | **CD** — publish `-api` and `-web` images to GHCR, re-run the training smoke test, publish the report to GitHub Pages | `blocked` — Dockerfiles, `dl/training/train.py` and `docs/report/_quarto.yml` missing |
+| Every PR and push to `main` | Astro landing build, Streamlit syntax check and container builds, gated on `frontend/landing/package.json`, the prototype and the Dockerfiles | `blocked` — files missing, jobs skip cleanly |
+| Tag `v*` | **CD** — publish `-api` and `-prototype` images to GHCR, re-run the TensorFlow training smoke test, publish the report to GitHub Pages | `blocked` — Dockerfiles, `dl/training/train.py` and `docs/report/_quarto.yml` missing |
 
 The optional jobs are gated by a small `changes` job that checks for the files
 and exposes the result as a job output. This is deliberate: job-level
@@ -318,33 +339,50 @@ gates are a fix, not a feature.
 [**ADR-0004**](docs/adr/0004-vercel-and-gitops-deployment.md) and
 [`docs/architecture/`](docs/architecture/README.md); no manifests exist.
 
-1. CD publishes a pinned image tag to GHCR.
-2. `k8s/base/` holds the Deployment, Service and ConfigMap;
-   `k8s/overlays/local/` targets Minikube.
+1. CD publishes pinned `-api` and `-prototype` image tags to GHCR.
+2. `k8s/base/` holds the API and prototype Deployments, Services, ConfigMap and
+   the prototype Ingress; `k8s/overlays/local/` targets Minikube. FastAPI is a
+   ClusterIP Service; only the Streamlit prototype is exposed.
 3. An Argo CD application watches this repository and syncs the local overlay,
    so a cluster change is a commit rather than a manual edit.
-4. `docker compose` remains the local developer path. Kubernetes is the demo
-   target, not a requirement for contributing.
+4. Vercel deploys the Astro landing page from its Git integration and links to
+   the public prototype URL.
+5. `docker compose` remains the local developer path (API + prototype).
+   Kubernetes is the demo target, not a requirement for contributing.
+
+**Reachability, solved by topology.** A Vercel page cannot call a Minikube API on
+`localhost`. The landing page is static and makes no API call; the browser opens
+Streamlit, and Streamlit calls FastAPI inside the cluster. For a public demo,
+expose **Streamlit** through an ingress tunnel (for example Cloudflare Tunnel or
+ngrok) or a public cluster; FastAPI stays internal. Do not expose the inference
+API just to make the landing page work.
 
 The fallback is explicit: if Minikube or Argo CD cannot be made reproducible by
 the end of week 2, the demo runs on compose and the reversal is recorded in
 ADR-0004 rather than left unspoken.
 
-## 11. Frontend and Vercel
+## 11. Frontend: Astro landing page and Streamlit prototype
 
-**Status: `missing`.** `frontend/` currently contains a README only. The target
-is Next.js (App Router) + Tailwind + shadcn/ui, deployed to **Vercel**.
+**Status: `missing`.** `frontend/` contains READMEs only. The target is two
+surfaces, not one dashboard:
 
-| Route | Purpose |
-|---|---|
-| `/` | Landing: what the project does, headline metrics, one example |
-| `/demo` | Upload or pick a sample, run inference, overlay + heatmap |
-| `/compare` | Same frame through all three models, score table |
-| `/about` | Method summary, dataset caveats (ADR-0001), credits |
+| Surface | Stack | Runs on | Purpose |
+|---|---|---|---|
+| **Landing** | Astro + Tailwind | **Vercel** | Project story, published results, links to the demo, report and repository |
+| **Prototype** | Streamlit | **Minikube** (or compose) | Upload or pick a frame, choose a model, set a threshold, see overlay/heatmap/scores |
 
-The backend contract is the OpenAPI schema at `/docs`; frontend types are
-generated from it, never hand-written. The Vercel project reads the API base URL
-from an environment variable. No Vercel project exists yet.
+The landing pages are `/` (story and status), `/results` (published comparison,
+empty until experiments land) and `/about` (protocol, ADR-0001 caveat, credits).
+The demo button points at the public Streamlit URL. The prototype is the only
+surface that calls FastAPI, and it does so from inside the cluster.
+
+The rules are narrow on purpose: the landing page makes no runtime API call and
+renders only numbers that trace to `docs/experiments/`; the prototype contains no
+model code, shows an explicit error when the API is unreachable and never draws a
+placeholder mask. The API contract remains the OpenAPI schema at `/docs`; the
+Streamlit client validates the fields it reads. No Vercel project, Astro app or
+Streamlit app exists yet. See
+[ADR-0006](docs/adr/0006-astro-and-streamlit-frontend.md).
 
 ## 12. Technical and commercial validation
 
@@ -383,9 +421,9 @@ The zeros are the honest state at this commit. In particular:
   threshold-tuned on held-out folds, and the two regimes are never mixed.
 
 **Implementation gaps.** No loader, model, training loop, metric harness,
-experiment record, API, dashboard, container, Kubernetes manifest, Argo CD
-application or Vercel project exists. The results table stays empty until a
-number can be traced to `docs/experiments/`.
+experiment record, API, Astro landing page, Streamlit prototype, container,
+Kubernetes manifest, Argo CD application or Vercel project exists. The results
+table stays empty until a number can be traced to `docs/experiments/`.
 
 **Commercial gaps.** No introduction, context, existing/deployed-solutions
 survey, Business Model Canvas, 4Ps, penetration strategy, brand assets, teaser
@@ -397,17 +435,17 @@ the tables describe roles, not people. The one edit that turns review routing on
 is replacing the placeholder handles in [`.github/CODEOWNERS`](.github/CODEOWNERS).
 
 **Risks, named.** *Compute:* three models on limited GPUs — mitigated by model A
-being cheap and C using pretrained backbones. *Scope:* the demo layer is week 3
-work and is the first thing to be cut to a single Streamlit page if week 2
-slips; the graded deliverable is the deep learning work and the report. *Time:*
-three weeks for six people, with the commercial validation landing after the
-technical one.
+being cheap and C using pretrained backbones. *Scope:* the experience layer is
+week 3 work; if week 2 slips, the Astro landing page is reduced to a single
+static page and the Streamlit prototype carries the demo. The graded deliverable
+is the deep learning work and the report. *Time:* three weeks for six people,
+with the commercial validation landing after the technical one.
 
 | Week | Dates | Goal | Milestone |
 |---|---|---|---|
 | **1** | Oct 19–25 | Foundations | Dataset loader + EDA; harness interface frozen; **autoencoder baseline producing a real number**; CI green |
 | **2** | Oct 26 – Nov 1 | The comparison | Resynthesis and segmentation models; threshold selection; ablations; per-frame and failure analysis |
-| **3** | Nov 2–8 | Deliverables | FastAPI + dashboard + compose; report written and rendered; README results table filled; reproducibility pass on a clean clone; tag `v1.0.0` |
+| **3** | Nov 2–8 | Deliverables | FastAPI + Astro landing page + Streamlit prototype + compose; report written and rendered; README results table filled; reproducibility pass on a clean clone; tag `v1.0.0` |
 
 ---
 
@@ -420,18 +458,18 @@ RoadAnomaly/
 ├── CONTRIBUTING.md         branching, review and suppression rules
 ├── Makefile                developer targets (status table in §6)
 ├── pyproject.toml          ruff, mypy, pytest and coverage configuration
-├── requirements/           dev · dl · api dependency sets
+├── requirements/           dev · dl · api-base · api · prototype sets
 ├── data/                   60 frames + labels + credits        (implemented)
 ├── dl/
 │   ├── data/               loader, mask decoding, splits        (missing)
 │   ├── models/             autoencoder · resynthesis · seg      (missing)
 │   ├── training/           one loop for all three models        (missing)
 │   ├── evaluation/         metrics.py — defined once            (missing)
-│   ├── inference/          TorchScript/ONNX export + scoring    (missing)
+│   ├── inference/          SavedModel export + scoring          (missing)
 │   └── notebooks/          EDA and result narratives            (missing)
 ├── configs/                one YAML per experiment              (missing)
 ├── backend/                FastAPI inference service            (missing — stub)
-├── frontend/               Next.js dashboard                    (missing — README)
+├── frontend/               Astro landing + Streamlit prototype  (missing — READMEs)
 ├── prototypes/             intended experimental workflow       (README only)
 ├── tests/
 │   ├── dataset/            frame ↔ label contract (6 tests)     (implemented)
@@ -440,7 +478,7 @@ RoadAnomaly/
 ├── infra/                  README; docker/ + compose/ planned   (missing)
 ├── docs/
 │   ├── architecture/       archify spec, HTML and Mermaid docs
-│   ├── adr/                0001–0004
+│   ├── adr/                0001–0006
 │   ├── experiments/        one file per run set                 (empty log)
 │   ├── report/             technical outline + commercial plan  (outline only)
 │   └── validation/         requirements traceability matrix
@@ -459,7 +497,7 @@ it.
 # Every published number must be reproducible from these three things:
 #   1. the commit          2. the config in configs/         3. this command
 make train CONFIG=configs/<name>.yaml
-make eval  CKPT=artifacts/<name>.pt
+make eval  CKPT=artifacts/<name>.keras
 ```
 
 - **Seeds are fixed and recorded** in the config; data-loader worker seeding is
@@ -468,13 +506,16 @@ make eval  CKPT=artifacts/<name>.pt
   `nbstripout` filter; each clone runs `nbstripout --install` once (see
   [`CONTRIBUTING.md`](CONTRIBUTING.md)) so diffs show code changes, not image
   bytes.
-- **Artefacts are not committed.** Checkpoints, ONNX exports and run logs are
-  regenerated; `artifacts/` is ignored.
+- **Artefacts are not committed.** Checkpoints, SavedModel exports and run logs
+  are regenerated; `artifacts/` is ignored.
 - **The environment is pinned** by `requirements/*.txt` and, in CI, by the exact
-  Python/Node versions in `.github/workflows/`.
-- **Known non-determinism:** cuDNN autotuning and non-deterministic reduction
-  kernels can shift metrics in the third decimal. Where that matters, the
-  experiment file records the observed spread rather than pretending it is zero.
+  Python/Node versions in `.github/workflows/`. The manifest records the exact
+  TensorFlow version used for each artifact.
+- **TensorFlow determinism:** the training entrypoint calls
+  `tf.keras.utils.set_random_seed(seed)` and
+  `tf.config.experimental.enable_op_determinism()`. Where cuDNN or reduction
+  kernels still shift metrics in the third decimal, the experiment file records
+  the observed spread rather than pretending it is zero.
 
 ## Team
 
@@ -502,7 +543,7 @@ then every path is reviewed by the repository owner (see
 | **M3** | Model B — resynthesis | `dl/models/resynthesis.py` | Faithfulness to Lis et al. and what we deviate from |
 | **M4** | Model C + metrics | `dl/models/segmentation.py`, `dl/evaluation/` | The shared harness everyone depends on — frozen in week 1 |
 | **M5** | Backend & delivery | `backend/`, `infra/`, `.github/workflows/` | Compose stack, images, CI/CD |
-| **M6** | Frontend & report | `frontend/`, `docs/`, `assets/` | Dashboard, README, diagram, report assembly |
+| **M6** | Frontend & report | `frontend/`, `docs/`, `assets/` | Astro landing, Streamlit prototype, README, diagram, report assembly |
 
 Everyone writes their own section of the report. **M4's harness is the critical
 path**: it is the interface the other two models plug into, so its signature is

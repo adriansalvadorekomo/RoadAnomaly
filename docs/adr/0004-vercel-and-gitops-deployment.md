@@ -6,6 +6,15 @@
 - **Supersedes in part:** [ADR-0003](0003-monorepo-and-serving-stack.md) —
   deployment clause only. The stack choices in ADR-0003 stand.
 
+> **Framework note (ADR-0005).** The inference runtime is TensorFlow
+> (`tensorflow-cpu` + SavedModel), not ONNX Runtime. The Vercel, Kubernetes and
+> Argo CD target is unchanged.
+>
+> **Frontend note (ADR-0006).** Vercel hosts the Astro landing page. The
+> Streamlit prototype and FastAPI run in Minikube; the prototype is the only
+> public workload and calls FastAPI over the cluster network. The Vercel page
+> links to the prototype instead of calling the Minikube API directly.
+
 ## Context
 
 ADR-0003 chose a local `docker compose up` as the deployment target and
@@ -26,13 +35,16 @@ silently contradicting it.
 
 1. **Frontend: Vercel.** The Next.js dashboard is deployed to Vercel. The API
    base URL is an environment variable; no backend URL is hard-coded.
+   *(Superseded by ADR-0006: the Vercel workload is now the Astro landing page;
+   the Streamlit prototype runs in Minikube.)*
 2. **Inference service: Kubernetes, locally Minikube.** Manifests live in
    `k8s/base/` (Deployment, Service, ConfigMap) with a
    `k8s/overlays/local/` overlay for Minikube.
 3. **GitOps: Argo CD.** The Argo CD application watches this repository and
    syncs the local overlay. A cluster change is a commit, not a manual edit.
 4. **Images: GHCR.** The existing CD workflow publishes `-api` and `-web`
-   images on tags. Kubernetes pulls the pinned tag; `latest` is never deployed.
+   images on tags. *(Now `-api` and `-prototype`; see ADR-0006.)* Kubernetes
+   pulls the pinned tag; `latest` is never deployed.
 5. **Local developer path: `docker compose`.** `infra/compose/` remains the
    fastest way to run both services on a laptop. Kubernetes is the demo target,
    not a requirement for contributing.

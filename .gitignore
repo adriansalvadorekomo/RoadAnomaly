@@ -31,11 +31,11 @@ checkpoints/
 runs/
 wandb/
 mlruns/
-*.pt
-*.pth
+*.keras
+*.h5
+*.tflite
 *.ckpt
-*.onnx
-*.torchscript
+saved_model/
 
 # Notebooks
 .ipynb_checkpoints/

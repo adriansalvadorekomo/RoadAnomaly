@@ -10,6 +10,15 @@
 > Vercel (frontend) and Kubernetes/Minikube + Argo CD (inference service) in
 > [ADR-0004](0004-vercel-and-gitops-deployment.md). `docker compose` remains the
 > local developer path.
+>
+> **Framework note (ADR-0005).** The serving artifact is a TensorFlow SavedModel
+> loaded by FastAPI with `tensorflow-cpu`; the TorchScript/ONNX and ONNX Runtime
+> references below are historical. The FastAPI and monorepo decisions stand.
+>
+> **Frontend note (ADR-0006).** The single Next.js dashboard is replaced by an
+> Astro landing page on Vercel plus a Streamlit prototype. FastAPI remains the
+> only inference service. The Next.js alternatives below are historical; the
+> Streamlit prototype is the accepted choice.
 
 ## Context
 

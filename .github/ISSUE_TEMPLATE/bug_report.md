@@ -27,7 +27,7 @@ labels: ["bug"]
 - Commit / branch:
 - Where: local / CI / Docker / Colab
 - GPU or CPU, and which:
-- Python, torch, node versions:
+- Python, TensorFlow, node versions:
 
 ## Evidence
 

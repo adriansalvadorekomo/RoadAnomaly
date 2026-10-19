@@ -9,7 +9,7 @@ Six people, three weeks, one deadline. This file exists so nobody has to ask
 ```bash
 git clone https://github.com/adriansalvadorekomo/RoadAnomaly.git
 cd RoadAnomaly
-make install                 # .venv + dev, deep learning and API dependencies
+make install                 # .venv + dev, deep learning, API and prototype dependencies
 make data-check              # confirms the dataset is intact
 nbstripout --install         # strips notebook outputs on commit
 ```

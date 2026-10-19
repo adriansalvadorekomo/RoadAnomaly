@@ -8,7 +8,7 @@ anything; it is shorter and stricter than the README.
 A Deep Learning module project on the RoadAnomaly benchmark: compare three
 anomaly-segmentation approaches (autoencoder reconstruction error, image
 resynthesis, transfer-learned segmentation), evaluate them on 60 held-out
-frames, and serve the selected model through a FastAPI + Next.js demo.
+frames, and serve the selected model through a FastAPI + Astro/Streamlit demo.
 
 Status vocabulary used throughout the repository: `implemented`,
 `in progress`, `missing`, `blocked`. Read
@@ -38,7 +38,7 @@ before claiming that anything works.
 | `dl/` | models, training, evaluation, inference, notebooks | missing (directories only) |
 | `configs/` | one YAML per experiment | missing (directory only) |
 | `backend/` | FastAPI inference service | missing (package stub) |
-| `frontend/` | Next.js dashboard | missing (README only) |
+| `frontend/` | Astro landing page + Streamlit prototype | missing (READMEs) |
 | `infra/` | `docker/` + `compose/` container files | missing |
 | `tests/` | `dataset/` implemented; `unit/`, `integration/` missing | in progress |
 | `docs/` | ADRs, experiments, report, architecture, validation | in progress |
@@ -47,7 +47,7 @@ before claiming that anything works.
 ## Commands
 
 ```bash
-make install       # .venv + dev, deep learning and API dependencies
+make install       # .venv + dev, deep learning, API and prototype dependencies
 make lint type     # ruff + mypy
 make test          # full pytest suite
 make data-check    # dataset contract only (fast, no GPU)
@@ -61,6 +61,8 @@ line above it.
 ## Conventions
 
 - Python 3.10+, 100-character lines, `from __future__ import annotations`.
+- TensorFlow/Keras is the deep learning framework (ADR-0005). Do not
+  introduce PyTorch, TorchScript, ONNX Runtime or a second model ecosystem.
 - Metrics are defined once, in `dl/evaluation/metrics.py`; do not duplicate one.
 - Experiment configs live in `configs/`, not inside `dl/`.
 - Architecture decisions that are expensive to reverse go to `docs/adr/` as a

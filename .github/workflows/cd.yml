@@ -1,11 +1,13 @@
 name: CD
 
 # Runs on version tags: v1.0.0, v0.2.1, ...
-# Publishes immutable container images, re-runs the training smoke test, and
-# deploys the technical report to GitHub Pages.
+# Publishes immutable API and prototype images, re-runs the training smoke
+# test, and deploys the technical report to GitHub Pages.
 #
-# Nothing here runs on a pull request. The only trigger is a tag, so a bad tag
-# is the only thing that can deploy — and tags are created deliberately.
+# The Astro landing page is not built here: Vercel deploys it from its Git
+# integration. Nothing here runs on a pull request. The only trigger is a tag,
+# so a bad tag is the only thing that can deploy — and tags are created
+# deliberately.
 
 on:
   push:
@@ -40,7 +42,7 @@ jobs:
       - id: detect
         name: Check for optional files
         run: |
-          echo "images=$(test -f infra/docker/Dockerfile.backend && test -f infra/docker/Dockerfile.frontend && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "images=$(test -f infra/docker/Dockerfile.backend && test -f infra/docker/Dockerfile.prototype && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "smoke=$(test -f dl/training/train.py && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "report=$(test -f docs/report/_quarto.yml && echo true || echo false)" >> "$GITHUB_OUTPUT"
 
@@ -67,7 +69,7 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-web
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -84,13 +86,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build and push dashboard image
+      - name: Build and push prototype image
         uses: docker/build-push-action@v6
         with:
-          context: frontend
-          file: infra/docker/Dockerfile.frontend
+          context: .
+          file: infra/docker/Dockerfile.prototype
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-web:${{ github.ref_name }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype:${{ github.ref_name }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -102,7 +105,9 @@ jobs:
             echo "| Image | Tag |"
             echo "|---|---|"
             echo "| \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api\` | \`${{ github.ref_name }}\` |"
-            echo "| \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-web\` | \`${{ github.ref_name }}\` |"
+            echo "| \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype\` | \`${{ github.ref_name }}\` |"
+            echo
+            echo "The Astro landing page is deployed by Vercel's Git integration."
           } >> "$GITHUB_STEP_SUMMARY"
 
   smoke-train:
@@ -120,10 +125,8 @@ jobs:
           cache: pip
           cache-dependency-path: requirements/*.txt
 
-      - name: Install CPU-only deep-learning dependencies
-        run: |
-          pip install -r requirements/dev.txt
-          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+      - name: Install TensorFlow training dependencies
+        run: pip install -r requirements/dl.txt
 
       - name: Train two steps on a two-image subset
         run: |

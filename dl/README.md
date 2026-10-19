@@ -8,7 +8,7 @@ dl/
 ├── models/       autoencoder.py · resynthesis.py · segmentation.py       (M2 M3 M4)
 ├── training/     train.py, one loop for all three models                 (M2)
 ├── evaluation/   metrics.py + evaluate.py — the shared scoring harness   (M4)
-├── inference/    checkpoint -> TorchScript/ONNX + scoring helpers         (M4)
+├── inference/    checkpoint -> SavedModel + scoring helpers                (M4)
 └── notebooks/    01_dataset_eda · 02_baseline_ae · 03_resynthesis
                   04_comparison — narrative only, no model logic           (all)
 ```
@@ -21,8 +21,8 @@ run (e.g. `configs/ae.yaml`, `configs/smoke.yaml`).
 1. **Notebooks contain no model logic.** They import from `dl/`. A result that
    only exists inside a notebook cannot be re-run by CI or by the API.
 2. **Every model implements the same interface** — a module with
-   `build(config)`, `forward(batch) -> score_map`, and `save/load` — so
-   `dl/evaluation/` can score any of them without knowing which it is.
+   `build(config)`, `predict(batch) -> score_map`, and `export(saved_model_dir)`,
+   so `dl/evaluation/` can score any of them without knowing which it is.
 3. **Metrics live in exactly one place** (`dl/evaluation/metrics.py`). If a
    model needs a new metric, it gets added there, once, for all three.
 

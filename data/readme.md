@@ -7,7 +7,7 @@ This dataset contains images of unusual dangers which can be encountered by a ve
 Its purpose is testing autonomous driving perception algorithms in rare but safety-critical circumstances.
 
 The dataset contains images with associated per-pixel labels.
-The labeling has been performed with our [LabelGrab](github.com/cvlab-epfl/LabelGrab) tool. Most frames retain the editor's files and can be further edited; some are missing because the labeling was done at a different resolution and rescaled. 
+The labeling has been performed with our [LabelGrab](https://github.com/cvlab-epfl/LabelGrab) tool. Most frames retain the editor's files and can be further edited; some are missing because the labeling was done at a different resolution and rescaled.
 If you need the editor files and instance labels for all frames, please [contact us](mailto:krzysztof.lis@epfl.ch).
 
 For any additional information, please contact [Krzysztof Lis](mailto:krzysztof.lis@epfl.ch).

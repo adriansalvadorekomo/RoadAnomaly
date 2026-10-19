@@ -1,28 +1,41 @@
-# `frontend/` — anomaly dashboard
+# `frontend/` — landing page and prototype
 
-Owner: **M6**. Next.js (App Router) + Tailwind + shadcn/ui.
+Owner: **M6**.
 
-## What it has to do in three clicks
+Two surfaces, two jobs, one backend:
 
-1. Drop in a road image (or pick one of the 60 bundled examples).
-2. See the anomaly mask overlaid on the image, plus the raw score heatmap.
-3. Compare the three methods side by side, with the numbers from
-   `docs/experiments/` shown next to the picture.
+| Path | Stack | Runs on | Job |
+|---|---|---|---|
+| `landing/` | Astro + Tailwind | **Vercel** | Public project/results page; links to the demo, report and repository |
+| `prototype/` | Streamlit | **Minikube** (or `docker compose`) | Upload/pick a frame, call FastAPI, show overlay/heatmap/scores |
 
-## Screens
-
-| Route | Purpose |
-|---|---|
-| `/` | Landing: what the project does, headline metrics, one example |
-| `/demo` | Upload / pick a sample, run inference, overlay + heatmap |
-| `/compare` | Same frame through all three models, score table |
-| `/about` | Method summary, dataset caveats (ADR-0001), credits |
+The backend is FastAPI in [`backend/`](../backend/). The landing page does **not**
+call the API; it links to the Streamlit prototype. The prototype calls the API
+inside the cluster, so the browser never needs a route to the inference service.
+See [ADR-0006](../docs/adr/0006-astro-and-streamlit-frontend.md).
 
 ## Rules
 
-- **Types come from the API.** Regenerate from the backend's OpenAPI schema;
-  do not hand-write response shapes.
-- **Never fake a result.** If the API is unavailable, say so. A placeholder
-  mask that happens to look plausible is worse than an error state.
-- Sample images are the bundled evaluation frames. They are evaluation data,
-  and the UI says so.
+- **Never fake a result.** If the API is unavailable, the prototype says so. A
+  placeholder mask that happens to look plausible is worse than an error state.
+- **The landing page renders published results only.** Numbers come from
+  `docs/experiments/` at build time and stay out of the page until the
+  experiment file exists. An empty table is the honest default.
+- **The prototype is a client, not a model runtime.** It must not import
+  TensorFlow or load a SavedModel; that is the API's job.
+- **Sample frames are evaluation data.** The bundled RoadAnomaly images are
+  shown for evaluation/demo only; the UI repeats the ADR-0001 caveat and the
+  attribution in [`data/credits.txt`](../data/credits.txt).
+- **The API contract is the OpenAPI schema** at `/docs`. The prototype validates
+  the fields it reads; the landing page has no runtime API types to generate.
+
+## Local commands
+
+```bash
+make landing     # Astro dev server on :4321
+make prototype   # Streamlit on :8501
+```
+
+The Streamlit app reads `API_BASE_URL` (default `http://localhost:8000`).
+`make install` installs `requirements/prototype.txt` alongside the Python
+training and API dependencies.
