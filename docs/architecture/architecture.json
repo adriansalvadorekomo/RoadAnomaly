@@ -2,14 +2,14 @@
   "schema_version": 1,
   "diagram_type": "architecture",
   "meta": {
-    "title": "RoadAnomaly Platform Architecture",
+    "title": "RoadAnomaly Target Architecture",
     "locale": "en",
     "output": "architecture.html",
     "quality_profile": "showcase",
     "views": [
-      { "id": "ml-path", "label": "Deep learning pipeline", "focus": ["normal", "dataset", "preproc", "train", "eval", "registry"], "note": "Normal-road corpora pre-train the models; RoadAnomaly stays a held-out anomaly benchmark." },
-      { "id": "serving-path", "label": "Serving path", "focus": ["registry", "api", "web"], "note": "Exported artifacts load into FastAPI, which serves masks and heatmaps to the dashboard." },
-      { "id": "delivery-path", "label": "Delivery path", "focus": ["cicd", "ghcr", "api"], "note": "CI gates every pull request; version tags publish the images the stack runs." }
+      { "id": "dl-path", "label": "Deep learning pipeline", "focus": ["normal", "dataset", "preproc", "train", "eval", "registry"], "note": "Normal-road corpora pre-train the models; RoadAnomaly stays a held-out anomaly benchmark." },
+      { "id": "serving-path", "label": "Serving path", "focus": ["registry", "api", "web"], "note": "Exported artifacts load into FastAPI on Kubernetes; the Next.js dashboard is deployed to Vercel." },
+      { "id": "delivery-path", "label": "Delivery path", "focus": ["cicd", "ghcr", "api", "web"], "note": "CI gates every pull request; version tags publish images to GHCR and Argo CD syncs the Kubernetes overlay." }
     ]
   },
   "components": [
@@ -19,15 +19,15 @@
     { "id": "train", "type": "backend", "label": "Training", "sublabel": "PyTorch", "pos": [580, 156], "size": [160, 62], "tag": "3 architectures" },
     { "id": "eval", "type": "backend", "label": "Evaluation", "sublabel": "IoU · Dice · F1 · AUPRC", "pos": [830, 156], "size": [170, 62] },
     { "id": "registry", "type": "database", "label": "Model registry", "sublabel": "TorchScript / ONNX", "pos": [1080, 156], "size": [180, 62] },
-    { "id": "api", "type": "backend", "label": "FastAPI inference", "sublabel": ":8000 POST /predict", "pos": [830, 372], "size": [160, 62] },
-    { "id": "web", "type": "frontend", "label": "Next.js dashboard", "sublabel": ":3000 · overlay + heatmap", "pos": [1080, 372], "size": [180, 62] },
+    { "id": "api", "type": "backend", "label": "FastAPI inference", "sublabel": ":8000 POST /predict", "pos": [830, 372], "size": [160, 62], "tag": "K8s target" },
+    { "id": "web", "type": "frontend", "label": "Next.js dashboard", "sublabel": "overlay + heatmap · Vercel", "pos": [1080, 372], "size": [180, 62] },
     { "id": "cicd", "type": "cloud", "label": "GitHub Actions", "sublabel": "CI per PR · CD per tag", "pos": [580, 534], "size": [160, 62] },
-    { "id": "ghcr", "type": "cloud", "label": "GHCR", "sublabel": "pinned image tags", "pos": [830, 534], "size": [160, 62] }
+    { "id": "ghcr", "type": "cloud", "label": "GHCR", "sublabel": "pinned tags · K8s", "pos": [830, 534], "size": [160, 62] }
   ],
   "boundaries": [
     { "kind": "region", "label": "Deep learning pipeline · dl/", "wraps": ["normal", "dataset", "preproc", "train", "eval", "registry"] },
-    { "kind": "region", "label": "Serving stack · docker-compose", "wraps": ["api", "web"] },
-    { "kind": "region", "label": "Delivery · CI/CD", "wraps": ["cicd", "ghcr"] }
+    { "kind": "region", "label": "Serving stack · Compose → Vercel + K8s", "wraps": ["api", "web"] },
+    { "kind": "region", "label": "Delivery · CI/CD + Argo CD", "wraps": ["cicd", "ghcr"] }
   ],
   "connections": [
     { "id": "normal-to-preproc", "from": "normal", "to": "preproc", "label": "pretraining" },
@@ -39,11 +39,11 @@
     { "id": "api-to-web", "from": "api", "to": "web", "label": "mask + heatmap" },
     { "id": "cicd-to-train", "from": "cicd", "to": "train", "label": "smoke test", "variant": "dashed", "fromSide": "top", "toSide": "bottom", "labelAt": [660, 400] },
     { "id": "cicd-to-ghcr", "from": "cicd", "to": "ghcr", "label": "build & push", "variant": "dashed" },
-    { "id": "ghcr-to-api", "from": "ghcr", "to": "api", "label": "deploy", "variant": "dashed", "fromSide": "top", "toSide": "bottom" }
+    { "id": "ghcr-to-api", "from": "ghcr", "to": "api", "label": "deploy · K8s", "variant": "dashed", "fromSide": "top", "toSide": "bottom" }
   ],
   "cards": [
     { "dot": "cyan", "title": "Data", "items": ["60 frames, one anomaly class, eval-only", "14 semantic-only frames in the loader", "CI guards the frame ↔ label contract"] },
     { "dot": "emerald", "title": "Models", "items": ["Autoencoder reconstruction error", "Image resynthesis (Lis et al. 2019)", "Transfer-learned DeepLabv3+ / SegFormer"] },
-    { "dot": "violet", "title": "Platform", "items": ["FastAPI returns mask, heatmap, scores", "Dashboard compares all three methods", "Compose stack pinned to GHCR tags"] }
+    { "dot": "violet", "title": "Platform", "items": ["FastAPI returns mask, heatmap, scores", "Dashboard compares all three methods", "Vercel frontend · K8s + Argo CD"] }
   ]
 }

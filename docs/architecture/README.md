@@ -16,7 +16,12 @@ The high-level picture is generated from
 [`architecture.json`](architecture.json) with
 [archify](https://github.com/tt-a1i/archify); open
 [`architecture.html`](architecture.html) for the interactive version. The PNGs
-embedded in the README are exported from the same spec.
+embedded in the README are exported from the same spec at 2× (2660 × 1368).
+
+The spec is titled **RoadAnomaly Target Architecture**. It labels the serving
+band `Compose → Vercel + K8s` and the delivery band `CI/CD + Argo CD`: compose
+is the local developer path, while Vercel, Kubernetes and Argo CD are the demo
+target. The diagram is a target, not a claim that those components are running.
 
 ## Current architecture (implemented)
 
