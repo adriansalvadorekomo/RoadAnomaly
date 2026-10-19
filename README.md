@@ -556,7 +556,6 @@ RoadAnomaly/
 ├── configs/                run YAML + dataset manifests          (empty; README)
 ├── backend/                FastAPI inference service            (missing — stub)
 ├── frontend/               Astro landing + Streamlit prototype  (missing — READMEs)
-├── prototypes/             intended experimental workflow       (README only)
 ├── tests/
 │   ├── dataset/            frame ↔ label contract (6 tests)     (implemented)
 │   ├── architecture/       spec + promotion rule (6 tests)      (implemented)
