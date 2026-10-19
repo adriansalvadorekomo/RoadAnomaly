@@ -20,4 +20,4 @@
 # --- Large generated artefacts: exclude from language statistics ----------
 data/frames/** linguist-vendored
 assets/*.png linguist-documentation
-docs/assets/*.html linguist-generated
+docs/architecture/*.html linguist-generated

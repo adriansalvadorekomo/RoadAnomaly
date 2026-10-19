@@ -5,7 +5,7 @@
 | `adr/` | Architecture and experiment decisions with the reasoning (start with [0001](adr/0001-evaluation-only-benchmark.md)) |
 | `experiments/` | One file per run set: what was run, with which config, and what came out |
 | `report/` | The technical report (Quarto → PDF/HTML, published to Pages by CD) |
-| `assets/` | Diagram source: `architecture.json` (archify spec) and the generated `architecture.html` |
+| `architecture/` | Component and deployment documentation; `architecture.json` (archify spec) and the generated `architecture.html` |
 
 ## Experiment log convention
 
@@ -37,7 +37,7 @@ bug. The pull request template asks about this explicitly.
 
 ## Diagrams
 
-`assets/architecture.json` is the source of truth for the architecture diagram;
+`architecture/architecture.json` is the source of truth for the architecture diagram;
 `architecture.html` and the PNGs in `/assets` are generated from it. Regenerate
 with the [archify](https://github.com/tt-a1i/archify) skill rather than editing
 the HTML by hand — the HTML is a build artifact.

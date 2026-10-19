@@ -32,9 +32,9 @@ TorchScript/ONNX artifacts load into FastAPI, which returns masks and heatmaps
 to the Next.js dashboard. **Delivery** — GitHub Actions gates every pull
 request and publishes tagged images to GHCR that the compose stack runs.
 
-The diagram is generated from [`docs/assets/architecture.json`](docs/assets/architecture.json)
+The diagram is generated from [`docs/architecture/architecture.json`](docs/architecture/architecture.json)
 with [archify](https://github.com/tt-a1i/archify); open
-[`architecture.html`](docs/assets/architecture.html) for the interactive version
+[`architecture.html`](docs/architecture/architecture.html) for the interactive version
 (pan, zoom, dark mode, guided tours). Regenerate it from the spec rather than
 editing the HTML — the HTML is a build artifact.
 
