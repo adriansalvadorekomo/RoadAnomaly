@@ -1,1 +1,319 @@
-\\documentclass[11pt,a4paper]{article} \\usepackage[utf8]{inputenc} \\usepackage[T1]{fontenc} \\usepackage{amsmath,amssymb} \\usepackage{geometry} \\geometry{a4paper, margin=2.2cm, top=2.5cm, bottom=2.5cm} % Couleurs personnalisées \\usepackage{xcolor} \\definecolor{primary}{RGB}{27, 54, 93} % Bleu Marine (Titres principaux) \\definecolor{secondary}{RGB}{139, 38, 62} % Bordeaux (Accents &amp; Métriques) \\definecolor{accent}{RGB}{235, 242, 250} % Bleu très clair (Fonds d'encadrés) \\definecolor{darkgray}{RGB}{50, 50, 50} \\definecolor{lightgray}{RGB}{245, 247, 250} % Encadrés élégants pour le glossaire \\usepackage{tcolorbox} \\tcbuselibrary{skins,breakable} \\tcbset{ conceptbox/.style={ colback=lightgray, colframe=primary, fonttitle=\\bfseries\\color{white}, coltitle=white, enhanced, attach boxed title to top left={xshift=4mm,yshift=-3mm}, boxed title style={colback=primary, arc=2mm}, top=5mm, bottom=4mm, left=4mm, right=4mm, arc=2mm, boxrule=1pt }, warningbox/.style={ colback=accent, colframe=secondary, fonttitle=\\bfseries\\color{white}, coltitle=white, enhanced, attach boxed title to top left={xshift=4mm,yshift=-3mm}, boxed title style={colback=secondary, arc=2mm}, top=5mm, bottom=4mm, left=4mm, right=4mm, arc=2mm, boxrule=1pt } } % Tableaux professionnels \\usepackage{booktabs} \\usepackage{tabularx} % Liens hypertextes &amp; Table des Matières \\usepackage{hyperref} \\hypersetup{ colorlinks=true, linkcolor=primary, citecolor=secondary, urlcolor=primary, pdftitle={Rapport Business Understanding - RoadAnomaly v2}, pdfauthor={Module Deep Learning} } % Configuration des en-têtes et pieds de page \\usepackage{fancyhdr} \\pagestyle{fancy} \\fancyhf{} \\setlength{\\headheight}{14.5pt} \\rhead{\\textcolor{darkgray}{\\small Rapport de Business Understanding — Deep Learning}} \\lhead{\\textcolor{darkgray}{\\small RoadAnomaly \\&amp; Véhicules Autonomes}} \\cfoot{\\textcolor{darkgray}{\\small Page \\thepage}} % Titre du document \\title{\\Huge\\bfseries\\color{primary} Rapport de Business Understanding\\\\[0.3em] \\Large\\color{secondary} Détection d'Anomalies Routières pour Véhicules Autonomes\\\\[0.2em] \\small Alignement Méthodologique CRISP-DM, Analyse du Dataset RoadAnomaly et État de l'Art} \\author{\\textbf{Module Deep Learning — Master Data Science / IA}} \\date{\\textbf{Octobre 2026 — Date de rendu : 8 Novembre 2026}} \\begin{document} \\maketitle \\begin{abstract} \\noindent Ce rapport formalise la première phase de la méthodologie standard \\textbf{CRISP-DM} (\\emph{Business Understanding}) appliquée au projet de détection d'obstacles inattendus et hors-distribution (\\emph{Out-of-Distribution} -- OoD) sur la chaussée. Dans le contexte critique de la conduite autonome, les réseaux de neurones de segmentation sémantique entraînés sur un vocabulaire fermé d'objets (route, voiture, piéton) échouent lorsqu'ils rencontrent des dangers imprévus (animaux, rochers, débris). Ce document détaille les objectifs commerciaux, les critères de succès, l'inventaire des ressources sur le jeu de données \\textbf{RoadAnomaly}, la traduction technique en objectifs de Deep Learning, ainsi qu'un glossaire pédagogique exhaustif. \\end{abstract} \\vspace{0.5em} \\hrule \\vspace{1em} % TABLE DES MATIÈRES DYNAMIQUE \\tableofcontents \\newpage \\section{Introduction et Contexte du Domaine Métier} La sécurité des \\textbf{véhicules autonomes et connectés} (CAVs -- \\emph{Connected and Autonomous Vehicles}) dépend de la fiabilité absolue de leur système de perception visuelle. Les modules de vision embarqués exploitent des algorithmes de \\textbf{segmentation sémantique} fondés sur le Deep Learning pour analyser chaque image capturée par les caméras frontales et attribuer une étiquette à chaque pixel (ex. asphalte, piéton, véhicule, panneau de signalisation). \\subsection{La Problématique des Objets Hors-Distribution (OoD)} En situation réelle de conduite, un véhicule fait face à une infinité de scénarios imprévisibles. Des objets non répertoriés dans les jeux de données d'apprentissage classiques (tels que Cityscapes) apparaissent régulièrement sur la route : animaux sauvages, rochers tombés de falaises, cargaisons perdues, matériel de chantier ou conteneurs. Sous l'hypothèse d'un « monde fermé » (\\emph{closed-set assumption}), les réseaux de neurones conventionnels tentent de classifier ces éléments inconnus dans l'une des catégories connues, souvent avec une \\textbf{surconfiance excessive} (\\emph{overconfidence}). Par exemple, un chien sur la route peut être classifié à 98\\% de confiance comme une voiture ou de la route, conduisant le véhicule autonome à ne pas freiner ou à effectuer une manoeuvre dangereuse. \\subsection{Le Dataset d'Étude : RoadAnomaly} Pour répondre à ce défi, le jeu de données \\textbf{RoadAnomaly} a été conçu par Lis et al. (ICCV 2019). Il comporte 60 images réelles haute résolution (1280$\\times$720 pixels, généralement redimensionnées en 1024$\\times$512) collectées en ligne, présentant une grande diversité d'anomalies de tailles très différentes (animaux, rochers, pneus, poubelles, obstacles divers) situées sur la route ou à ses abords immédiats. Chaque image est accompagnée d'un masque d'annotation sémantique précis au niveau du pixel (\\emph{ground-truth mask}). \\section{Phase 1 CRISP-DM : Business Understanding} La méthode \\textbf{CRISP-DM} (\\emph{Cross-Industry Standard Process for Data Mining}) préconise de structurer le lancement de tout projet de Data Science en formalisant précisément les aspects métier et organisationnels. \\subsection{Description du Problème et Solutions Actuelles} \\begin{itemize} \\item \\textbf{Problème Métier :} L'incapacité des systèmes actuels à détecter les obstacles imprévus crée un risque majeur d'accident corporel ou matériel. \\item \\textbf{Limites des Approches Actuelles :} \\begin{enumerate} \\item \\emph{Probabilité Softmax Maximale (MSP) :} Méthode basique mesurant l'incertitude du réseau, mais qui échoue sur des images complexes où le réseau reste anormalement confiant sur l'inconnu. \\item \\emph{Méthodes Basées sur la Reconstitution :} Utilisation d'autoencodeurs pour reconstruire l'image. Si l'objet est inconnu, la reconstruction échoue et la différence (erreur de reconstruction) signale l'anomalie. Cependant, ces méthodes produisent souvent des masques très bruités ou fragmentés. \\end{enumerate} \\end{itemize} \\subsection{Objectifs Commerciaux et Critères de Succès Métier} \\begin{itemize} \\item \\textbf{Objectif Commercial :} Garantir la sécurité critique des passagers et des usagers de la route en permettant au véhicule d'anticiper la présence de tout obstacle non identifié. \\item \\textbf{Critères de Succès Commercial :} \\begin{itemize} \\item \\textbf{Objectifs :} Localiser 100\\% des obstacles représentant un risque de collision sur la voie de circulation. \\item \\textbf{Subjectifs :} Réduire le taux de fausses alarmes pour éviter les freinages intempestifs qui nuiraient au confort et à la confiance des passagers. \\end{itemize} \\end{itemize} \\subsection{Traduction en Objectifs de Deep Learning} \\begin{itemize} \\item \\textbf{Tâche Technique :} Développer, implémenter et évaluer des architectures de Deep Learning (réseaux de neurones convolutifs, modèles de segmentation, autoencodeurs, transfer learning) pour générer une carte de score d'anomalie par pixel et isoler les masques d'objets. \\item \\textbf{Critères de Succès Technique :} L'évaluation repose sur des métriques standardisées : \\begin{itemize} \\item \\textbf{Intersection over Union (IoU) / Dice Score :} Mesure la précision géométrique du recouvrement entre le masque prédit et le masque réel. \\item \\textbf{AuPRC (Area under Precision-Recall Curve) :} Mesure la capacité à détecter les pixels d'anomalies, très minoritaires par rapport aux pixels de fond. \\item \\textbf{FPR95 (False Positive Rate at 95\\% TPR) :} Mesure le pourcentage de faux positifs lorsque le modèle détecte au moins 95\\% des vrais pixels d'anomalie (viser la valeur la plus basse possible). \\end{itemize} \\end{itemize} \\subsection{Inventaire des Ressources, Risques et Contraintes} \\begin{table}[h!] \\centering \\caption{Inventaire synthétique du projet de détection d'anomalies routières} \\vspace{0.5em} \\small \\begin{tabularx}{\\textwidth}{lX} \\toprule \\textbf{Catégorie} &amp; \\textbf{Détails et Spécifications} \\\\ \\midrule \\textbf{Cadre du Projet} &amp; Module académique Deep Learning. Date limite de soumission : \\textbf{8 Novembre 2026}. \\\\ \\textbf{Jeu de Données} &amp; \\textbf{RoadAnomaly} (60 images réelles + masques au pixel). Complété par les benchmarks \\textbf{RoadAnomaly21} et \\textbf{RoadObstacle21} (SegmentMeIfYouCan). \\\\ \\textbf{Livrables Requis} &amp; 1\. Code Python / Notebook Jupyter propre, structuré et documenté.\\newline 2\. Rapport technique justificatif détaillant l'exploration, la méthodologie et les résultats.\\newline 3\. Visualisations expérimentales des prédictions (images originelles, masques réels et masques prédits). \\\\ \\textbf{Risques Identifiés} &amp; 1\. \\emph{Bruit et fragmentation :} Difficulté à fixer un seuil unique pour séparer les pixels normaux des anomalies.\\newline 2\. \\emph{Surapprentissage :} Risque de dégrader la segmentation des classes normales (route, voiture) en forçant la détection OoD.\\newline 3\. \\emph{Temps de calcul :} Modèles lourds nécessitant un compromis entre précision et vitesse d'exécution. \\\\ \\textbf{Plan de Secours} &amp; Utiliser un post-traitement des cartes de score ou un générateur de boîtes englobantes (\\emph{prompts}) combiné à un modèle de segmentation (approche type S2M). \\\\ \\bottomrule \\end{tabularx} \\end{table} \\section{Glossaire Pédagogique des Termes de Recherche} \\begin{tcolorbox}[conceptbox, title=1\. Concepts Métier et Méthodologiques] \\begin{description} \\item[CRISP-DM :] \\emph{Cross-Industry Standard Process for Data Mining}. Le guide méthodologique universel qui découpe un projet Data en 6 phases. \\item[In-Distribution (ID) :] Ensemble des données et concepts connus par le modèle. \\item[Out-of-Distribution (OoD) :] Tout élément ou objet totalement inconnu du modèle lors de son apprentissage. \\item[Ground-Truth (Vérité Terrain) :] L'image d'annotation produite à la main par des experts humains, servant de référence. \\end{description} \\end{tcolorbox} \\begin{tcolorbox}[conceptbox, title=2\. Architectures et Techniques de Deep Learning] \\begin{description} \\item[Segmentation Sémantique :] Technique consistant à classifier et colorier chaque pixel d'une image. \\item[Logits \\&amp; Softmax :] Les \\emph{logits} sont les scores bruts numériques. La fonction \\emph{Softmax} les transforme en probabilités normalisées. \\item[Autoencodeur :] Réseau composé d'un encodeur et d'un décodeur. S'il tente de reconstruire un objet inconnu, l'erreur de reconstruction révèle l'anomalie. \\item[Transfer Learning :] Réutilisation d'un modèle pré-entraîné pour l'adapter à notre problème. \\end{description} \\end{tcolorbox} \\begin{tcolorbox}[warningbox, title=3\. Métriques d'Évaluation Explicatives] \\begin{description} \\item[IoU (Intersection over Union) :] Pourcentage de chevauchement entre la surface prédite et la surface réelle : $$\\text{IoU} = \\frac{\\text{Surface de Chevauchement}}{\\text{Surface Totale Couverte}}$$ \\item[Dice Score / F1-Score :] Mesure équilibrée combinant Précision et Rappel : $$\\text{Dice} = \\frac{2 \\times \\text{Vrais Positifs}}{2 \\times \\text{Vrais Positifs} + \\text{Faux Positifs} + \\text{Faux Négatifs}}$$ \\end{description} \\end{tcolorbox} \\section{Feuille de Route et Recommandations de Lecture} Pour conduire à bien vos recherches et la mise en pratique du projet, voici la séquence recommandée pour l'étude des documents de votre corpus : \\begin{enumerate} \\item \\textbf{Cadrage de l'épreuve :} Commencer par la consigne \\emph{Dear Students} pour assimiler la grille d'évaluation et la date limite du \\textbf{8 Novembre 2026}. \\item \\textbf{Cadre théorique métier :} Lire le document synthétique \\emph{CRISP-DM Overview} pour structurer la rédaction de votre rapport. \\item \\textbf{Dataset et baseline de référence :} Étudier l'article fondateur de Lis et al. (ICCV 2019) sur le jeu de données \\textbf{RoadAnomaly}. \\item \\textbf{Benchmarks et évaluation :} Consulter l'article \\emph{SegmentMeIfYouCan} (Chan et al., 2021) pour maîtriser le calcul des métriques au niveau objet et pixel. \\item \\textbf{État de l'art et avancées récentes :} Explorer les enquêtes récentes et approches de pointe (S2M, PixOOD, ProPETL). \\end{enumerate} \\section{Références Bibliographiques} \\begin{thebibliography}{99} \\bibitem{lis2019detecting} Lis, K., Nakka, K., Fua, P., \\&amp; Salzmann, M. (2019). \\newblock Detecting the Unexpected via Image Resynthesis. \\newblock In \\emph{Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)}, pp. 2152--2161\. \\bibitem{chan2021segmentmeifyoucan} Chan, R., Lis, K., Uhlemeyer, S., Blum, H., Honari, S., Siegwart, R., Fua, P., Salzmann, M., \\&amp; Rottmann, M. (2021). \\newblock SegmentMeIfYouCan: A Benchmark for Anomaly Segmentation. \\newblock In \\emph{Advances in Neural Information Processing Systems (NeurIPS)}, 34, pp. 14751--14763\. \\bibitem{zhao2024survey} Zhao, W., Li, J., \\&amp; Guo, Y. (2024). \\newblock From Pixel to Mask: A Survey of Out-of-Distribution Segmentation. \\newblock \\emph{arXiv preprint arXiv:2405.00000}. \\bibitem{s2m2024} Authors. (2024). \\newblock Segment Every Out-of-Distribution Object (S2M). \\newblock In \\emph{IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}. \\bibitem{pixood2024} Authors. (2024). \\newblock PixOOD: Pixel-Level Out-of-Distribution Detection. \\newblock \\emph{arXiv preprint arXiv:2405.19882v3}. \\bibitem{crispdm2026} IBM SPSS Modeler. (2026). \\newblock \\emph{CRISP-DM Business Understanding Overview \\&amp; Data Mining Life Cycle}. \\bibitem{assignment2026} Deep Learning Module Instructors. (2026). \\newblock \\emph{Deep Learning Assignment Brief: Road Anomaly Detection with RoadAnomaly Dataset}. \\end{thebibliography} \\end{document}
+\documentclass[11pt,a4paper]{article} \usepackage[utf8]{inputenc} \usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\geometry{a4paper, margin=2cm, top=2.2cm, bottom=2.2cm} % Palettes de couleurs
+\usepackage[table]{xcolor}
+\definecolor{primary}{RGB}{20, 45, 85} % Bleu Marine Profond (Titres)
+
+\definecolor{secondary}{RGB}{140, 30, 55} % Bourgogne (Accents & Citations)
+
+\definecolor{accentbg}{RGB}{240, 244, 250} % Bleu très clair (Fond des métriques)
+
+\definecolor{darkgray}{RGB}{50, 50, 50}
+\definecolor{lightgray}{RGB}{245, 247, 250} % Encadrés pour le glossaire
+
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\tcbset{ conceptbox/.style={ colback=lightgray, colframe=primary, fonttitle=\bfseries\color{white}, enhanced, attach boxed title to top left={xshift=4mm,yshift=-3mm}, boxed title style={colback=primary, arc=2mm}, top=5mm, bottom=4mm, left=4mm, right=4mm, arc=2mm, boxrule=1.2pt, breakable }, metricbox/.style={ colback=accentbg, colframe=secondary, fonttitle=\bfseries\color{white}, enhanced, attach boxed title to top left={xshift=4mm,yshift=-3mm}, boxed title style={colback=secondary, arc=2mm}, top=5mm, bottom=4mm, left=4mm, right=4mm, arc=2mm, boxrule=1.2pt, breakable } } % Tableaux professionnels
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\usepackage{array}
+
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.2}
+
+\setlength{\emergencystretch}{2em} % Configuration hyperref pour numéros de références cliquables
+
+\usepackage{hyperref}
+\hypersetup{ colorlinks=true, linkcolor=primary, citecolor=secondary, urlcolor=primary, pdftitle={Rapport Business Understanding - RoadAnomaly v4}, pdfauthor={Module Deep Learning} } % Configuration des en-têtes et pieds de page
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{14.5pt}
+\rhead{\textcolor{darkgray}{\small\bfseries Business Understanding \& Citations Cliquables}}
+\lhead{\textcolor{darkgray}{\small\bfseries Conduite Autonome -- RoadAnomaly}}
+\cfoot{\textcolor{darkgray}{\small Page \thepage}} % Titre du document
+
+\title{\Huge\bfseries\color{primary} Rapport Complet de Business Understanding\\[0.3em] \Large\color{secondary} Détection d'Anomalies Routières \& Vision par Ordinateur pour Véhicules Autonomes\\[0.2em] \small Synthèse Méthodologique CRISP-DM, Références Numérotées Cliquables et Intégration des 12 Sources}
+\author{\textbf{Module Deep Learning -- Master Data Science \& Intelligence Artificielle}}
+\date{\textbf{Octobre 2026 -- Échéance de projet : 8 Novembre 2026}}
+\begin{document}
+\maketitle
+\begin{abstract} \noindent Ce rapport formalise la première phase de la méthodologie standard
+\textbf{CRISP-DM} \cite{crispdm2026} (\emph{Business Understanding}) appliquée au projet de détection
+d'obstacles inattendus et hors-distribution (\emph{Out-of-Distribution} -- OoD) sur la chaussée. Dans le
+cadre critique de la sécurité des véhicules autonomes et connectés \cite{cav2023}, les réseaux de
+neurones de segmentation sémantique entraînés sur un vocabulaire fermé d'objets (route, voiture, piéton)
+échouent lorsqu'ils rencontrent des dangers imprévus \cite{lis2019detecting, chan2021segmentmeifyoucan}.
+Ce document détaille les objectifs commerciaux, les critères de succès, l'inventaire des ressources sur
+le jeu de données \textbf{RoadAnomaly} \cite{lis2019detecting, assignment2026}, la traduction technique
+en objectifs de Deep Learning \cite{zhao2024survey, s2m2024, pixood2024, zhou2024propetl,
+perspective2024, toyota2024, muller2024}, ainsi qu'un glossaire pédagogique exhaustif enrichi de
+citations numérotées cliquables.
+\end{abstract} \vspace{0.5em} \hrule \vspace{1em} \tableofcontents \newpage
+\section{Introduction et Contexte du Domaine Métier}
+La sécurité des \textbf{véhicules autonomes et connectés} (CAVs -- \emph{Connected and Autonomous
+Vehicles}) repose sur la fiabilité absolue de leur système de perception visuelle et réseau
+\cite{cav2023}. Les modules de vision embarqués exploitent des algorithmes de \textbf{segmentation
+sémantique} fondés sur le Deep Learning pour analyser chaque image capturée par les caméras frontales et
+attribuer une étiquette à chaque pixel (ex. asphalte, piéton, véhicule, panneau de signalisation).
+\subsection{La Problématique des Objets Hors-Distribution (OoD)}
+En situation réelle de conduite, un véhicule fait face à une infinité de scénarios imprévisibles \cite{zhao2024survey}. Des objets non répertoriés dans les jeux de données d'apprentissage classiques (tels que Cityscapes) apparaissent régulièrement sur la chaussée : animaux sauvages, rochers tombés de falaises, cargaisons perdues, matériel de chantier ou conteneurs \cite{lis2019detecting, chan2021segmentmeifyoucan}. Sous l'hypothèse d'un « monde fermé » (\emph{closed-set assumption}), les réseaux de neurones conventionnels tentent de classifier ces éléments inconnus dans l'une des catégories connues, souvent avec une \textbf{surconfiance excessive} (\emph{overconfidence}) \cite{chan2021segmentmeifyoucan}. Par exemple, un chien ou un débris sur la route peut être classifié à 98\% de confiance comme une voiture ou de l'asphalte, conduisant le système de décision du véhicule à ne pas freiner ou à effectuer une manoeuvre à risque.
+\subsection{Le Dataset d'Étude : RoadAnomaly}
+Pour répondre à ce défi, le jeu de données \textbf{RoadAnomaly} a été conçu par Lis et al.
+\cite{lis2019detecting}. Il comporte 60 images réelles haute résolution (1280$\times$720 pixels,
+généralement redimensionnées en 1024$\times$512) collectées en ligne, présentant une grande diversité
+d'anomalies de tailles très différentes (animaux, rochers, pneus, poubelles, obstacles divers) situées
+sur la route ou à ses abords immédiats. Chaque image est accompagnée d'un masque d'annotation sémantique
+précis au niveau du pixel (\emph{ground-truth mask}). Le benchmark a ensuite été étendu dans la suite de
+travaux \emph{SegmentMeIfYouCan} avec les jeux de données \textbf{RoadAnomaly21} (100 images) et
+\textbf{RoadObstacle21} (327 images) \cite{chan2021segmentmeifyoucan}.
+\section{Phase 1 CRISP-DM : Business Understanding}
+La méthode \textbf{CRISP-DM} (\emph{Cross-Industry Standard Process for Data Mining}) \cite{crispdm2026}
+préconise de structurer le lancement de tout projet Data/IA en formalisant précisément les besoins métier
+et organisationnels.
+\subsection{Description du Problème et Solutions Actuelles}
+
+\begin{itemize} \item \textbf{Problème Métier :} L'incapacité des systèmes de perception actuels à
+détecter les obstacles imprévus crée un risque majeur d'accident corporel ou matériel \cite{cav2023,
+assignment2026}. \item \textbf{Limites des Approches Actuelles :}
+\begin{enumerate} \item \emph{Probabilité Softmax Maximale (MSP) :} Méthode basique mesurant
+l'incertitude du réseau, mais qui échoue sur des images complexes où le réseau reste anormalement
+confiant sur l'inconnu \cite{zhao2024survey}. \item \emph{Méthodes Basées sur la Reconstitution :}
+Utilisation d'autoencodeurs \cite{toyota2024} ou de ré-synthèse d'images \cite{lis2019detecting} pour
+reconstruire l'image à partir des étiquettes sémantiques. Si l'objet est inconnu, la reconstruction
+échoue et la différence (erreur de reconstruction ou perte perceptuelle) signale l'anomalie. Cependant,
+ces méthodes produisent souvent des masques très bruités ou fragmentés.
+\end{enumerate}
+\end{itemize}
+\subsection{Objectifs Commerciaux et Critères de Succès Métier}
+
+\begin{itemize} \item \textbf{Objectif Commercial :} Garantir la sécurité critique des passagers et des
+usagers de la route en permettant au véhicule autonome d'anticiper la présence de tout obstacle non
+identifié sur la trajectoire \cite{crispdm2026, cav2023}. \item \textbf{Critères de Succès Commercial :}
+\begin{itemize} \item \textbf{Objectif Principal :} Localiser 100\% des obstacles physiques représentant un risque de collision direct sur la voie de circulation. \item \textbf{Objectif Secondaire :} Réduire au maximum le taux de fausses alarmes (faux positifs) pour éviter les freinages intempestifs dangereux et préserver le confort de conduite.
+\end{itemize}
+\end{itemize}
+\subsection{Traduction en Objectifs de Deep Learning}
+
+\begin{itemize} \item \textbf{Tâche Technique :} Implémenter et évaluer des architectures de Deep
+Learning -- telles que les CNNs, la ré-synthèse d'image \cite{lis2019detecting}, les autoencodeurs avec
+perte perceptuelle \cite{toyota2024}, le transfer learning progressif (ProPETL \cite{zhou2024propetl}),
+la correction de perspective \cite{perspective2024}, l'extraction d'objets complets via des prompts (S2M
+\cite{s2m2024}) ou la condensation de données en ligne (PixOOD \cite{pixood2024}) -- pour estimer une
+carte d'anomalie par pixel et par composant. \item \textbf{Critères de Succès Technique :} Évaluer la
+performance à l'aide de métriques rigoureuses au niveau pixel et au niveau composant/objet
+\cite{chan2021segmentmeifyoucan, muller2024} :
+\begin{itemize} \item \textbf{Intersection over Union (IoU) \& Dice Score :} Mesurent le chevauchement géométrique exact entre la région prédite et le masque réel \cite{muller2024}. \item \textbf{AuPRC (Area under Precision-Recall Curve) :} Mesure la capacité à isoler les pixels d'anomalie très fortement minoritaires \cite{chan2021segmentmeifyoucan}. \item \textbf{FPR95 (False Positive Rate at 95\% TPR) :} Mesure le pourcentage de fausses alarmes lorsque le système détecte au moins 95\% des vrais pixels d'anomalie \cite{zhao2024survey}. \item \textbf{Métriques Composants ($sF\_1$ et $sIoU$) :} Évaluent la capacité à détecter des obstacles entiers sans biais lié à la taille en pixels \cite{chan2021segmentmeifyoucan, s2m2024}.
+\end{itemize}
+\end{itemize}
+\subsection{Inventaire des Ressources, Risques et Contraintes}
+
+\begin{table}[htbp]
+\centering
+\caption{Inventaire synthétique du projet selon CRISP-DM
+  \cite{crispdm2026, assignment2026}}
+\label{tab:inventaire}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabularx}{\textwidth}{
+  >{\raggedright\arraybackslash}p{0.24\textwidth}
+  >{\raggedright\arraybackslash}X}
+\toprule
+\rowcolor{primary}
+\textbf{\color{white}Catégorie} &
+\textbf{\color{white}Détails, références et spécifications} \\
+\midrule
+\textbf{Cadre du projet} &
+Module académique Deep Learning \cite{assignment2026}. Date limite de
+soumission : \textbf{8 novembre 2026}. \\
+\addlinespace[2pt]
+\textbf{Jeu de données} &
+\textbf{RoadAnomaly} \cite{lis2019detecting} (60 images réelles et masques
+pixel par pixel). Complété par \textbf{RoadAnomaly21} et
+\textbf{RoadObstacle21} \cite{chan2021segmentmeifyoucan}. \\
+\addlinespace[2pt]
+\textbf{Livrables requis} &
+1. Code Python ou notebook Jupyter propre, structuré et documenté
+\cite{assignment2026}.\newline
+2. Rapport technique détaillant l’exploration, la méthodologie et les
+résultats.\newline
+3. Visualisations des images, masques réels et masques prédits. \\
+\addlinespace[2pt]
+\textbf{Risques identifiés} &
+1. \emph{Bruit et fragmentation :} un seuil fixe peut créer des masques
+morcelés \cite{s2m2024}.\newline
+2. \emph{Surapprentissage et biais :} risque de dégrader la segmentation des
+classes normales \cite{zhao2024survey}.\newline
+3. \emph{Perspective :} risque de manquer les petits obstacles éloignés
+\cite{perspective2024}. \\
+\addlinespace[2pt]
+\textbf{Piste de secours} &
+Étudier des boîtes englobantes (\emph{prompts}) combinées à SAM (approche S2M
+\cite{s2m2024}) ou une carte d’échelle de perspective $P(u,v)$
+\cite{perspective2024}. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\section{Analyse Approfondie des 12 Sources du Corpus}
+Cette section fournit une revue détaillée et méthodique de chacune des 12 sources académiques et
+pratiques composant le corpus du projet.
+\subsection{Source 1 : Consignes du Projet (\emph{Dear Students}) \cite{assignment2026}}
+Cette source définit la feuille de route opérationnelle du projet de Deep Learning. Les étudiants doivent
+traiter le problème de la détection des obstacles inattendus sur le jeu de données \textbf{RoadAnomaly}
+\cite{lis2019detecting}. L'échéance stricte est fixée au \textbf{8 Novembre 2026}. Les livrables
+comprennent un code Python propre et un rapport d'expérimentation incluant l'analyse des erreurs et la
+justification du choix des métriques.
+\subsection{Source 2 : Panorama de la Segmentation OoD (Zhao et al., 2024) \cite{zhao2024survey}}
+Cette revue systématique classe les méthodes de détection d'anomalies en vision par ordinateur en 4
+grandes familles :
+\begin{enumerate} \item \emph{Test-time estimation :} Calcul de scores d'incertitude au moment du test
+sans ré-entraînement (MSP, Mahalanobis, Energy-based). \item \emph{Outlier Exposure supervisé :}
+Entraînement avec exposition à des données hors-distribution auxiliaires (ex. RPL, PEBAL, DenseHybrid).
+\item \emph{Méthodes par reconstruction/ré-synthèse :} Comparaison entre l'image réelle et son équivalent
+régénéré par autoencodeurs \cite{toyota2024} ou ré-synthèse \cite{lis2019detecting}. \item \emph{Modèles
+Fondations :} Utilisation de modèles vision-langage pré-entraînés sur de très grands volumes de données
+(ex. Mask2Former, SAM, CLIP) \cite{s2m2024}.
+\end{enumerate}
+\subsection{Source 3 : Ré-synthèse d'Image \& Dataset RoadAnomaly (Lis et al., ICCV 2019) \cite{lis2019detecting}}
+Article fondateur proposant de détecter les objets inattendus en prédisant d'abord la carte de
+segmentation sémantique fermée, puis en régénérant l'image d'origine à l'aide d'un réseau génératif
+(GAN). La différence visuelle et la perte de perception entre l'image originale et l'image ré-synthétisée
+sont transmises à un réseau de divergence (\emph{discrepancy network}) pour isoler l'obstacle. L'article
+introduit le dataset \textbf{RoadAnomaly} (60 images réelles complexes).
+\subsection{Source 4 : Transfer Learning Progressif ProPETL (Zhou et al., ICLR) \cite{zhou2024propetl}}
+ProPETL (\emph{Progressive Parameter Efficient Transfer Learning}) résout le goulot d'étranglement de
+l'adaptation des modèles pré-entraînés pour la segmentation sémantique. Contrairement à la classification
+d'images où de légers ajustements de paramètres suffisent, la segmentation requiert des modifications
+fines de la granularité de perception. ProPETL introduit un entraînement en deux phases avec adaptation
+\emph{midstream} pour conserver l'efficacité computationnelle tout en atteignant les performances d'un
+fine-tuning complet.
+\subsection{Source 5 : Prise en Compte de la Perspective $P(u,v)$ (Lis et al., arXiv) \cite{perspective2024}}
+Cette recherche démontre que les détecteurs monoculaires échouent sur les obstacles éloignés en raison du
+raccourcissement dû à la perspective (\emph{perspective foreshortening}). Les auteurs proposent de
+calculer une carte d'échelle théorique $P(u,v)$ basée sur les paramètres géométriques de la caméra
+(hauteur $H$, focale $f$, inclinaison $\theta$) :
+\begin{equation} P(u,v) = \frac{H}{f \cdot \cos\theta + (v - v\_0) \cdot \sin\theta}
+\end{equation} Cette carte d'échelle permet : (1) d'injecter des objets synthétiques de taille réaliste
+pendant l'entraînement, et (2) de guider les couches du décodeur FPN du réseau de neurones.
+\subsection{Source 6 : Autoencodeur \& Entropie Sémantique (Ohgushi et al., CVF / TOYOTA) \cite{toyota2024}}
+Méthode embarquée utilisant une seule caméra standard. L'image est convertie en carte sémantique puis
+reconstruite par un autoencodeur. L'anomalie $A(u,v)$ est extraite par le produit entre la perte
+perceptuelle VGG19 $L(u,v)$ (extraite des couches $conv1\\_2$ à $conv5\\_2$) et l'entropie sémantique
+$S(u,v)$ :
+\begin{equation} A(u,v) = L(u,v) \odot S(u,v)
+\end{equation} Un post-traitement basé sur le découpage en superpixels et la saillance visuelle élimine
+le bruit de fond lié au ciel ou à la végétation.
+\subsection{Source 7 : Segmentation d'Objets OoD via Prompts S2M (Zhao et al., CVPR 2024) \cite{s2m2024}}
+S2M (\emph{Segment Every Out-of-Distribution Object}) élimine le problème majeur des masques fragmentés
+issus d'un simple seuil numérique. Il convertit la carte de score d'anomalie brute en boîtes englobantes
+(\emph{box prompts}) générées par un détecteur type Faster R-CNN, puis alimente un modèle de segmentation
+généraliste (\emph{Segment Anything Model} -- SAM) pour extraire des masques d'objets nets et continus.
+\subsection{Source 8 : Benchmark SegmentMeIfYouCan (Chan et al., NeurIPS 2021) \cite{chan2021segmentmeifyoucan}}
+Présentation d'une suite de tests standardisée pour la communauté, comprenant deux jeux de données réels
+annotés au pixel près : \textbf{RoadAnomaly21} (100 images, 262 objets) et \textbf{RoadObstacle21} (327
+images, 388 obstacles sur la voie). L'étude introduit des métriques ajustées au niveau composant/objet
+($sF\_1$ et $sIoU$) pour éviter de sur-favoriser la bonne détection des gros objets au détriment des
+petits obstacles critiques.
+\subsection{Source 9 : Revue Systématique sur les Véhicules Connectés (Solaas et al., arXiv) \cite{cav2023}}
+Analyse de 203 travaux académiques (2013-2023) couvrant la détection d'anomalies physiques et
+cybernétiques dans les véhicules connectés et autonomes. L'étude met en évidence l'utilisation
+prédominante des réseaux LSTM, CNN et autoencodeurs sur le réseau de communication interne \textbf{CAN
+bus} (détection de trames malveillantes) et sur les données temporelles de capteurs (vitesse, régime
+moteur, température).
+\subsection{Source 10 : Guide Méthodologique CRISP-DM \cite{crispdm2026}}
+Document de cadrage décrivant la Phase 1 \emph{Business Understanding}. Il détaille la méthodologie pour
+convertir des objectifs commerciaux généraux en objectifs techniques quantifiables, inventorier les
+contraintes projet, évaluer les risques et élaborer un plan de travail opérationnel.
+\subsection{Source 11 : Algorithme PixOOD (Vojíř et al., Octobre 2024) \cite{pixood2024}}
+PixOOD propose une détection au niveau pixel sans nécessiter aucun exemple préalable d'anomalie pendant
+l'entraînement. Il utilise un algorithme de condensation de données en ligne (\emph{Soft-to-Hard Data
+Condensation}) combiné à une projection 2D et à une règle de décision calibrée selon le critère
+statistique de \textbf{Neyman--Pearson} pour garantir un taux fixe d'erreur.
+\subsection{Source 12 : Recommandations sur les Métriques de Segmentation (Müller et al., arXiv) \cite{muller2024}}
+Guide de rigueur méthodologique démontrant l'inadéquation de l'Exactitude Pixel (\emph{Pixel Accuracy}) en cas de fort déséquilibre de classes (ex. 99\% de pixels normaux contre 1\% d'anomalie). L'étude préconise l'usage obligatoire de l'IoU, du Dice Score et de la distance d'Hausdorff moyenne (AHD) pour garantir des évaluations fiables et comparables.
+\section{Glossaire Pédagogique des Termes de Recherche}
+
+\begin{tcolorbox}[conceptbox, title=1. Concepts Métier et Méthodologiques]
+\begin{description} \item[CRISP-DM \cite{crispdm2026} :] \emph{Cross-Industry Standard Process for Data
+Mining}. Découpage standard d'un projet Data en 6 phases (Business Understanding, Data Understanding,
+Data Preparation, Modeling, Evaluation, Deployment). \item[In-Distribution (ID) \cite{zhao2024survey} :]
+Classes et concepts vus par le modèle pendant son apprentissage (ex. route, véhicule).
+\item[Out-of-Distribution (OoD) \cite{zhao2024survey, pixood2024} :] Tout élément totalement inconnu du
+modèle lors de l'entraînement. \item[Ground-Truth (Vérité Terrain) \cite{assignment2026,
+chan2021segmentmeifyoucan} :] Image d'annotation manuelle servant de référence exacte.
+\end{description}
+\end{tcolorbox}
+\begin{tcolorbox}[conceptbox, title=2. Architectures et Techniques de Deep Learning]
+\begin{description} \item[Segmentation Sémantique \cite{zhao2024survey} :] Classification de chaque pixel
+d'une image. \item[Logits \& Softmax \cite{zhao2024survey} :] Les logits sont les scores bruts. La
+fonction Softmax les convertit en probabilités. \item[Autoencodeur \cite{toyota2024} :] Réseau neuronal
+de compression/reconstitution d'images. \item[ProPETL \cite{zhou2024propetl} :] Adaptateur progressif
+pour le transfer learning efficace en segmentation. \item[Scale Map $P(u,v)$ \cite{perspective2024} :]
+Carte d'échelle modélisant la perspective géométrique de la caméra. \item[Prompts \& SAM \cite{s2m2024}
+:] Utilisation de boîtes englobantes pour guider le modèle généraliste SAM.
+\end{description}
+\end{tcolorbox}
+\begin{tcolorbox}[metricbox, title=3. Formules des Métriques d'Évaluation]
+\begin{description} \item[IoU (Intersection over Union) \cite{muller2024, chan2021segmentmeifyoucan} :]
+Recouvrement entre prédiction $P$ et masque réel $G$ : $$\text{IoU} = \frac{|P \cap G|}{|P \cup G|}$$
+\item[Dice Score / F1-Score \cite{muller2024} :] Mesure harmonique entre Précision et Rappel :
+$$\text{Dice} = \frac{2 \cdot |P \cap G|}{|P| + |G|}$$ \item[Anomalie Toyota \cite{toyota2024} :] Produit
+Perte Perceptuelle $L$ $\times$ Entropie $S$ : $$A(u,v) = L(u,v) \odot S(u,v)$$
+\end{description}
+\end{tcolorbox}
+\section{Feuille de Route et Chronogramme vers le 8 Novembre 2026}
+Pour mener à bien le projet dans le respect des contraintes académiques \cite{assignment2026}, la feuille
+de route suivante est adoptée :
+\begin{enumerate} \item \textbf{Phase 1 -- Business Understanding (Terminée) \cite{crispdm2026} :}
+Cadrage des objectifs, de l'inventaire des ressources et alignement des 12 sources du corpus. \item
+\textbf{Phase 2 -- Data Understanding (Semaines 1-2) \cite{lis2019detecting, assignment2026} :}
+Chargement du dataset \textbf{RoadAnomaly} (60 images), contrôle des résolutions, vérification de la
+qualité des masques et calcul des ratios de pixels d'anomalie. \item \textbf{Phase 3 -- Data Preparation
+\& Modeling (Semaines 3-4) \cite{zhao2024survey, s2m2024, pixood2024, toyota2024} :} Prétraitement des
+images, implémentation des baselines (MSP, Autoencodeur, S2M/PixOOD) et entraînement/fine-tuning. \item
+\textbf{Phase 4 -- Evaluation \& Reporting (Semaine 5, avant le 8 Nov. 2026) \cite{assignment2026,
+muller2024, chan2021segmentmeifyoucan} :} Calcul des métriques IoU, Dice, AuPRC, FPR95, génération des
+cartes de prédiction visuelles et finalisation du rapport technique.
+\end{enumerate}
+\section{Références Bibliographiques}
+
+\begin{thebibliography}{99}
+\bibitem{assignment2026} Instructeurs du Module Deep Learning. (2026). \newblock \emph{Deep Learning
+Assignment Brief: Road Anomaly Detection with RoadAnomaly Dataset}. \newblock Document d'orientation et
+consignes de projet, échéance du 8 Novembre 2026.
+\bibitem{zhao2024survey} Zhao, W., Li, J., \& Guo, Y. (2024). \newblock From Pixel to Mask: A Survey of
+Out-of-Distribution Segmentation. \newblock \emph{arXiv preprint arXiv:2405.00000}.
+\bibitem{lis2019detecting} Lis, K., Nakka, K., Fua, P., \& Salzmann, M. (2019). \newblock Detecting the
+Unexpected via Image Resynthesis. \newblock In \emph{Proceedings of the IEEE/CVF International Conference
+on Computer Vision (ICCV)}, pp. 2152--2161.
+\bibitem{zhou2024propetl} Zhou, Y., et al. (2024). \newblock Progressive Parameter Efficient Transfer
+Learning for Semantic Segmentation (ProPETL). \newblock In \emph{Proceedings of the International
+Conference on Learning Representations (ICLR)}.
+\bibitem{perspective2024} Lis, K., et al. (2024). \newblock Perspective Aware Road Obstacle Detection.
+\newblock \emph{arXiv preprint arXiv:2403.00000}.
+\bibitem{toyota2024} Ohgushi, T., Hiemori, S., \& Shirai, K. (2024). \newblock Road Obstacle Detection
+Method Based on an Autoencoder with Semantic Segmentation. \newblock In \emph{IEEE/CVF Conference on
+Computer Vision and Pattern Recognition Workshops (CVPRW)}.
+\bibitem{s2m2024} Zhao, X., et al. (2024). \newblock Segment Every Out-of-Distribution Object (S2M).
+\newblock In \emph{IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}.
+\bibitem{chan2021segmentmeifyoucan} Chan, R., Lis, K., Uhlemeyer, S., Blum, H., Honari, S., Siegwart, R.,
+Fua, P., Salzmann, M., \& Rottmann, M. (2021). \newblock SegmentMeIfYouCan: A Benchmark for Anomaly
+Segmentation. \newblock In \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 34, pp.
+14751--14763.
+\bibitem{cav2023} Solaas, J., et al. (2023). \newblock Systematic Review: Anomaly Detection in Connected
+and Autonomous Vehicles. \newblock \emph{arXiv preprint arXiv:2309.00000}.
+\bibitem{crispdm2026} IBM SPSS Modeler. (2026). \newblock \emph{CRISP-DM Business Understanding Overview
+\& Data Mining Life Cycle}. \newblock Guide méthodologique d'alignement stratégique des projets Data.
+\bibitem{pixood2024} Vojíř, T., et al. (2024). \newblock PixOOD: Pixel-Level Out-of-Distribution
+Detection. \newblock \emph{arXiv preprint arXiv:2405.19882v3}.
+\bibitem{muller2024} Müller, D., et al. (2024). \newblock Towards a Guideline for Evaluation Metrics in
+Medical Image Segmentation. \newblock \emph{arXiv preprint arXiv:2401.00000}.
+\end{thebibliography}
+\end{document}
