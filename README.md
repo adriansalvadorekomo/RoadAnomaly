@@ -73,7 +73,7 @@ before any model code existed.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/architecture-dark.png">
-  <img alt="RoadAnomaly target architecture: Deep learning pipeline, serving stack and CI/CD delivery" src="assets/architecture.png" width="100%">
+  <img alt="RoadAnomaly target architecture: deep learning pipeline, FastAPI on Kubernetes, Next.js on Vercel, and CI/CD + Argo CD delivery" src="assets/architecture.png" width="100%">
 </picture>
 
 **This is the target, not the current state.** Three bands, one system:
@@ -82,11 +82,16 @@ before any model code existed.
   models; RoadAnomaly is scored held-out. See
   [ADR-0002](docs/adr/0002-three-model-families.md).
 - **Serving stack** (`missing`) — exported TorchScript/ONNX artifacts load into
-  FastAPI, which returns masks and heatmaps to the Next.js dashboard.
+  FastAPI on Kubernetes, which returns masks and heatmaps to the Next.js
+  dashboard on Vercel.
 - **Delivery** (`implemented` workflow, `missing` deployment) — GitHub Actions
   gates every pull request and publishes tagged images to GHCR. The target
   deployment is Vercel (frontend) plus Kubernetes/Minikube and Argo CD
   (inference), recorded in [ADR-0004](docs/adr/0004-vercel-and-gitops-deployment.md).
+
+Read the labels literally: `Compose → Vercel + K8s` is the path from the local
+stack to the demo target, and `CI/CD + Argo CD` is how a tagged image reaches
+the cluster. Neither Vercel nor the cluster exists yet.
 
 The diagram is generated from
 [`docs/architecture/architecture.json`](docs/architecture/architecture.json)
