@@ -6,192 +6,573 @@
     "locale": "en",
     "output": "architecture.html",
     "quality_profile": "showcase",
+    "viewBox": [
+      930,
+      880
+    ],
     "views": [
       {
-        "id": "train-eval",
-        "label": "Train & evaluate",
-        "focus": ["pipeline", "model_a", "model_b", "model_c", "benchmark", "eval", "registry"],
-        "note": "Normal-road data trains three families; RoadAnomaly only scores them."
+        "id": "crisp-dm-lifecycle",
+        "label": "CRISP-DM lifecycle",
+        "focus": [
+          "scope",
+          "normal_data",
+          "pipeline",
+          "models",
+          "validation",
+          "bench_eval",
+          "xai"
+        ],
+        "note": "Business understanding to evaluation; XAI is a required gate, not an optional extra."
       },
       {
-        "id": "serve-experience",
-        "label": "Serve & experience",
-        "focus": ["registry", "api", "prototype", "landing"],
-        "note": "FastAPI is internal; Streamlit is the public demo; Astro links to it."
+        "id": "serving-path",
+        "label": "Serving path",
+        "focus": [
+          "registry",
+          "api",
+          "prototype",
+          "landing"
+        ],
+        "note": "Registry retains all three candidate models and a selected alias; Streamlit is public; FastAPI stays cluster-internal."
       },
       {
-        "id": "delivery",
-        "label": "Deliver & deploy",
-        "focus": ["cicd", "k8s", "api", "prototype", "landing"],
-        "note": "GitHub Actions publishes images; Argo CD syncs Minikube; Vercel builds the landing page."
+        "id": "delivery-path",
+        "label": "Delivery path",
+        "focus": [
+          "ci",
+          "gitops",
+          "registry",
+          "api",
+          "prototype",
+          "landing"
+        ],
+        "note": "CI publishes immutable tags; Argo CD pulls Git and syncs Minikube; Vercel builds Astro."
+      },
+      {
+        "id": "guardrails",
+        "label": "Guardrails",
+        "focus": [
+          "scope",
+          "bench_eval",
+          "validation",
+          "registry",
+          "xai"
+        ],
+        "note": "RoadAnomaly scores and XAI never promote a model; selection uses normal-road validation."
       }
-    ]
+    ],
+    "legend": {
+      "mode": "all",
+      "entries": {
+        "frontend": {
+          "visible": true
+        },
+        "backend": {
+          "visible": true
+        },
+        "database": {
+          "visible": true
+        },
+        "cloud": {
+          "visible": true
+        },
+        "external": {
+          "visible": true
+        },
+        "security": {
+          "visible": false
+        },
+        "messagebus": {
+          "visible": false
+        }
+      }
+    }
   },
   "components": [
     {
-      "id": "pipeline",
+      "id": "scope",
       "type": "external",
-      "label": "Normal-road pipeline",
-      "sublabel": "Cityscapes / BDD100K · tf.data · train/val",
-      "pos": [380, 110],
-      "size": [260, 72],
-      "tag": "normal only"
+      "label": "Objectives & protocol",
+      "sublabel": "3 families · eval-only · XAI",
+      "pos": [
+        30,
+        120
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "CRISP-DM 1"
     },
     {
-      "id": "model_a",
+      "id": "normal_data",
+      "type": "external",
+      "label": "Normal-road corpora",
+      "sublabel": "Cityscapes / BDD100K normal",
+      "pos": [
+        260,
+        120
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "pinned manifest"
+    },
+    {
+      "id": "pipeline",
       "type": "backend",
-      "label": "A · Autoencoder",
-      "sublabel": "reconstruct → per-pixel error",
-      "pos": [40, 300],
-      "size": [240, 72],
-      "tag": "family A"
+      "label": "tf.data preparation",
+      "sublabel": "decode · augment · grouped splits",
+      "pos": [
+        490,
+        120
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "CRISP-DM 3"
     },
     {
-      "id": "model_b",
+      "id": "models",
       "type": "backend",
-      "label": "B · Resynthesis",
-      "sublabel": "synthesize → residual",
-      "pos": [380, 300],
-      "size": [260, 72],
-      "tag": "family B"
+      "label": "Training + 3 families",
+      "sublabel": "A AE · B resynth · C segmentation",
+      "pos": [
+        720,
+        120
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "TensorFlow 2.21"
     },
     {
-      "id": "model_c",
-      "type": "backend",
-      "label": "C · Segmentation",
-      "sublabel": "DeepLabV3+ / U-Net · MSP",
-      "pos": [780, 300],
-      "size": [240, 72],
-      "tag": "family C"
-    },
-    {
-      "id": "benchmark",
+      "id": "bench_eval",
       "type": "database",
-      "label": "RoadAnomaly benchmark",
-      "sublabel": "60 frames · {0,2} · never trained",
-      "pos": [40, 520],
-      "size": [240, 72],
+      "label": "RoadAnomaly evaluation",
+      "sublabel": "60 held-out frames · IoU/Dice/F1",
+      "pos": [
+        30,
+        340
+      ],
+      "size": [
+        190,
+        72
+      ],
       "tag": "eval-only"
     },
     {
-      "id": "eval",
-      "type": "backend",
-      "label": "Shared evaluation harness",
-      "sublabel": "IoU · Dice · F1 · AUPRC · threshold CV",
-      "pos": [380, 520],
-      "size": [260, 72]
+      "id": "xai",
+      "type": "external",
+      "label": "XAI gate",
+      "sublabel": "saliency / occlusion / Grad-CAM",
+      "pos": [
+        260,
+        340
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "blocked · G1"
     },
     {
-      "id": "registry",
-      "type": "database",
-      "label": "Model registry",
-      "sublabel": "SavedModel + manifest · versioned",
-      "pos": [780, 520],
-      "size": [240, 72]
+      "id": "validation",
+      "type": "backend",
+      "label": "Validation & selection",
+      "sublabel": "grouped folds · threshold CV",
+      "pos": [
+        720,
+        340
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "never benchmark"
     },
     {
       "id": "landing",
       "type": "frontend",
       "label": "Astro landing page",
-      "sublabel": "Vercel · static · links to demo + report",
-      "pos": [40, 720],
-      "size": [240, 76],
-      "tag": "Vercel"
+      "sublabel": "Vercel · static · results + demo",
+      "pos": [
+        30,
+        560
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "Vercel Git"
     },
     {
       "id": "prototype",
       "type": "frontend",
       "label": "Streamlit prototype",
-      "sublabel": "public ingress · overlay + heatmap + compare",
-      "pos": [380, 720],
-      "size": [260, 76],
+      "sublabel": "public ingress · overlay + heatmap",
+      "pos": [
+        260,
+        560
+      ],
+      "size": [
+        190,
+        72
+      ],
       "tag": "public demo"
     },
     {
       "id": "api",
       "type": "backend",
       "label": "FastAPI inference",
-      "sublabel": ":8000 POST /predict · cluster-internal",
-      "pos": [780, 720],
-      "size": [240, 76],
-      "tag": "TensorFlow"
+      "sublabel": "POST /predict · cluster-internal",
+      "pos": [
+        490,
+        560
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "cluster-internal"
     },
     {
-      "id": "cicd",
-      "type": "cloud",
-      "label": "GitHub Actions + GHCR",
-      "sublabel": "CI per PR · images per tag",
-      "pos": [380, 930],
-      "size": [260, 72]
+      "id": "registry",
+      "type": "database",
+      "label": "Model registry",
+      "sublabel": "3 SavedModels + manifests · alias",
+      "pos": [
+        720,
+        560
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "immutable tags"
     },
     {
-      "id": "k8s",
+      "id": "gitops",
       "type": "cloud",
-      "label": "Minikube + Argo CD",
-      "sublabel": "syncs API + prototype",
-      "pos": [780, 930],
-      "size": [240, 72],
-      "tag": "GitOps"
+      "label": "Argo CD + Minikube",
+      "sublabel": "pulls Git · syncs API + prototype",
+      "pos": [
+        490,
+        720
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "pull, not push"
+    },
+    {
+      "id": "ci",
+      "type": "cloud",
+      "label": "Git repo + Actions + GHCR",
+      "sublabel": "gated CI · immutable tags",
+      "pos": [
+        720,
+        720
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "tag": "delivery"
     }
   ],
   "boundaries": [
-    { "kind": "region", "label": "1 · Data · normal-road only", "wraps": ["pipeline"] },
-    { "kind": "region", "label": "2 · Modeling · TensorFlow/Keras", "wraps": ["model_a", "model_b", "model_c"] },
-    { "kind": "region", "label": "3 · Evaluation & promotion · eval-only benchmark", "wraps": ["benchmark", "eval", "registry"] },
-    { "kind": "region", "label": "4 · Serving & experience · Minikube + Vercel", "wraps": ["landing", "prototype", "api"] },
-    { "kind": "region", "label": "5 · Delivery · GitHub Actions + Argo CD", "wraps": ["cicd", "k8s"] }
+    {
+      "kind": "region",
+      "label": "1 · Business understanding",
+      "wraps": [
+        "scope"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "region",
+      "label": "2 · Data understanding",
+      "wraps": [
+        "normal_data"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "region",
+      "label": "3 · Data preparation",
+      "wraps": [
+        "pipeline"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "region",
+      "label": "4 · Modeling",
+      "wraps": [
+        "models"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "region",
+      "label": "5 · Evaluation — normal-road selection, held-out scoring, XAI",
+      "wraps": [
+        "bench_eval",
+        "xai",
+        "validation"
+      ],
+      "pad": 18
+    },
+    {
+      "kind": "region",
+      "label": "6 · Deployment — registry, serving, experience and GitOps delivery",
+      "wraps": [
+        "landing",
+        "prototype",
+        "api",
+        "registry",
+        "gitops",
+        "ci"
+      ],
+      "pad": 18
+    }
   ],
   "connections": [
-    { "id": "pipeline-to-a", "from": "pipeline", "to": "model_a", "fromSide": "bottom", "toSide": "top" },
-    { "id": "pipeline-to-b", "from": "pipeline", "to": "model_b", "label": "train/val", "fromSide": "bottom", "toSide": "top", "labelAt": [510, 265] },
-    { "id": "pipeline-to-c", "from": "pipeline", "to": "model_c", "fromSide": "bottom", "toSide": "top" },
-    { "id": "a-to-eval", "from": "model_a", "to": "eval", "fromSide": "bottom", "toSide": "top" },
-    { "id": "b-to-eval", "from": "model_b", "to": "eval", "label": "score maps", "fromSide": "bottom", "toSide": "top", "labelAt": [510, 386] },
-    { "id": "c-to-eval", "from": "model_c", "to": "eval", "fromSide": "bottom", "toSide": "top" },
-    { "id": "benchmark-to-eval", "from": "benchmark", "to": "eval", "label": "held-out GT", "variant": "emphasis" },
-    { "id": "eval-to-registry", "from": "eval", "to": "registry", "label": "promote" },
-    { "id": "registry-to-api", "from": "registry", "to": "api", "label": "loads SavedModel", "fromSide": "bottom", "toSide": "top", "labelAt": [900, 606] },
-    { "id": "prototype-to-api", "from": "prototype", "to": "api", "label": "POST /predict", "fromSide": "right", "toSide": "left", "labelAt": [710, 738] },
-    { "id": "api-to-prototype", "from": "api", "to": "prototype", "label": "mask + heatmap", "fromSide": "left", "toSide": "right", "labelAt": [710, 782] },
-    { "id": "landing-to-prototype", "from": "landing", "to": "prototype", "label": "demo link", "variant": "dashed" },
-    { "id": "cicd-to-k8s", "from": "cicd", "to": "k8s", "label": "images + manifests" },
-    { "id": "k8s-to-api", "from": "k8s", "to": "api", "label": "hosts", "fromSide": "top", "toSide": "bottom" }
+    {
+      "id": "scope-to-normal-data",
+      "from": "scope",
+      "to": "normal_data",
+      "label": "objectives + success criteria",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [
+        240,
+        204
+      ]
+    },
+    {
+      "id": "normal-data-to-pipeline",
+      "from": "normal_data",
+      "to": "pipeline",
+      "label": "pinned corpora",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [
+        470,
+        204
+      ]
+    },
+    {
+      "id": "pipeline-to-models",
+      "from": "pipeline",
+      "to": "models",
+      "label": "tf.data train/val",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [
+        700,
+        204
+      ]
+    },
+    {
+      "id": "models-to-validation",
+      "from": "models",
+      "to": "validation",
+      "label": "scores on val",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [
+        870,
+        270
+      ]
+    },
+    {
+      "id": "models-to-bench-eval",
+      "from": "models",
+      "to": "bench_eval",
+      "label": "held-out score maps · report only",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [
+        470,
+        262
+      ]
+    },
+    {
+      "id": "validation-to-xai",
+      "from": "validation",
+      "to": "xai",
+      "label": "explain selected model",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "right",
+      "labelAt": [
+        585,
+        410
+      ]
+    },
+    {
+      "id": "validation-to-registry",
+      "from": "validation",
+      "to": "registry",
+      "label": "select + retain all 3",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [
+        815,
+        470
+      ]
+    },
+    {
+      "id": "bench-eval-to-landing",
+      "from": "bench_eval",
+      "to": "landing",
+      "label": "committed metrics · build time",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [
+        125,
+        470
+      ]
+    },
+    {
+      "id": "xai-to-prototype",
+      "from": "xai",
+      "to": "prototype",
+      "label": "explanations · blocked G1",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [
+        355,
+        470
+      ]
+    },
+    {
+      "id": "landing-to-prototype",
+      "from": "landing",
+      "to": "prototype",
+      "label": "demo link",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [
+        240,
+        650
+      ]
+    },
+    {
+      "id": "prototype-to-api",
+      "from": "prototype",
+      "to": "api",
+      "label": "POST /predict · JSON + PNG",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelAt": [
+        470,
+        650
+      ]
+    },
+    {
+      "id": "registry-to-api",
+      "from": "registry",
+      "to": "api",
+      "label": "SavedModel + manifest",
+      "fromSide": "left",
+      "toSide": "right",
+      "labelAt": [
+        700,
+        650
+      ]
+    },
+    {
+      "id": "ci-to-registry",
+      "from": "ci",
+      "to": "registry",
+      "label": "publishes bundle",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelAt": [
+        870,
+        680
+      ]
+    },
+    {
+      "id": "ci-to-gitops",
+      "from": "ci",
+      "to": "gitops",
+      "label": "Argo CD pulls Git + image digest",
+      "fromSide": "left",
+      "toSide": "right",
+      "labelAt": [
+        700,
+        698
+      ]
+    },
+    {
+      "id": "gitops-to-api",
+      "from": "gitops",
+      "to": "api",
+      "label": "syncs Deployment",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelAt": [
+        650,
+        680
+      ]
+    },
+    {
+      "id": "gitops-to-prototype",
+      "from": "gitops",
+      "to": "prototype",
+      "label": "syncs prototype",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelAt": [
+        420,
+        680
+      ]
+    }
   ],
   "cards": [
     {
       "dot": "cyan",
-      "title": "Guardrail",
+      "title": "CRISP-DM in this repository",
       "items": [
-        "RoadAnomaly: 60 frames, labels {0,2}",
-        "Evaluation-only, never a training input",
-        "Threshold tuning uses scene-grouped folds"
-      ]
-    },
-    {
-      "dot": "emerald",
-      "title": "Modeling",
-      "items": [
-        "A autoencoder · B resynthesis · C DeepLabV3+ / U-Net",
-        "One Keras interface: build / predict / export",
-        "TensorFlow 2.21 · SavedModel + manifest"
-      ]
-    },
-    {
-      "dot": "violet",
-      "title": "Experience",
-      "items": [
-        "Astro landing page on Vercel is static",
-        "Streamlit prototype calls FastAPI in-cluster",
-        "FastAPI stays internal; no public inference API"
+        "1 Business — objectives, ADR-0001 evaluation-only guardrail",
+        "2 Data understanding — RoadAnomaly audit + normal-road source manifest",
+        "3 Data preparation — tf.data, scene-grouped train/validation splits",
+        "4 Modeling — A autoencoder, B resynthesis, C segmentation behind one Keras interface",
+        "5 Evaluation — normal-road selection, held-out benchmarking, XAI gate",
+        "6 Deployment — registry, FastAPI, Streamlit, Astro, GitOps"
       ]
     },
     {
       "dot": "amber",
-      "title": "Status",
+      "title": "Promotion rule",
+      "items": [
+        "Selection uses normal-road validation only; RoadAnomaly never fits weights or thresholds",
+        "Benchmark and XAI results are report-only; there is no edge from either to the registry",
+        "The registry keeps all three candidate SavedModels + manifests and a selected alias",
+        "Landing metrics render only from committed docs/experiments/ records"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Status and gates",
       "items": [
         "Target architecture, not deployed",
-        "Vercel, Minikube and Argo CD are missing",
-        "Published numbers require docs/experiments/ evidence"
+        "XAI method undecided (G1): V1.8 cannot start until the method and justification are recorded",
+        "No model, API, frontend, manifests, Argo CD application or Vercel project exists yet",
+        "README results table stays empty until an experiment file exists"
       ]
     }
   ]

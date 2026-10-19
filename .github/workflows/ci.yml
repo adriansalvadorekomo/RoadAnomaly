@@ -68,7 +68,10 @@ jobs:
       - name: Mypy
         run: mypy dl backend tests
 
-      - name: Dataset integrity tests
+      - name: Architecture contract tests
+        run: pytest -q tests/architecture -v
+
+      - name: Dataset and full contract tests
         run: pytest -q
 
       - name: Coverage report (non-blocking until models land)

@@ -11,10 +11,12 @@ git clone https://github.com/adriansalvadorekomo/RoadAnomaly.git
 cd RoadAnomaly
 make install                 # .venv + dev, deep learning, API and prototype dependencies
 make data-check              # confirms the dataset is intact
+pytest -q tests/architecture # confirms the promotion rule and diagram assets
 nbstripout --install         # strips notebook outputs on commit
 ```
 
-`make lint type test` must pass before you push. It is the same thing CI runs.
+`make lint type test` must pass before you push. It is the same thing CI runs,
+including the architecture contract tests.
 
 ## Branching
 
@@ -37,15 +39,20 @@ contribution, and an abandoned branch is not a failure.
 
 1. **`main` stays green.** If your change breaks CI, fixing it is the next
    thing you do — not the thing you do after lunch.
-2. **Never fit weights on the 60 evaluation frames.** See
-   [ADR-0001](docs/adr/0001-evaluation-only-benchmark.md). This is not a style
-   preference; a model trained on the evaluation set produces numbers that mean
-   nothing and would have to be withdrawn.
+2. **Never fit weights or select a model on the 60 evaluation frames.** See
+   [ADR-0001](docs/adr/0001-evaluation-only-benchmark.md). The separately
+   reported threshold-tuned regime may choose one scalar on scene-grouped
+   benchmark folds; it never promotes a model. Early stopping and model
+   selection use the normal-road validation split. This is not a style
+   preference; a model trained or selected on the evaluation set produces
+   numbers that mean nothing and would have to be withdrawn.
 3. **Metrics are defined once, in `dl/evaluation/metrics.py`.** If your model
    needs a new one, add it there so all three models get it.
 4. **A reported number needs an experiment file.** Anything in the README or the
-   report must trace to `docs/experiments/NNNN-*.md` with the commit, config and
-   command. The PR template asks about this.
+   report must trace to `docs/experiments/NNNN-*.md` with the commit, config,
+   command, normal-road manifest and split hash. Normal-road selection metrics
+   and RoadAnomaly held-out scores go in separate rows. The PR template asks
+   about this.
 5. **No silent suppressions.** A `# type: ignore`, `@ts-ignore`, skipped test or
    lowered threshold needs a comment on the line above saying why. If the reason
    is "it was failing", the fix is not a suppression.
@@ -55,6 +62,20 @@ contribution, and an abandoned branch is not a failure.
    A README sentence is not evidence, and neither is a directory that contains
    only `.gitkeep`.
 
+## Delivery and model-artifact rules
+
+- **Selection comes from normal-road validation.** The registry keeps all three
+  candidate SavedModels and manifests; `selected.json` is an alias. There is no
+  RoadAnomaly-to-registry path ([ADR-0008](docs/adr/0008-promotion-and-model-registry.md)).
+- **XAI is a gate, not a promotion signal.** The method is undecided (G1). Do not
+  invent one, and do not render a placeholder explanation
+  ([ADR-0009](docs/adr/0009-xai-evaluation-gate.md)).
+- **No weights in Git or images.** Build a versioned model bundle, publish it to
+  GHCR, and mount it read-only. Compose uses a local `artifacts/` mount.
+- **Deploy immutable references.** Pin images and model bundles by digest; no
+  `latest`, no moving `major.minor` tags. Promotion is a reviewed commit, and
+  Argo CD pulls it. CI does not hold cluster credentials.
+
 ## Definition of done
 
 - [ ] `make lint type test` passes locally
@@ -62,8 +83,10 @@ contribution, and an abandoned branch is not a failure.
 - [ ] Docstrings on anything another person will import
 - [ ] If it changes what the report claims, `docs/experiments/` is updated
 - [ ] If it changes a capability, `docs/validation/requirements-matrix.md` is updated
+- [ ] If it changes the diagram, `pytest -q tests/architecture` passes and the PNGs are regenerated
+- [ ] Normal-road selection and RoadAnomaly held-out results remain separate
 - [ ] One reviewer from the affected workstream (CODEOWNERS does this for you)
-- [ ] No secrets, no `data/credits.txt` edits, no committed artefacts
+- [ ] No secrets, no `data/credits.txt` edits, no committed artefacts or weights
 
 ## Commits
 

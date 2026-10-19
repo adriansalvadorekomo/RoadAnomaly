@@ -11,7 +11,7 @@ objects that a driving perception stack was never trained to expect.**
 [![CD](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/cd.yml/badge.svg)](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/cd.yml)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![Data: CC BY-SA 4.0](https://img.shields.io/badge/annotations-CC%20BY--SA%204.0-lightgrey.svg)](data/credits.txt)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](pyproject.toml)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-3776ab.svg)](pyproject.toml)
 [![TensorFlow 2.21](https://img.shields.io/badge/TensorFlow-2.21-FF6F00?logo=tensorflow&logoColor=white)](docs/adr/0005-tensorflow-framework.md)
 [![Node 20+](https://img.shields.io/badge/node-20%2B-339933.svg)](frontend/)
 [![Code style: ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](pyproject.toml)
@@ -45,7 +45,7 @@ when the world stops matching them.
 | O1 | Understand the benchmark and freeze an honest protocol | Verified dataset report, EDA notebook, ADR-0001 | `in progress` — facts verified, no EDA notebook |
 | O2 | Implement three general model families | A/B/C behind one interface, trained and reproducible | `missing` |
 | O3 | Compare them behind one metric harness | Results table populated from `docs/experiments/` | `missing` |
-| O4 | Explain the selected model (XAI) | Saliency/occlusion maps plus a written justification | `blocked` — no model, no method decision (G1) |
+| O4 | Explain the selected model (XAI) | A recorded method decision, per-frame explanations and a written justification | `blocked` — no model, no method decision (G1) |
 | O5 | Serve the selected model | FastAPI + Streamlit prototype + Astro landing + containers + deployment | `missing` |
 | O6 | Make the commercial case | BMC, 4Ps, teaser, commercial report | `missing` |
 
@@ -59,48 +59,55 @@ component view is in [`docs/architecture/README.md`](docs/architecture/README.md
 |---|---|---|
 | Dataset (60 frames + labels + credits) | `implemented` | `data/`, tracked in git (15 MB) |
 | Dataset contract tests | `implemented` | 6 tests in `tests/dataset/` |
+| Architecture contract tests | `implemented` | 6 tests in `tests/architecture/` |
 | Lint, types and test gate | `implemented` | `ruff`, `mypy`, `pytest`; `.github/workflows/ci.yml` |
-| Decision records and protocol | `implemented` | `docs/adr/0001`–`0006` |
+| Decision records and protocol | `implemented` | `docs/adr/0001`–`0009` |
 | Scaffold, Makefile, templates | `implemented` | `Makefile`, `.github/` |
 | Models, training, metrics, inference | `missing` | `dl/` holds directories only |
 | Backend, frontend, containers | `missing` | backend stub, frontend READMEs, no Dockerfiles |
 | Deployment (compose, Kubernetes, Vercel) | `missing` | target documented in ADR-0004 |
 
-The only executable pipeline today is CI: lint, type-check and the six dataset
-tests. That is deliberate — the protocol and the data contract were frozen
-before any model code existed.
+The only executable pipeline today is CI: lint, type-check, the dataset tests
+and the architecture contract tests. That is deliberate — the protocol, the data
+contract and the promotion rule were frozen before any model code existed.
 
 ## 3. Target architecture
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/architecture-dark.png">
-  <img alt="RoadAnomaly end-to-end system map: normal-road data and three TensorFlow models, shared evaluation, FastAPI serving, a Streamlit prototype, an Astro landing page on Vercel, and GitHub Actions with Argo CD delivery" src="assets/architecture.png" width="100%">
+  <img alt="RoadAnomaly end-to-end system map following CRISP-DM: business understanding, normal-road and RoadAnomaly data understanding, a TensorFlow data pipeline, three Keras models, normal-road validation and held-out RoadAnomaly scoring with a blocked XAI gate, a three-model SavedModel registry, FastAPI, Streamlit, an Astro page on Vercel, and gated CI/CD with Argo CD pulling into Minikube" src="assets/architecture.png" width="100%">
 </picture>
 
-**This is the target, not the current state.** Five stages, one system:
+**This is the target, not the current state.** The map follows the six
+[CRISP-DM](https://www.ibm.com/docs/en/spss-modeler/saas?topic=dm-crisp-help-methodology)
+phases recorded in [ADR-0007](docs/adr/0007-crisp-dm-methodology.md). They are
+iterative and evidence-gated, not a waterfall; the arrows show the primary
+evidence path.
 
-- **Data** (`missing`) — normal-road corpora feed a TensorFlow/Keras `tf.data`
-  pipeline with scene-grouped train/validation splits. RoadAnomaly is never a
-  training input. See [ADR-0001](docs/adr/0001-evaluation-only-benchmark.md).
-- **Modeling** (`missing`) — three families are compared behind one interface:
-  A autoencoder, B image resynthesis and C DeepLabV3+ / U-Net. See
-  [ADR-0002](docs/adr/0002-three-model-families.md) and
-  [ADR-0005](docs/adr/0005-tensorflow-framework.md).
-- **Evaluation and promotion** (`missing`) — one metric harness scores all three
-  models, selects on normal-road validation and promotes a TensorFlow SavedModel
-  plus a manifest. The 60 RoadAnomaly frames are scored held-out only, and
-  threshold tuning is reported separately from the zero-shot column.
-- **Serving and experience** (`missing`) — FastAPI loads the SavedModel and
-  exposes `POST /predict`; the Streamlit prototype is the public interactive
-  demo; the Astro landing page on Vercel presents the project, links to the
-  prototype and renders only published results. Streamlit calls FastAPI inside
-  the cluster, so the browser never needs a route to the inference API.
-- **Delivery** (`implemented` workflow, `missing` deployment) — GitHub Actions
-  gates every pull request and publishes tagged API and prototype images to
-  GHCR. Argo CD syncs Minikube; Vercel builds the Astro landing page through its
-  Git integration. The target is recorded in
-  [ADR-0004](docs/adr/0004-vercel-and-gitops-deployment.md) and
-  [ADR-0006](docs/adr/0006-astro-and-streamlit-frontend.md).
+| Phase | What it owns here | Status |
+|---|---|---|
+| **1. Business understanding** | Scope, three model families, success criteria and the evaluation-only protocol | `in progress` — [ADR-0001](docs/adr/0001-evaluation-only-benchmark.md), [ADR-0007](docs/adr/0007-crisp-dm-methodology.md) |
+| **2. Data understanding** | RoadAnomaly facts and EDA; normal-road source, licence and scene audit | `in progress` — dataset contract tested; EDA (G2) and normal-road manifest missing |
+| **3. Data preparation** | `tf.data` loading, augmentation, scene-grouped folds, pinned dataset manifest | `missing` — no loader or run config |
+| **4. Modeling** | A autoencoder, B resynthesis and C segmentation behind one Keras interface | `missing` — [ADR-0002](docs/adr/0002-three-model-families.md), [ADR-0005](docs/adr/0005-tensorflow-framework.md) |
+| **5. Evaluation** | Shared metrics, **normal-road selection**, held-out RoadAnomaly scoring, threshold regimes and XAI | `blocked` — metrics and XAI method (G1) missing |
+| **6. Deployment** | Export/registry, FastAPI, Streamlit, Astro on Vercel, containers and Argo CD | `missing` — target in [ADR-0004](docs/adr/0004-vercel-and-gitops-deployment.md), [ADR-0006](docs/adr/0006-astro-and-streamlit-frontend.md) |
+
+Four rules make the diagram reviewable:
+
+- **RoadAnomaly is scoring only.** Selection, early stopping and thresholds come
+  from scene-grouped folds of the normal-road corpus. There is deliberately no
+  edge from `RA` or `HELD` to the registry in the map below. The 60 frames are
+  reported as zero-shot and, separately, threshold-tuned.
+- **The registry keeps all three candidates.** Normal-road validation writes a
+  `selected` alias, but the three SavedModels and their manifests stay for audit.
+  See [ADR-0008](docs/adr/0008-promotion-and-model-registry.md).
+- **XAI is a gate, not decoration.** It sits in Evaluation, consumes the selected
+  model, and is still `blocked` on a method decision (G1). It never promotes a
+  model. See [ADR-0009](docs/adr/0009-xai-evaluation-gate.md).
+- **Delivery is pull-based.** Gated CI/CD publishes immutable image digests and
+  an OCI model bundle to GHCR. A promotion commit pins them; Argo CD pulls and
+  syncs Minikube. CI does not hold cluster credentials.
 
 Read the labels literally: the diagram is a target, not a claim that the model,
 API, prototype, landing page or cluster is running. `docker compose` is the
@@ -110,8 +117,9 @@ The diagram is generated from
 [`docs/architecture/architecture.json`](docs/architecture/architecture.json)
 with [archify](https://github.com/tt-a1i/archify); open
 [`architecture.html`](docs/architecture/architecture.html) for the interactive
-version (pan, zoom, dark mode, guided tours). Regenerate it from the spec rather
-than editing the HTML — the HTML is a build artifact.
+version (pan, zoom, dark mode, guided tours). The README PNGs are exported from
+the same spec at 2× (1860 × 1760). Regenerate them from the spec rather than
+editing the HTML — the HTML is a build artifact.
 
 ## 4. Dataset and evaluation protocol
 
@@ -185,15 +193,20 @@ unavailable: any model trained here would be tested on its own training set.
 The protocol, recorded in full in
 [**ADR-0001**](docs/adr/0001-evaluation-only-benchmark.md):
 
-1. **Train on normal** — Cityscapes/BDD100K normal subsets and ImageNet-pretrained
-   backbones. The anomaly is defined by absence, never shown as a class.
+1. **Train on normal** — Cityscapes/BDD100K normal subsets with a pinned release
+   and split manifest, plus ImageNet-pretrained backbones. The anomaly is
+   defined by absence, never shown as a class.
 2. **Report all 60 frames** — including the ones we fail on, with the per-frame
    IoU distribution published, not just the mean.
-3. **Split only for tuning** — scene-grouped k-fold (the `animals*`, `cones*`,
-   `obstacles*` prefixes) so one source image never spans two folds.
+3. **Split only for tuning** — scene-grouped k-fold by benchmark scene prefix
+   (`animals*`, `cones*`, `obstacles*`) for the separately reported
+   *threshold-tuned* regime. These folds never select weights, checkpoints or
+   the registry alias; early stopping uses scene-grouped folds from the
+   normal-road corpus, whose release and split hash must be pinned in the run
+   manifest.
 4. **Two regimes, labelled honestly** — *zero-shot* (nothing tuned) and
-   *threshold-tuned* (one scalar chosen on held-out folds). Never in the same
-   column.
+   *threshold-tuned* (one scalar chosen on held-out benchmark folds). Never in
+   the same column, and never used to pick the model.
 
 This is the single most important design decision in the project, and the one
 we expect to be challenged on in the defence. It is written down before any
@@ -235,11 +248,30 @@ TorchScript or ONNX step (ADR-0005).
 metric set. No model can be evaluated more favourably than another, and a
 metric is implemented exactly once, in one file, for all three.
 
-**Explainability (XAI) is required by the technical validation and is not yet
-planned.** No saliency, occlusion, Grad-CAM or SHAP method has been chosen, and
-there is no record of the decision. It is tracked as gap G1 in the validation
-matrix; the method and its justification must be written down before it can be
-implemented.
+**Explainability (XAI) is a required Evaluation gate, not a UI afterthought.**
+[ADR-0009](docs/adr/0009-xai-evaluation-gate.md) fixes its placement and
+evidence format: it consumes the selected model and its score maps, produces
+per-frame explanations plus a written justification, and never influences
+selection or promotion. **The method is still undecided** — Grad-CAM, occlusion,
+integrated gradients and saliency are candidates, not a decision — so V1.8
+stays `blocked` on gap G1. The Streamlit prototype may show an explanation panel
+only after a method is chosen and the artifacts exist; it must not render a
+placeholder.
+
+### Results (not published)
+
+No model has been trained, so no number is published. The table stays empty
+until an experiment record in `docs/experiments/` traces every value to a commit,
+config, dataset manifest, command and hardware. Normal-road selection and
+RoadAnomaly held-out scores are separate columns on purpose; they are never
+averaged.
+
+| Model | Normal-road validation (selection) | RoadAnomaly zero-shot | RoadAnomaly threshold-tuned |
+|---|---|---|---|
+| A — autoencoder | — | — | — |
+| B — resynthesis | — | — | — |
+| C — segmentation | — | — | — |
+
 
 ## 6. Development workflow
 
@@ -249,6 +281,7 @@ cd RoadAnomaly
 
 make install            # venv + dev, deep learning, API and prototype dependencies
 make data-check         # verify the dataset contract (fast, no GPU)
+pytest -q tests/architecture  # architecture spec, promotion rule and PNG assets
 make lint type test     # what CI runs
 ```
 
@@ -268,7 +301,8 @@ make lint type test     # what CI runs
 | `make up` / `make down` | Local compose stack (API + prototype) | `missing` — `infra/compose/docker-compose.yml` |
 
 The dataset is already in the repository; there is no download step.
-**Requirements:** Python 3.10+; Node 20+ only for the Astro landing page.
+**Requirements:** Python 3.12, the version CI, training and serving pin; Node 20+
+only for the Astro landing page.
 Training is happiest with a GPU, but every model runs CPU-only at reduced
 throughput; `requirements/dl.txt` documents the TensorFlow CPU package and
 Apple Silicon note. The local `make install` uses `requirements/api-base.txt`
@@ -276,19 +310,23 @@ instead of `tensorflow-cpu`, so TensorFlow is installed exactly once.
 
 ## 7. Testing and code quality
 
-**Status: `implemented` for the dataset tier.**
+**Status: `implemented` for the dataset and architecture tiers.**
 
 | Tier | Scope | Status |
 |---|---|---|
 | `tests/dataset/` | Frame ↔ label contract, mask vocabulary, instance consistency | `implemented` — 6 tests |
+| `tests/architecture/` | Six CRISP-DM regions, unique IDs, no benchmark-to-registry path, XAI gate, PNG assets | `implemented` — 6 tests |
 | `tests/unit/` | Pure functions: metrics, mask decoding, thresholding | `missing` — appears with the first model module |
 | `tests/integration/` | API contract, artifact loading, end-to-end inference | `missing` — appears with the backend |
 
 The dataset tests are the interesting ones: they re-derive every documented
 fact — 60 frames, the `{0, 2}` label vocabulary, 201 instances, 46
 instance-annotated directories, 14 semantic-only ones — and fail the build if
-the data and the documentation disagree. Documentation that cannot rot is worth
-more than documentation that is merely correct today.
+the data and the documentation disagree. The architecture tests enforce the
+rules that are easy to lose in a diagram edit: RoadAnomaly and XAI cannot reach
+the registry, selection comes from normal-road validation, the registry retains
+all three candidates, and the PNGs match the spec's 2× export. Documentation
+that cannot rot is worth more than documentation that is merely correct today.
 
 `ruff check`, `ruff format --check` and `mypy` run over the whole repository
 (Markdown excluded from formatting so the illustrative snippets keep their
@@ -313,19 +351,42 @@ infra/
 When the files land, `make up` starts the API on `:8000` and the Streamlit
 prototype on `:8501`. The API image is CPU-only and ships only `tensorflow-cpu`:
 the SavedModel is exported by `dl/inference/`, and training dependencies stay out
-of the serving container. The Astro landing page is not containerized for the
-serving path — Vercel builds it, and `make landing` runs it locally on `:4321`.
+of the serving container.
+
+**No weights are baked into an image or committed to Git.** The release bundle
+(three candidate SavedModels, three manifests and `selected.json`) is a versioned
+OCI artifact in GHCR. Compose mounts a local `artifacts/` directory read-only for
+development; Minikube mounts the bundle through an init container or a pre-seeded
+read-only volume. The API fails at startup if the selected manifest is missing,
+rather than silently serving a different model. The Astro landing page is not
+containerized for the serving path — Vercel builds it, and `make landing` runs it
+locally on `:4321`.
 
 ## 9. Planned CI/CD workflow with GitHub Actions
 
-**Status: CI `implemented`; CD workflow `implemented`, deployment `blocked` on
-missing images and report.** The workflows are in `.github/workflows/`.
+**Status: CI `implemented`; CD workflow `implemented` and gated; deployment and
+promotion `blocked` on missing images, model bundle and manifests.** The
+workflows are in `.github/workflows/`.
 
 | Trigger | What runs | Status |
 |---|---|---|
-| Every PR and push to `main` | **CI** — ruff lint, ruff format check, mypy, 6 dataset-integrity tests | `implemented` |
+| Every PR and push to `main` | **CI** — ruff lint, ruff format check, mypy, 6 dataset tests and the architecture contract tests | `implemented` |
 | Every PR and push to `main` | Astro landing build, Streamlit syntax check and container builds, gated on `frontend/landing/package.json`, the prototype and the Dockerfiles | `blocked` — files missing, jobs skip cleanly |
-| Tag `v*` | **CD** — publish `-api` and `-prototype` images to GHCR, re-run the TensorFlow training smoke test, publish the report to GitHub Pages | `blocked` — Dockerfiles, `dl/training/train.py` and `docs/report/_quarto.yml` missing |
+| Tag `v*` | **CD quality gate first** (same ruff/mypy/pytest), then optional training smoke, then immutable `-api`/`-prototype` images; a model OCI bundle and promotion commit once export/manifests exist; report to GitHub Pages | `blocked` — Dockerfiles, training entrypoint, model bundle, manifests and report missing |
+
+CD does not trust a tag: it re-runs the quality gate before publishing, because a
+tag can point at a commit that never saw pull-request CI. Image publication is
+gated on the quality job; the training smoke test is additionally required when
+`dl/training/train.py` exists. The promotion job is gated on
+`k8s/overlays/local/kustomization.yaml` and opens a reviewed commit that pins the
+image digests. The model-bundle digest joins the same promotion step when the
+export bundle exists. Argo CD pulls that commit; CI never receives cluster
+credentials.
+
+Published references are **immutable**: the release tag `v1.0.0` plus a
+`sha-<commit>` tag, and the digest recorded in the workflow summary. `latest`
+and moving `major.minor` tags are not pushed or deployed. When the model bundle
+exists, it is promoted by digest, not by a mutable tag.
 
 The optional jobs are gated by a small `changes` job that checks for the files
 and exposes the result as a job output. This is deliberate: job-level
@@ -336,19 +397,27 @@ gates are a fix, not a feature.
 ## 10. Planned Kubernetes, Minikube and Argo CD workflow
 
 **Status: `missing`.** The target is documented in
-[**ADR-0004**](docs/adr/0004-vercel-and-gitops-deployment.md) and
+[**ADR-0004**](docs/adr/0004-vercel-and-gitops-deployment.md),
+[**ADR-0008**](docs/adr/0008-promotion-and-model-registry.md) and
 [`docs/architecture/`](docs/architecture/README.md); no manifests exist.
 
-1. CD publishes pinned `-api` and `-prototype` image tags to GHCR.
+1. CD runs the quality gate and publishes `-api` and `-prototype` images with
+   immutable tags/digests. Once export exists it publishes the model bundle as a
+   versioned OCI artifact, then opens a promotion commit that pins the available
+   digests in `k8s/overlays/local/`.
 2. `k8s/base/` holds the API and prototype Deployments, Services, ConfigMap and
    the prototype Ingress; `k8s/overlays/local/` targets Minikube. FastAPI is a
-   ClusterIP Service; only the Streamlit prototype is exposed.
-3. An Argo CD application watches this repository and syncs the local overlay,
-   so a cluster change is a commit rather than a manual edit.
+   ClusterIP Service; only the Streamlit prototype is exposed. The model bundle
+   is fetched by an init container or mounted from a pre-seeded read-only volume;
+   it is **not** baked into the API image.
+3. An Argo CD application watches this repository and **pulls** the promoted
+   commit to sync the local overlay. CI has no cluster credentials and does not
+   run `kubectl apply`, so every cluster change is reviewable in Git.
 4. Vercel deploys the Astro landing page from its Git integration and links to
    the public prototype URL.
-5. `docker compose` remains the local developer path (API + prototype).
-   Kubernetes is the demo target, not a requirement for contributing.
+5. `docker compose` remains the local developer path (API + prototype, with a
+   read-only local `artifacts/` mount). Kubernetes is the demo target, not a
+   requirement for contributing.
 
 **Reachability, solved by topology.** A Vercel page cannot call a Minikube API on
 `localhost`. The landing page is static and makes no API call; the browser opens
@@ -369,7 +438,7 @@ surfaces, not one dashboard:
 | Surface | Stack | Runs on | Purpose |
 |---|---|---|---|
 | **Landing** | Astro + Tailwind | **Vercel** | Project story, published results, links to the demo, report and repository |
-| **Prototype** | Streamlit | **Minikube** (or compose) | Upload or pick a frame, choose a model, set a threshold, see overlay/heatmap/scores |
+| **Prototype** | Streamlit | **Minikube** (or compose) | Upload or pick a frame, choose A/B/C, set a threshold, see overlay/score map/pixel statistics; XAI panel only when artifacts exist |
 
 The landing pages are `/` (story and status), `/results` (published comparison,
 empty until experiments land) and `/about` (protocol, ADR-0001 caveat, credits).
@@ -379,10 +448,21 @@ surface that calls FastAPI, and it does so from inside the cluster.
 The rules are narrow on purpose: the landing page makes no runtime API call and
 renders only numbers that trace to `docs/experiments/`; the prototype contains no
 model code, shows an explicit error when the API is unreachable and never draws a
-placeholder mask. The API contract remains the OpenAPI schema at `/docs`; the
-Streamlit client validates the fields it reads. No Vercel project, Astro app or
-Streamlit app exists yet. See
-[ADR-0006](docs/adr/0006-astro-and-streamlit-frontend.md).
+placeholder mask. The landing page has no generated API types or API base URL.
+
+`POST /predict` is `multipart/form-data` with `file`, `model` (`A`/`B`/`C`) and
+an optional `threshold`. It returns `model`, `model_digest`, the echoed
+`threshold`, `input` dimensions, base64 PNG `score_map_png_b64`,
+`mask_png_b64`, `overlay_png_b64`, `pixel_stats` and `timing_ms`. These are
+**pixel statistics, not evaluation metrics**: an upload has no ground truth, so
+the API does not compute IoU, Dice or AUPRC. The prototype may re-threshold a
+cached score map locally, but it must display the threshold that produced the
+mask. The full field table and example live in
+[`docs/architecture/README.md`](docs/architecture/README.md#frontendbackend-boundary);
+the OpenAPI schema at `/docs` is generated from `backend/app/schemas.py` when the
+service exists. No Vercel project, Astro app or Streamlit app exists yet. See
+[ADR-0006](docs/adr/0006-astro-and-streamlit-frontend.md) and
+[ADR-0009](docs/adr/0009-xai-evaluation-gate.md).
 
 ## 12. Technical and commercial validation
 
@@ -393,17 +473,19 @@ This table is only a summary; the matrix is the authority.
 
 | Validation | Weight | `implemented` | `in progress` | `missing` | `blocked` |
 |---|---:|---:|---:|---:|---:|
-| Technical (W9) | 60 % | 0 | 1 | 5 | 2 |
+| Technical (W9) | 60 % | 0 | 2 | 4 | 2 |
 | Commercial (W10) | 40 % | 0 | 4 | 9 | 2 |
-| **Both** | 100 % | **0** | **5** | **14** | **4** |
+| **Both** | 100 % | **0** | **6** | **13** | **4** |
 
 The zeros are the honest state at this commit. In particular:
 
-- **XAI is not planned** (gap G1). It is not in ADR-0002 or the roadmap, and no
-  method has been chosen. This is a technical-validation requirement, not an
-  optional extra.
+- **XAI is gated, not planned away** (gap G1). ADR-0009 fixes its place and
+  evidence format, but no method has been chosen and no code exists. This is a
+  technical-validation requirement, not an optional extra.
 - **No model exists**, so the comparison, the selected-model deployment and the
   commercial demo are all downstream of the same dependency.
+- **No normal-road split manifest is pinned**, so even the first training run
+  cannot yet claim a reproducible train/validation boundary.
 - **No commercial artefact exists** — no canvas, no 4Ps, no penetration
   strategy, no logo/flyer, no teaser and no report.
 - **Ownership is unassigned**; every CODEOWNERS path routes to the repository
@@ -420,10 +502,11 @@ The zeros are the honest state at this commit. In particular:
 - **No anomaly training data** by construction; the protocol is zero-shot or
   threshold-tuned on held-out folds, and the two regimes are never mixed.
 
-**Implementation gaps.** No loader, model, training loop, metric harness,
-experiment record, API, Astro landing page, Streamlit prototype, container,
-Kubernetes manifest, Argo CD application or Vercel project exists. The results
-table stays empty until a number can be traced to `docs/experiments/`.
+**Implementation gaps.** No normal-road manifest, loader, model, training loop,
+metric harness, experiment record, API, Astro landing page, Streamlit prototype,
+container, Kubernetes manifest, Argo CD application or Vercel project exists. The
+XAI gate has a place but no method (G1). The results table stays empty until a
+number can be traced to `docs/experiments/`.
 
 **Commercial gaps.** No introduction, context, existing/deployed-solutions
 survey, Business Model Canvas, 4Ps, penetration strategy, brand assets, teaser
@@ -467,19 +550,20 @@ RoadAnomaly/
 │   ├── evaluation/         metrics.py — defined once            (missing)
 │   ├── inference/          SavedModel export + scoring          (missing)
 │   └── notebooks/          EDA and result narratives            (missing)
-├── configs/                one YAML per experiment              (missing)
+├── configs/                run YAML + dataset manifests          (empty; README)
 ├── backend/                FastAPI inference service            (missing — stub)
 ├── frontend/               Astro landing + Streamlit prototype  (missing — READMEs)
 ├── prototypes/             intended experimental workflow       (README only)
 ├── tests/
 │   ├── dataset/            frame ↔ label contract (6 tests)     (implemented)
+│   ├── architecture/       spec + promotion rule (6 tests)      (implemented)
 │   ├── unit/               pure functions                       (missing)
 │   └── integration/        API and artifact contracts           (missing)
 ├── infra/                  README; docker/ + compose/ planned   (missing)
 ├── docs/
 │   ├── architecture/       archify spec, HTML and Mermaid docs
-│   ├── adr/                0001–0006
-│   ├── experiments/        one file per run set                 (empty log)
+│   ├── adr/                0001–0009
+│   ├── experiments/        one file per run set (template)      (empty log)
 │   ├── report/             technical outline + commercial plan  (outline only)
 │   └── validation/         requirements traceability matrix
 ├── assets/                 generated README images

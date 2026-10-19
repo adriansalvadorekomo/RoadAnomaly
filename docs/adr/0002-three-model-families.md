@@ -7,6 +7,10 @@
 > **Framework note (ADR-0005).** The three-family decision stands. Model C is
 > implemented with TensorFlow-native DeepLabV3+ / U-Net instead of SegFormer;
 > the MSP baseline and the shared evaluation harness are unchanged.
+>
+> **XAI note (ADR-0009).** Explainability is required evaluation evidence for
+> the selected model, not a fourth model family. The method is still undecided
+> (gap G1) and does not change the three-family comparison.
 
 ## Context
 

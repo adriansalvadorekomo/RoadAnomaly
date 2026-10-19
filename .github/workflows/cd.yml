@@ -1,13 +1,14 @@
 name: CD
 
 # Runs on version tags: v1.0.0, v0.2.1, ...
-# Publishes immutable API and prototype images, re-runs the training smoke
-# test, and deploys the technical report to GitHub Pages.
+#
+# The order is deliberate: quality gate -> optional training smoke -> immutable
+# images -> reviewed promotion commit. A tag can point at a commit that never
+# saw pull-request CI, so CD re-runs the checks instead of trusting it.
 #
 # The Astro landing page is not built here: Vercel deploys it from its Git
-# integration. Nothing here runs on a pull request. The only trigger is a tag,
-# so a bad tag is the only thing that can deploy — and tags are created
-# deliberately.
+# integration. Nothing here runs on a pull request. CI does not hold cluster
+# credentials; Argo CD pulls the promotion commit.
 
 on:
   push:
@@ -36,6 +37,7 @@ jobs:
       images: ${{ steps.detect.outputs.images }}
       smoke: ${{ steps.detect.outputs.smoke }}
       report: ${{ steps.detect.outputs.report }}
+      manifests: ${{ steps.detect.outputs.manifests }}
     steps:
       - uses: actions/checkout@v4
 
@@ -45,12 +47,51 @@ jobs:
           echo "images=$(test -f infra/docker/Dockerfile.backend && test -f infra/docker/Dockerfile.prototype && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "smoke=$(test -f dl/training/train.py && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "report=$(test -f docs/report/_quarto.yml && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "manifests=$(test -f k8s/overlays/local/kustomization.yaml && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  quality:
+    name: Quality gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+
+      - name: Install development dependencies
+        run: pip install -r requirements/dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Format check
+        run: ruff format --check .
+
+      - name: Type-check
+        run: mypy dl backend tests
+
+      - name: Architecture contract
+        run: pytest -q tests/architecture -v
+
+      - name: Full test suite
+        run: pytest -q
 
   images:
-    name: Publish images to GHCR
-    needs: changes
-    if: needs.changes.outputs.images == 'true'
+    name: Publish immutable images to GHCR
+    needs: [changes, quality, smoke-train]
+    if: |
+      always() &&
+      github.ref_type == 'tag' &&
+      needs.changes.outputs.images == 'true' &&
+      needs.quality.result == 'success' &&
+      (needs.changes.outputs.smoke != 'true' || needs.smoke-train.result == 'success')
     runs-on: ubuntu-latest
+    outputs:
+      api_digest: ${{ steps.build-api.outputs.digest }}
+      prototype_digest: ${{ steps.build-prototype.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
 
@@ -63,37 +104,37 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Derive tags and labels
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix=sha-
-
       - name: Build and push API image
+        id: build-api
         uses: docker/build-push-action@v6
         with:
           context: .
           file: infra/docker/Dockerfile.backend
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api:${{ github.ref_name }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api:${{ github.ref_name }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api:sha-${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Build and push prototype image
+        id: build-prototype
         uses: docker/build-push-action@v6
         with:
           context: .
           file: infra/docker/Dockerfile.prototype
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype:${{ github.ref_name }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype:${{ github.ref_name }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype:sha-${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -102,18 +143,72 @@ jobs:
           {
             echo "### Images published for \`${{ github.ref_name }}\`"
             echo
-            echo "| Image | Tag |"
-            echo "|---|---|"
-            echo "| \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api\` | \`${{ github.ref_name }}\` |"
-            echo "| \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype\` | \`${{ github.ref_name }}\` |"
+            echo "Immutable references:"
             echo
+            echo "| Image | Digest |"
+            echo "|---|---|"
+            echo "| \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api\` | \`${{ steps.build-api.outputs.digest }}\` |"
+            echo "| \`${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype\` | \`${{ steps.build-prototype.outputs.digest }}\` |"
+            echo
+            echo "Tags: \`${{ github.ref_name }}\` and \`sha-${{ github.sha }}\`. No \`latest\` tag is published."
             echo "The Astro landing page is deployed by Vercel's Git integration."
+            echo "Promotion pins these digests in the Kubernetes overlay; Argo CD pulls the commit."
           } >> "$GITHUB_STEP_SUMMARY"
+
+  promotion:
+    name: Open image-digest promotion PR
+    needs: [changes, quality, images]
+    if: |
+      github.ref_type == 'tag' &&
+      needs.changes.outputs.manifests == 'true' &&
+      needs.quality.result == 'success' &&
+      needs.images.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: imranismail/setup-kustomize@v2
+
+      - name: Pin image digests in the local overlay
+        env:
+          API_DIGEST: ${{ needs.images.outputs.api_digest }}
+          PROTOTYPE_DIGEST: ${{ needs.images.outputs.prototype_digest }}
+        run: |
+          test -n "$API_DIGEST"
+          test -n "$PROTOTYPE_DIGEST"
+          cd k8s/overlays/local
+          kustomize edit set image \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-api@${API_DIGEST}"
+          kustomize edit set image \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-prototype@${PROTOTYPE_DIGEST}"
+
+      - name: Open the promotion PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: promote ${{ github.ref_name }} image digests"
+          title: "chore: promote ${{ github.ref_name }}"
+          body: |
+            Promotes the images published for `${{ github.ref_name }}` by digest.
+
+            | Image | Digest |
+            |---|---|
+            | API | `${{ needs.images.outputs.api_digest }}` |
+            | Prototype | `${{ needs.images.outputs.prototype_digest }}` |
+
+            This PR does not deploy. Argo CD pulls the merged commit and syncs Minikube.
+            The model OCI bundle is promoted separately once `dl/inference/` and the
+            registry bundle exist; no weights are committed here.
+          branch: release/${{ github.ref_name }}
+          delete-branch: true
 
   smoke-train:
     name: Training smoke test
-    needs: changes
-    if: needs.changes.outputs.smoke == 'true'
+    needs: [changes, quality]
+    if: needs.quality.result == 'success' && needs.changes.outputs.smoke == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -145,8 +240,8 @@ jobs:
 
   report:
     name: Publish technical report
-    needs: changes
-    if: needs.changes.outputs.report == 'true'
+    needs: [changes, quality]
+    if: needs.changes.outputs.report == 'true' && needs.quality.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read

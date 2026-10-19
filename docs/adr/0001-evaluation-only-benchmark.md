@@ -4,6 +4,17 @@
 - **Date:** 2026-10-18
 - **Deciders:** whole team
 
+> **CRISP-DM and split clarification (2026-10-19).** This ADR is the phase 1
+> (Business understanding) guardrail; phase 5 (Evaluation) enforces it. The
+> scene-grouped folds named below are for the **threshold-tuned evaluation
+> regime on RoadAnomaly only**. They never train a model and never choose an
+> early-stopping checkpoint. Early stopping and model selection use
+> scene-grouped folds drawn from the **normal-road corpus**, with the source
+> release and split hash pinned in the run manifest. No RoadAnomaly fold may
+> influence weights, early stopping, the selected alias or a deployment gate.
+> See [ADR-0007](0007-crisp-dm-methodology.md) and
+> [ADR-0008](0008-promotion-and-model-registry.md).
+
 ## Context
 
 The RoadAnomaly dataset folder in this repository contains 60 images, each

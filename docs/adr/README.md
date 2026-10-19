@@ -11,6 +11,9 @@ code so nobody has to reconstruct the reasoning from a group chat.
 | [0004](0004-vercel-and-gitops-deployment.md) | Vercel frontend, Kubernetes + Argo CD inference target | Accepted (not implemented); inference runtime amended by 0005 |
 | [0005](0005-tensorflow-framework.md) | TensorFlow/Keras for training and inference | Accepted |
 | [0006](0006-astro-and-streamlit-frontend.md) | Astro landing page + Streamlit prototype; FastAPI backend | Accepted (not implemented) |
+| [0007](0007-crisp-dm-methodology.md) | Use CRISP-DM as the project methodology | Accepted |
+| [0008](0008-promotion-and-model-registry.md) | Select on normal-road validation; immutable registry and GitOps promotion | Accepted (not implemented) |
+| [0009](0009-xai-evaluation-gate.md) | XAI is an evaluation gate; method remains open | Accepted; method `blocked` (G1) |
 
 ## Adding one
 
