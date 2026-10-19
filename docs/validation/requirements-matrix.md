@@ -33,8 +33,8 @@ the evidence that would satisfy it. **A README statement is not evidence.**
 
 | ID | Requirement | Evidence today | File / document | Status |
 |---|---|---|---|---|
-| V2.1 | Introduction | No commercial report exists. | none | `missing` |
-| V2.2 | General context | No commercial report exists. | none | `missing` |
+| V2.1 | Introduction | A standalone preliminary Business Understanding report exists; it is not yet integrated into the commercial report. | `docs/report/Buisness Understanding report.pdf` | `in progress` |
+| V2.2 | General context | Covered in the standalone preliminary Business Understanding report; the commercial report chapter is not yet integrated. | `docs/report/Buisness Understanding report.pdf` | `in progress` |
 | V2.3 | Existing solutions | No survey or comparison exists. | none | `missing` |
 | V2.4 | Deployed solutions | No survey or comparison exists. | none | `missing` |
 | V2.5 | Problem statement | The operational problem is written for a technical audience. | `README.md` §1 | `in progress` |
@@ -47,7 +47,7 @@ the evidence that would satisfy it. **A README statement is not evidence.**
 | V2.12 | Charts, logo and flyer | No brand or communication artefact exists. | none | `missing` |
 | V2.13 | Conclusion | No report exists. | none | `missing` |
 | V2.14 | 45-second commercial teaser | No demo exists to film. | none | `blocked` on V2.7/V1.7 |
-| V2.15 | Complete report | Neither the technical nor the commercial report exists. | `docs/report/README.md` (outline only) | `blocked` on results and V2.1–V2.13 |
+| V2.15 | Complete report | The standalone Business Understanding report is preliminary; neither complete report is available. | `docs/report/README.md` (outline and preliminary report) | `blocked` on results and V2.1–V2.13 |
 
 ## Summary
 

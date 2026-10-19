@@ -4,7 +4,7 @@
 |---|---|
 | `adr/` | Architecture and experiment decisions with the reasoning (start with [0001](adr/0001-evaluation-only-benchmark.md); methodology is [0007](adr/0007-crisp-dm-methodology.md)) |
 | `experiments/` | One file per run set: what was run, with which config, and what came out |
-| `report/` | The technical report (Quarto → PDF/HTML, published to Pages by CD) and the commercial deliverable plan |
+| `report/` | Technical report outline, commercial deliverable plan, and a standalone preliminary Business Understanding report (TeX/PDF) |
 | `validation/` | Traceability matrix for the technical and commercial validations |
 | `architecture/` | Component and deployment documentation; `architecture.json` (archify spec) and the generated `architecture.html` / README PNGs |
 

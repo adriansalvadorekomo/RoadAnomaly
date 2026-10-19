@@ -47,7 +47,8 @@ follow [`docs/validation/requirements-matrix.md`](../validation/requirements-mat
 
 | Deliverable | Source material today | Status |
 |---|---|---|
-| Introduction, general context, existing/deployed solutions | Nothing beyond the technical problem statement | `missing` (problem statement `in progress` in `README.md`) |
+| Introduction and general context | Standalone preliminary Business Understanding report ([TeX](Buisness%20Understanding%20report.tex), [PDF](Buisness%20Understanding%20report.pdf)); not yet integrated into the commercial report | `in progress` |
+| Existing/deployed solutions | No survey or comparison yet | `missing` |
 | Methodology, proposed solution, work completed | ADR-0001/0002/0003/0004/0007/0008/0009 and the README status sections | `in progress` |
 | Business Model Canvas | none | `missing` |
 | Marketing Mix (4Ps) | none | `missing` |
@@ -57,9 +58,9 @@ follow [`docs/validation/requirements-matrix.md`](../validation/requirements-mat
 | 45-second commercial teaser | Requires a working demo | `blocked` |
 | Complete commercial report | Requires the sections above | `blocked` |
 
-No commercial artefact exists at this commit. This table is a plan, not a
-claim, and it must be updated from evidence like every other status in the
-repository.
+The standalone Business Understanding report is preliminary and does not
+fulfil the complete commercial deliverable. This table tracks that deliverable
+and must be updated from evidence like every other status in the repository.
 
-The format (slides, PDF, or both) is not decided yet; do not create a
-commercial subdirectory until the first artefact has a home.
+The format of the complete commercial report (slides, PDF, or both) is not
+decided yet.

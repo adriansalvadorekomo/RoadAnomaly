@@ -508,9 +508,12 @@ container, Kubernetes manifest, Argo CD application or Vercel project exists. Th
 XAI gate has a place but no method (G1). The results table stays empty until a
 number can be traced to `docs/experiments/`.
 
-**Commercial gaps.** No introduction, context, existing/deployed-solutions
-survey, Business Model Canvas, 4Ps, penetration strategy, brand assets, teaser
-or complete report exists. The plan and statuses are in
+**Commercial gaps.** A standalone preliminary Business Understanding report
+covers the introduction and general context, but is not yet integrated into
+the commercial report. The existing/deployed-solutions survey, Business Model
+Canvas, 4Ps, penetration strategy, brand assets, teaser and complete report
+remain outstanding. The draft is in [`docs/report/`](docs/report/); the plan
+and statuses are in
 [`docs/report/README.md`](docs/report/README.md).
 
 **People.** Workstream ownership is assigned at the kickoff meeting; until then
@@ -564,7 +567,7 @@ RoadAnomaly/
 │   ├── architecture/       archify spec, HTML and Mermaid docs
 │   ├── adr/                0001–0009
 │   ├── experiments/        one file per run set (template)      (empty log)
-│   ├── report/             technical outline + commercial plan  (outline only)
+│   ├── report/             technical outline + commercial plan + Business Understanding draft
 │   └── validation/         requirements traceability matrix
 ├── assets/                 generated README images
 └── .github/                CI/CD, CODEOWNERS, PR and issue templates
