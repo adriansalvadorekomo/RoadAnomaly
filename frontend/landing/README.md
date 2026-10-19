@@ -12,7 +12,9 @@ the technical report and the repository.
   Minikube cluster to be running.
 - **No invented metrics.** The build reads `docs/experiments/`; a model or metric
   appears only when its experiment file exists. Until then, the results section
-  says the comparison is not published yet.
+  says the comparison is not published yet. Normal-road selection and
+  RoadAnomaly held-out columns stay separate; the page never presents a single
+  "best" number that hides the protocol.
 - **No model assets.** The page may show a published figure from `assets/`, but
   it does not ship a SavedModel or call FastAPI.
 - **Clear status language.** The site carries the same `implemented`,

@@ -25,8 +25,8 @@ The deliverable actually has two surfaces with different jobs:
    report and the demo, and is fast, indexable and cheap to host. It does not
    need a live model call.
 2. An **interactive prototype** where a reviewer uploads or picks a frame, runs
-   the selected model, moves the threshold and sees the overlay and heatmap.
-   This is a demo tool, not a production UI.
+   a candidate model (the selected alias by default), moves the threshold and
+   sees the overlay and score map. This is a demo tool, not a production UI.
 
 Building both as one Next.js application means writing a custom upload flow,
 state management and chart layer before the prototype can be evaluated. Astro
@@ -51,8 +51,10 @@ removes that constraint without exposing the inference API publicly.
 2. **Interactive prototype: Streamlit** in `frontend/prototype/`. It can upload
    a frame or pick a bundled evaluation frame, select a model, set an optional
    threshold and call the FastAPI `POST /predict` endpoint. It renders the
-   overlay, heatmap, scores and timing. It contains no model code and never
-   fabricates a result when the API is unavailable.
+   overlay, heatmap, pixel statistics and timing. It contains no model code and
+   never fabricates a result when the API is unavailable. An XAI panel appears
+   only after [ADR-0009](0009-xai-evaluation-gate.md) has a method and
+   explanation artifacts exist; it never renders a placeholder explanation.
 3. **Backend: FastAPI stays the only inference service.** It loads the
    TensorFlow SavedModel, owns preprocessing and returns the score map, mask and
    timing. The prototype is a client, not a second model runtime.

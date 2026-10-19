@@ -28,6 +28,10 @@ See [ADR-0006](../docs/adr/0006-astro-and-streamlit-frontend.md).
   attribution in [`data/credits.txt`](../data/credits.txt).
 - **The API contract is the OpenAPI schema** at `/docs`. The prototype validates
   the fields it reads; the landing page has no runtime API types to generate.
+  `pixel_stats` are display statistics, not IoU/Dice/AUPRC.
+- **XAI is gated.** The prototype shows an explanation panel only when the
+  method is chosen and artifacts exist (ADR-0009). It must not label a score map
+  as Grad-CAM or any other explanation method.
 
 ## Local commands
 

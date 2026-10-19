@@ -14,6 +14,13 @@
 > Streamlit prototype and FastAPI run in Minikube; the prototype is the only
 > public workload and calls FastAPI over the cluster network. The Vercel page
 > links to the prototype instead of calling the Minikube API directly.
+>
+> **Artifact and promotion note (ADR-0008).** CD publishes immutable image
+> digests and a versioned model bundle to GHCR; it does not apply workloads to
+> the cluster. The model bundle contains all three candidate SavedModels plus
+> manifests and a `selected` alias. Promotion is a reviewed commit that pins
+> those digests in the overlay. Argo CD **pulls** that commit and syncs Minikube;
+> CI holds no cluster credentials.
 
 ## Context
 
@@ -44,7 +51,7 @@ silently contradicting it.
    syncs the local overlay. A cluster change is a commit, not a manual edit.
 4. **Images: GHCR.** The existing CD workflow publishes `-api` and `-web`
    images on tags. *(Now `-api` and `-prototype`; see ADR-0006.)* Kubernetes
-   pulls the pinned tag; `latest` is never deployed.
+   pulls the pinned digest/commit; `latest` is never deployed.
 5. **Local developer path: `docker compose`.** `infra/compose/` remains the
    fastest way to run both services on a laptop. Kubernetes is the demo target,
    not a requirement for contributing.

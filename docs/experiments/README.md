@@ -17,4 +17,6 @@ can, this directory is where the new number is justified.
 
 Because an experiment is only useful if it records what was *assumed* as well as
 what was measured. The template asks for the hypothesis and for the result that
-would have falsified it, which is the part that gets lost first.
+would have falsified it, which is the part that gets lost first. It also forces
+normal-road **selection** metrics and held-out **RoadAnomaly** scores into
+separate rows: they are different evidence and must never be averaged together.

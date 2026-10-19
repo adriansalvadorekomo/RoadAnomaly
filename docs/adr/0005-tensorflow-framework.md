@@ -31,10 +31,16 @@ or FCN as the fallback.
 - **Metrics stay framework-agnostic.** `dl/evaluation/metrics.py` consumes NumPy
   score maps and ground-truth masks; it does not import TensorFlow.
 - **Export:** a TensorFlow **SavedModel** with a documented serving signature,
-  plus a `manifest.json` containing the git SHA, config hash, dataset version,
-  TensorFlow version, input spec, validation metrics and default threshold.
-  There is no TorchScript or ONNX step.
-- **Serving:** FastAPI loads the SavedModel once at startup with
+  plus a `manifest.json` containing the git SHA, config hash, normal-road dataset
+  manifest ID and split hash, TensorFlow version, input spec, normal-road
+  validation metrics, default threshold and artifact digest. There is no
+  TorchScript or ONNX step.
+- **Registry:** export produces all three candidate SavedModels and manifests;
+  `selected.json` points at the candidate chosen on normal-road validation. The
+  release bundle is published as an OCI artifact to GHCR and mounted read-only
+  by the API. RoadAnomaly metrics stay in `docs/experiments/` and never enter
+  the selection fields. See [ADR-0008](0008-promotion-and-model-registry.md).
+- **Serving:** FastAPI loads the selected SavedModel once at startup with
   `tensorflow-cpu`; `POST /predict` accepts a threshold as a request parameter.
   TensorFlow Serving and TFLite are not part of the initial target.
 - **Dependencies:** `requirements/dl.txt` installs `tensorflow==2.21.*` for
