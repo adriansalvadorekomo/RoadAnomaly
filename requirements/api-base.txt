@@ -1,0 +1,9 @@
+# Framework-free API dependencies.
+# Used by the API image (through api.txt) and by `make install`, which already
+# installs TensorFlow for training. This file must not pin a TensorFlow flavor.
+fastapi>=0.111
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+pydantic>=2.7
+numpy>=1.26
+pillow>=10.3

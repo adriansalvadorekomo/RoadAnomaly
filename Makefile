@@ -10,7 +10,7 @@ VENV ?= .venv
 BIN := $(VENV)/bin
 
 .PHONY: help venv install lint fmt type test test-fast data-check \
-        train eval export serve ui up down clean
+        train eval export serve landing prototype up down clean
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -20,8 +20,8 @@ venv: ## Create the local virtual environment
 	$(PY) -m venv $(VENV)
 	$(BIN)/pip install --upgrade pip
 
-install: venv ## Install dev + deep learning + API dependencies
-	$(BIN)/pip install -r requirements/dl.txt -r requirements/api.txt -r requirements/dev.txt
+install: venv ## Install dev + deep learning + API + prototype dependencies
+	$(BIN)/pip install -r requirements/dl.txt -r requirements/api-base.txt -r requirements/prototype.txt -r requirements/dev.txt
 
 lint: ## Ruff lint + format check
 	$(BIN)/ruff check .
@@ -46,19 +46,22 @@ data-check: ## Validate the RoadAnomaly checkout (frame <-> label contract)
 train: ## Train one model. Usage: make train CONFIG=configs/ae.yaml
 	$(BIN)/python -m dl.training.train --config $(CONFIG)
 
-eval: ## Evaluate a checkpoint. Usage: make eval CKPT=artifacts/best.pt
+eval: ## Evaluate a checkpoint. Usage: make eval CKPT=artifacts/best.keras
 	$(BIN)/python -m dl.evaluation.evaluate --ckpt $(CKPT)
 
-export: ## Export a checkpoint to TorchScript/ONNX for the API
-	$(BIN)/python -m dl.inference.to_onnx --ckpt $(CKPT)
+export: ## Export a checkpoint to a SavedModel for the API
+	$(BIN)/python -m dl.inference.export_savedmodel --ckpt $(CKPT)
 
 serve: ## Run the FastAPI inference service on :8000
 	cd backend && ../$(BIN)/uvicorn app.main:app --reload --port 8000
 
-ui: ## Run the Next.js dashboard on :3000
-	cd frontend && npm run dev
+landing: ## Run the Astro landing page on :4321
+	cd frontend/landing && npm run dev
 
-up: ## Bring up the whole stack (API + dashboard) with compose
+prototype: ## Run the Streamlit prototype on :8501
+	$(BIN)/streamlit run frontend/prototype/app.py --server.port 8501
+
+up: ## Bring up the local stack (API + prototype) with compose
 	docker compose -f infra/compose/docker-compose.yml up --build
 
 down: ## Stop the stack

@@ -2,11 +2,13 @@
 #
 # This file holds *tool configuration only*. Dependencies live in
 # requirements/*.txt so that CI can install a light dev environment
-# without pulling ~2 GB of PyTorch for a lint job:
+# without pulling a large TensorFlow wheel for a lint job:
 #
-#   requirements/dev.txt  lint, types, tests, dataset integrity  (fast, no torch)
+#   requirements/dev.txt  lint, types, tests, dataset integrity  (fast, no TensorFlow)
 #   requirements/dl.txt   training, evaluation, notebooks
-#   requirements/api.txt  FastAPI inference service
+#   requirements/api-base.txt  framework-free FastAPI service dependencies
+#   requirements/api.txt  full API image (FastAPI + tensorflow-cpu)
+#   requirements/prototype.txt  Streamlit prototype client
 
 [project]
 name = "roadanomaly"

@@ -4,6 +4,10 @@
 - **Date:** 2026-10-18
 - **Deciders:** whole team
 
+> **Framework note (ADR-0005).** The three-family decision stands. Model C is
+> implemented with TensorFlow-native DeepLabV3+ / U-Net instead of SegFormer;
+> the MSP baseline and the shared evaluation harness are unchanged.
+
 ## Context
 
 The module asks us to "experiment with suitable deep learning approaches,

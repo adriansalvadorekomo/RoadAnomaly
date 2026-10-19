@@ -1,0 +1,7 @@
+# Local Streamlit prototype.
+# Install with:  pip install -r requirements/prototype.txt
+# The prototype calls the FastAPI service; it does not load a model itself.
+streamlit>=1.37
+requests>=2.32
+pillow>=10.3
+numpy>=1.26

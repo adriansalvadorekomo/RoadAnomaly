@@ -2,48 +2,197 @@
   "schema_version": 1,
   "diagram_type": "architecture",
   "meta": {
-    "title": "RoadAnomaly Target Architecture",
+    "title": "RoadAnomaly End-to-End System Map",
     "locale": "en",
     "output": "architecture.html",
     "quality_profile": "showcase",
     "views": [
-      { "id": "dl-path", "label": "Deep learning pipeline", "focus": ["normal", "dataset", "preproc", "train", "eval", "registry"], "note": "Normal-road corpora pre-train the models; RoadAnomaly stays a held-out anomaly benchmark." },
-      { "id": "serving-path", "label": "Serving path", "focus": ["registry", "api", "web"], "note": "Exported artifacts load into FastAPI on Kubernetes; the Next.js dashboard is deployed to Vercel." },
-      { "id": "delivery-path", "label": "Delivery path", "focus": ["cicd", "ghcr", "api", "web"], "note": "CI gates every pull request; version tags publish images to GHCR and Argo CD syncs the Kubernetes overlay." }
+      {
+        "id": "train-eval",
+        "label": "Train & evaluate",
+        "focus": ["pipeline", "model_a", "model_b", "model_c", "benchmark", "eval", "registry"],
+        "note": "Normal-road data trains three families; RoadAnomaly only scores them."
+      },
+      {
+        "id": "serve-experience",
+        "label": "Serve & experience",
+        "focus": ["registry", "api", "prototype", "landing"],
+        "note": "FastAPI is internal; Streamlit is the public demo; Astro links to it."
+      },
+      {
+        "id": "delivery",
+        "label": "Deliver & deploy",
+        "focus": ["cicd", "k8s", "api", "prototype", "landing"],
+        "note": "GitHub Actions publishes images; Argo CD syncs Minikube; Vercel builds the landing page."
+      }
     ]
   },
   "components": [
-    { "id": "normal", "type": "external", "label": "Normal-road corpora", "sublabel": "Cityscapes / BDD100K", "pos": [60, 90], "size": [180, 62] },
-    { "id": "dataset", "type": "database", "label": "RoadAnomaly dataset", "sublabel": "60 frames · 1280×720", "pos": [60, 222], "size": [180, 62], "tag": "eval-only" },
-    { "id": "preproc", "type": "backend", "label": "Preprocessing", "sublabel": "mask decode · resize", "pos": [320, 156], "size": [170, 62] },
-    { "id": "train", "type": "backend", "label": "Training", "sublabel": "PyTorch", "pos": [580, 156], "size": [160, 62], "tag": "3 architectures" },
-    { "id": "eval", "type": "backend", "label": "Evaluation", "sublabel": "IoU · Dice · F1 · AUPRC", "pos": [830, 156], "size": [170, 62] },
-    { "id": "registry", "type": "database", "label": "Model registry", "sublabel": "TorchScript / ONNX", "pos": [1080, 156], "size": [180, 62] },
-    { "id": "api", "type": "backend", "label": "FastAPI inference", "sublabel": ":8000 POST /predict", "pos": [830, 372], "size": [160, 62], "tag": "K8s target" },
-    { "id": "web", "type": "frontend", "label": "Next.js dashboard", "sublabel": "overlay + heatmap · Vercel", "pos": [1080, 372], "size": [180, 62] },
-    { "id": "cicd", "type": "cloud", "label": "GitHub Actions", "sublabel": "CI per PR · CD per tag", "pos": [580, 534], "size": [160, 62] },
-    { "id": "ghcr", "type": "cloud", "label": "GHCR", "sublabel": "pinned tags · K8s", "pos": [830, 534], "size": [160, 62] }
+    {
+      "id": "pipeline",
+      "type": "external",
+      "label": "Normal-road pipeline",
+      "sublabel": "Cityscapes / BDD100K · tf.data · train/val",
+      "pos": [380, 110],
+      "size": [260, 72],
+      "tag": "normal only"
+    },
+    {
+      "id": "model_a",
+      "type": "backend",
+      "label": "A · Autoencoder",
+      "sublabel": "reconstruct → per-pixel error",
+      "pos": [40, 300],
+      "size": [240, 72],
+      "tag": "family A"
+    },
+    {
+      "id": "model_b",
+      "type": "backend",
+      "label": "B · Resynthesis",
+      "sublabel": "synthesize → residual",
+      "pos": [380, 300],
+      "size": [260, 72],
+      "tag": "family B"
+    },
+    {
+      "id": "model_c",
+      "type": "backend",
+      "label": "C · Segmentation",
+      "sublabel": "DeepLabV3+ / U-Net · MSP",
+      "pos": [780, 300],
+      "size": [240, 72],
+      "tag": "family C"
+    },
+    {
+      "id": "benchmark",
+      "type": "database",
+      "label": "RoadAnomaly benchmark",
+      "sublabel": "60 frames · {0,2} · never trained",
+      "pos": [40, 520],
+      "size": [240, 72],
+      "tag": "eval-only"
+    },
+    {
+      "id": "eval",
+      "type": "backend",
+      "label": "Shared evaluation harness",
+      "sublabel": "IoU · Dice · F1 · AUPRC · threshold CV",
+      "pos": [380, 520],
+      "size": [260, 72]
+    },
+    {
+      "id": "registry",
+      "type": "database",
+      "label": "Model registry",
+      "sublabel": "SavedModel + manifest · versioned",
+      "pos": [780, 520],
+      "size": [240, 72]
+    },
+    {
+      "id": "landing",
+      "type": "frontend",
+      "label": "Astro landing page",
+      "sublabel": "Vercel · static · links to demo + report",
+      "pos": [40, 720],
+      "size": [240, 76],
+      "tag": "Vercel"
+    },
+    {
+      "id": "prototype",
+      "type": "frontend",
+      "label": "Streamlit prototype",
+      "sublabel": "public ingress · overlay + heatmap + compare",
+      "pos": [380, 720],
+      "size": [260, 76],
+      "tag": "public demo"
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "FastAPI inference",
+      "sublabel": ":8000 POST /predict · cluster-internal",
+      "pos": [780, 720],
+      "size": [240, 76],
+      "tag": "TensorFlow"
+    },
+    {
+      "id": "cicd",
+      "type": "cloud",
+      "label": "GitHub Actions + GHCR",
+      "sublabel": "CI per PR · images per tag",
+      "pos": [380, 930],
+      "size": [260, 72]
+    },
+    {
+      "id": "k8s",
+      "type": "cloud",
+      "label": "Minikube + Argo CD",
+      "sublabel": "syncs API + prototype",
+      "pos": [780, 930],
+      "size": [240, 72],
+      "tag": "GitOps"
+    }
   ],
   "boundaries": [
-    { "kind": "region", "label": "Deep learning pipeline · dl/", "wraps": ["normal", "dataset", "preproc", "train", "eval", "registry"] },
-    { "kind": "region", "label": "Serving stack · Compose → Vercel + K8s", "wraps": ["api", "web"] },
-    { "kind": "region", "label": "Delivery · CI/CD + Argo CD", "wraps": ["cicd", "ghcr"] }
+    { "kind": "region", "label": "1 · Data · normal-road only", "wraps": ["pipeline"] },
+    { "kind": "region", "label": "2 · Modeling · TensorFlow/Keras", "wraps": ["model_a", "model_b", "model_c"] },
+    { "kind": "region", "label": "3 · Evaluation & promotion · eval-only benchmark", "wraps": ["benchmark", "eval", "registry"] },
+    { "kind": "region", "label": "4 · Serving & experience · Minikube + Vercel", "wraps": ["landing", "prototype", "api"] },
+    { "kind": "region", "label": "5 · Delivery · GitHub Actions + Argo CD", "wraps": ["cicd", "k8s"] }
   ],
   "connections": [
-    { "id": "normal-to-preproc", "from": "normal", "to": "preproc", "label": "pretraining" },
-    { "id": "dataset-to-preproc", "from": "dataset", "to": "preproc", "label": "frames + GT" },
-    { "id": "preproc-to-train", "from": "preproc", "to": "train", "label": "batches" },
-    { "id": "train-to-eval", "from": "train", "to": "eval", "label": "checkpoints" },
-    { "id": "eval-to-registry", "from": "eval", "to": "registry", "label": "best model" },
-    { "id": "registry-to-api", "from": "registry", "to": "api", "label": "loads model", "fromSide": "bottom", "toSide": "top", "via": [[1170, 323], [910, 323]] },
-    { "id": "api-to-web", "from": "api", "to": "web", "label": "mask + heatmap" },
-    { "id": "cicd-to-train", "from": "cicd", "to": "train", "label": "smoke test", "variant": "dashed", "fromSide": "top", "toSide": "bottom", "labelAt": [660, 400] },
-    { "id": "cicd-to-ghcr", "from": "cicd", "to": "ghcr", "label": "build & push", "variant": "dashed" },
-    { "id": "ghcr-to-api", "from": "ghcr", "to": "api", "label": "deploy · K8s", "variant": "dashed", "fromSide": "top", "toSide": "bottom" }
+    { "id": "pipeline-to-a", "from": "pipeline", "to": "model_a", "fromSide": "bottom", "toSide": "top" },
+    { "id": "pipeline-to-b", "from": "pipeline", "to": "model_b", "label": "train/val", "fromSide": "bottom", "toSide": "top", "labelAt": [510, 265] },
+    { "id": "pipeline-to-c", "from": "pipeline", "to": "model_c", "fromSide": "bottom", "toSide": "top" },
+    { "id": "a-to-eval", "from": "model_a", "to": "eval", "fromSide": "bottom", "toSide": "top" },
+    { "id": "b-to-eval", "from": "model_b", "to": "eval", "label": "score maps", "fromSide": "bottom", "toSide": "top", "labelAt": [510, 386] },
+    { "id": "c-to-eval", "from": "model_c", "to": "eval", "fromSide": "bottom", "toSide": "top" },
+    { "id": "benchmark-to-eval", "from": "benchmark", "to": "eval", "label": "held-out GT", "variant": "emphasis" },
+    { "id": "eval-to-registry", "from": "eval", "to": "registry", "label": "promote" },
+    { "id": "registry-to-api", "from": "registry", "to": "api", "label": "loads SavedModel", "fromSide": "bottom", "toSide": "top", "labelAt": [900, 606] },
+    { "id": "prototype-to-api", "from": "prototype", "to": "api", "label": "POST /predict", "fromSide": "right", "toSide": "left", "labelAt": [710, 738] },
+    { "id": "api-to-prototype", "from": "api", "to": "prototype", "label": "mask + heatmap", "fromSide": "left", "toSide": "right", "labelAt": [710, 782] },
+    { "id": "landing-to-prototype", "from": "landing", "to": "prototype", "label": "demo link", "variant": "dashed" },
+    { "id": "cicd-to-k8s", "from": "cicd", "to": "k8s", "label": "images + manifests" },
+    { "id": "k8s-to-api", "from": "k8s", "to": "api", "label": "hosts", "fromSide": "top", "toSide": "bottom" }
   ],
   "cards": [
-    { "dot": "cyan", "title": "Data", "items": ["60 frames, one anomaly class, eval-only", "14 semantic-only frames in the loader", "CI guards the frame ↔ label contract"] },
-    { "dot": "emerald", "title": "Models", "items": ["Autoencoder reconstruction error", "Image resynthesis (Lis et al. 2019)", "Transfer-learned DeepLabv3+ / SegFormer"] },
-    { "dot": "violet", "title": "Platform", "items": ["FastAPI returns mask, heatmap, scores", "Dashboard compares all three methods", "Vercel frontend · K8s + Argo CD"] }
+    {
+      "dot": "cyan",
+      "title": "Guardrail",
+      "items": [
+        "RoadAnomaly: 60 frames, labels {0,2}",
+        "Evaluation-only, never a training input",
+        "Threshold tuning uses scene-grouped folds"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Modeling",
+      "items": [
+        "A autoencoder · B resynthesis · C DeepLabV3+ / U-Net",
+        "One Keras interface: build / predict / export",
+        "TensorFlow 2.21 · SavedModel + manifest"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Experience",
+      "items": [
+        "Astro landing page on Vercel is static",
+        "Streamlit prototype calls FastAPI in-cluster",
+        "FastAPI stays internal; no public inference API"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Status",
+      "items": [
+        "Target architecture, not deployed",
+        "Vercel, Minikube and Argo CD are missing",
+        "Published numbers require docs/experiments/ evidence"
+      ]
+    }
   ]
 }

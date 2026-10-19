@@ -1,7 +1,7 @@
 # `backend/` — inference API
 
-Owner: **M5**. Stack: FastAPI + ONNX Runtime (CPU), same language as `dl/` so a
-model bug never requires switching ecosystems.
+Owner: **M5**. Stack: FastAPI + TensorFlow runtime (CPU), same language as
+`dl/` so a model bug never requires switching ecosystems.
 
 ```
 backend/
@@ -13,7 +13,7 @@ backend/
     └── registry.py    maps model name -> exported artifact path
 ```
 
-## Contract the dashboard depends on
+## Contract the prototype depends on
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -23,13 +23,17 @@ backend/
 
 `POST /predict` accepts `multipart/form-data` (`file`, `model`, optional
 `threshold`) and returns base64 PNG overlays plus timing. The OpenAPI schema at
-`/docs` is the source of truth: the frontend types are generated from it, so
-changing a field here means regenerating them there.
+`/docs` is the source of truth: the Streamlit prototype validates the fields it
+reads, and the Astro landing page has no runtime API client.
 
 ## Serving notes
 
-- Artifacts are **exported** by `dl/inference/`, not trained here. The API never
-  imports torch in production; it runs ONNX.
+- Artifacts are **exported** by `dl/inference/`, not trained here. The API loads
+  a TensorFlow SavedModel and its manifest; it does not import training code or
+  a second model ecosystem.
 - Threshold is a request parameter, not a constant, because ADR-0001 makes the
   operating point an explicit experimental choice.
 - Model loading happens once in the lifespan hook, never per request.
+- Preprocessing must match the training graph. The SavedModel exposes the
+  serving signature and its input specification in the manifest; a contract
+  test loads the exported artifact and checks the output shape and dtype.

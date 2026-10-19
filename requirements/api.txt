@@ -1,9 +1,6 @@
-# FastAPI inference service.
-# CPU inference: ONNX Runtime serves the exported models without torch.
-fastapi>=0.111
-uvicorn[standard]>=0.30
-python-multipart>=0.0.9
-pydantic>=2.7
-onnxruntime>=1.18
-numpy>=1.26
-pillow>=10.3
+# FastAPI inference image (CPU).
+# TensorFlow SavedModel is loaded by the API (ADR-0005).
+# Do not install this file and requirements/dl.txt into the same environment:
+# one pins tensorflow-cpu, the other pins tensorflow.
+-r api-base.txt
+tensorflow-cpu==2.21.*

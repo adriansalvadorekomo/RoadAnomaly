@@ -16,8 +16,8 @@ visible before it is promoted into `dl/`, `backend/` or `frontend/`.
 | 4 | Evaluation and comparison | shared metric harness, per-frame table, failure analysis | `dl/evaluation/`, `docs/experiments/` | missing |
 | 5 | Explainable AI (XAI) | saliency, occlusion or error maps plus a written justification of the method | `dl/inference/`, report | blocked — no trained model and no recorded method decision (gap G1) |
 | 6 | Image and video inference | single-frame and sequence scoring, latency measurement | `dl/inference/`, `backend/` | missing |
-| 7 | Streamlit prototyping (if adopted) | throwaway UI for one result | `prototypes/` | missing — not adopted; the canonical UI is Next.js |
-| 8 | Integration with backend and deployment | export → API → dashboard → Vercel / Kubernetes | `backend/`, `frontend/`, `infra/`, `k8s/` | blocked on steps 2–6 |
+| 7 | Streamlit prototype (accepted in ADR-0006) | interactive one-result UI | `frontend/prototype/` | missing |
+| 8 | Integration with backend and deployment | export → API → Astro landing + Streamlit prototype → Vercel / Kubernetes | `backend/`, `frontend/`, `infra/`, `k8s/` | blocked on steps 2–6 |
 
 ## Rules
 
@@ -25,9 +25,11 @@ visible before it is promoted into `dl/`, `backend/` or `frontend/`.
   must come from an experiment file.
 - Anything that survives validation moves into `dl/` (logic) or `frontend/`
   (UI). The API never imports from `prototypes/`.
-- Do not create a Streamlit or Astro application as part of a documentation or
-  structure change. If Streamlit is adopted, record the decision in an ADR
-  first.
+- The frontend split is accepted in
+  [ADR-0006](../docs/adr/0006-astro-and-streamlit-frontend.md): an Astro landing
+  page on Vercel and a Streamlit prototype. Do not add either application as
+  part of a documentation or structure change; implementation follows the ADR
+  and the evidence bar in the requirements matrix.
 - Step 5 is required by the technical validation. It is `blocked` on trained
   models, and it is also missing a method decision; both facts are tracked in
   [`docs/validation/requirements-matrix.md`](../docs/validation/requirements-matrix.md).

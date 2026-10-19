@@ -1,10 +1,12 @@
 # Training, evaluation, notebooks.
-# Install with:  pip install -r requirements/ml.txt
+# Install with:  pip install -r requirements/dl.txt
 #
-# CPU-only machines: replace the torch line with the CPU wheel index, e.g.
-#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-torch>=2.2
-torchvision>=0.17
+# TensorFlow/Keras (ADR-0005). CPU-only machines: install tensorflow-cpu==2.21.*
+# instead of tensorflow; never install both packages into one environment.
+# Apple Silicon: use the TensorFlow package recommended by Apple for this
+# version (tensorflow-macos / tensorflow-metal), or run training on Linux/Colab.
+tensorflow==2.21.*
+tensorboard>=2.21
 numpy>=1.26
 pillow>=10.3
 scikit-learn>=1.4

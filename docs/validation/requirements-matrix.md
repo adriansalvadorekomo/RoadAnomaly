@@ -1,6 +1,6 @@
 # Requirements traceability matrix
 
-> Snapshot: **2026-10-19** · branch `refactor/repo-structure` · base `935f7a9`.
+> Snapshot: **2026-10-19** · branch `main` · base `d237a85`.
 > Update this file whenever a status changes; do not update it from memory.
 
 Two validations are graded independently. This matrix maps every requirement to
@@ -39,7 +39,7 @@ the evidence that would satisfy it. **A README statement is not evidence.**
 | V2.4 | Deployed solutions | No survey or comparison exists. | none | `missing` |
 | V2.5 | Problem statement | The operational problem is written for a technical audience. | `README.md` §The problem | `in progress` |
 | V2.6 | Methodology | The evaluation protocol and model families are decided. | ADR-0001, ADR-0002, README §Methodology | `in progress` |
-| V2.7 | Proposed solution | The target architecture is documented; nothing is deployed. | `README.md` §Target architecture, `docs/architecture/`, ADR-0003, ADR-0004 | `in progress` |
+| V2.7 | Proposed solution | The target architecture is documented; nothing is deployed. | `README.md` §Target architecture, `docs/architecture/`, ADR-0003, ADR-0004, ADR-0005, ADR-0006 | `in progress` |
 | V2.8 | Work completed | The current state is recorded honestly, but there is no report chapter. | `README.md` §Current architecture, §Project status | `in progress` |
 | V2.9 | Business Model Canvas | No canvas exists. | none | `missing` |
 | V2.10 | Marketing Mix (4Ps) | No analysis exists. | none | `missing` |
