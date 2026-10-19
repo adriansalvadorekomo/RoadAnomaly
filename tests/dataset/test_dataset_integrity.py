@@ -8,20 +8,26 @@ expected to fail loudly rather than let the docs go stale.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import numpy as np
 import pytest
-from conftest import (
-    ANOMALY_CLASS,
-    EXPECTED_FRAME_COUNT,
-    EXPECTED_FRAME_SIZE,
-    EXPECTED_INSTANCE_COUNT,
-    FRAMES_DIR,
-    VALID_SEMANTIC_CLASSES,
-)
 from PIL import Image
 
 pytestmark = pytest.mark.dataset
+
+# Documented dataset contract. These numbers are asserted here and quoted
+# verbatim in README.md. They live with the test rather than in conftest.py
+# so the contract cannot drift from the assertions that enforce it.
+REPO_ROOT = Path(__file__).resolve().parents[2]
+FRAMES_DIR = REPO_ROOT / "data" / "frames"
+
+EXPECTED_FRAME_COUNT = 60
+EXPECTED_FRAME_SIZE = (1280, 720)
+EXPECTED_INSTANCE_COUNT = 201
+BACKGROUND_CLASS = 0
+ANOMALY_CLASS = 2
+VALID_SEMANTIC_CLASSES = {BACKGROUND_CLASS, ANOMALY_CLASS}
 
 SEMANTIC_ONLY_DIR_COUNT = 14
 

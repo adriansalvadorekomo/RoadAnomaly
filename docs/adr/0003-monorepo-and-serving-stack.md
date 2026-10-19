@@ -1,8 +1,15 @@
 # 0003. Monorepo, FastAPI + Next.js, GHCR delivery
 
-- **Status:** Accepted
+- **Status:** Accepted; deployment clause superseded by
+  [ADR-0004](0004-vercel-and-gitops-deployment.md)
 - **Date:** 2026-10-18
 - **Deciders:** whole team
+
+> **Superseded in part.** The stack choices below stand. The sentence that
+> makes local `docker compose` the only deployment target is replaced by
+> Vercel (frontend) and Kubernetes/Minikube + Argo CD (inference service) in
+> [ADR-0004](0004-vercel-and-gitops-deployment.md). `docker compose` remains the
+> local developer path.
 
 ## Context
 

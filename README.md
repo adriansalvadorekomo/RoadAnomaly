@@ -7,8 +7,8 @@
 **Finding the unexpected on the road: animals, cones, boulders, debris and other
 objects that a driving perception stack was never trained to expect.**
 
-[![CI](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/ci.ydl/badge.svg)](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/ci.yml)
-[![CD](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/cd.ydl/badge.svg)](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/cd.yml)
+[![CI](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/ci.yml/badge.svg)](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/ci.yml)
+[![CD](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/cd.yml/badge.svg)](https://github.com/adriansalvadorekomo/RoadAnomaly/actions/workflows/cd.yml)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![Data: CC BY-SA 4.0](https://img.shields.io/badge/annotations-CC%20BY--SA%204.0-lightgrey.svg)](data/credits.txt)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](pyproject.toml)
@@ -19,28 +19,14 @@ objects that a driving perception stack was never trained to expect.**
 
 ---
 
-## Architecture
+> **How to read the status words.** `implemented` means a file or command in
+> this repository proves the capability. `in progress` means partial evidence
+> exists. `missing` means nothing exists yet. `blocked` means a named dependency
+> must land first. The authority is
+> [`docs/validation/requirements-matrix.md`](docs/validation/requirements-matrix.md);
+> a sentence in this README is never the evidence for its own claim.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/architecture-dark.png">
-  <img alt="RoadAnomaly platform architecture: Deep learning pipeline, serving stack and CI/CD delivery" src="assets/architecture.png" width="100%">
-</picture>
-
-Three bands, one system. **Deep learning pipeline** — normal-road corpora pre-train three
-models, RoadAnomaly is scored held-out. **Serving stack** — exported
-TorchScript/ONNX artifacts load into FastAPI, which returns masks and heatmaps
-to the Next.js dashboard. **Delivery** — GitHub Actions gates every pull
-request and publishes tagged images to GHCR that the compose stack runs.
-
-The diagram is generated from [`docs/assets/architecture.json`](docs/assets/architecture.json)
-with [archify](https://github.com/tt-a1i/archify); open
-[`architecture.html`](docs/assets/architecture.html) for the interactive version
-(pan, zoom, dark mode, guided tours). Regenerate it from the spec rather than
-editing the HTML — the HTML is a build artifact.
-
----
-
-## The problem
+## 1. Overview and objectives
 
 A segmentation model trained on Cityscapes or BDD100K predicts a closed set of
 classes: road, car, pedestrian, sky. Anything else — a deer on the asphalt, a
@@ -53,17 +39,69 @@ belong to anything I was trained to recognise*. The model is never given an
 "anomaly" class to learn. It is given normal driving scenes and has to notice
 when the world stops matching them.
 
-That reframing is why the dataset is unusual, and why the protocol below matters
-more than the model choice.
+| # | Objective | What would prove it | Status |
+|---|---|---|---|
+| O1 | Understand the benchmark and freeze an honest protocol | Verified dataset report, EDA notebook, ADR-0001 | `in progress` — facts verified, no EDA notebook |
+| O2 | Implement three general model families | A/B/C behind one interface, trained and reproducible | `missing` |
+| O3 | Compare them behind one metric harness | Results table populated from `docs/experiments/` | `missing` |
+| O4 | Explain the selected model (XAI) | Saliency/occlusion maps plus a written justification | `blocked` — no model, no method decision (G1) |
+| O5 | Serve the selected model | FastAPI + Next.js + containers + deployment | `missing` |
+| O6 | Make the commercial case | BMC, 4Ps, teaser, commercial report | `missing` |
 
----
+## 2. Current architecture (implemented)
 
-## The dataset
+At this commit the repository is a **verified dataset and its guard rails**,
+not a running system. There is no model, API, dashboard or container. The full
+component view is in [`docs/architecture/README.md`](docs/architecture/README.md).
+
+| Component | State | Evidence |
+|---|---|---|
+| Dataset (60 frames + labels + credits) | `implemented` | `data/`, tracked in git (15 MB) |
+| Dataset contract tests | `implemented` | 6 tests in `tests/dataset/` |
+| Lint, types and test gate | `implemented` | `ruff`, `mypy`, `pytest`; `.github/workflows/ci.yml` |
+| Decision records and protocol | `implemented` | `docs/adr/0001`–`0004` |
+| Scaffold, Makefile, templates | `implemented` | `Makefile`, `.github/` |
+| Models, training, metrics, inference | `missing` | `dl/` holds directories only |
+| Backend, frontend, containers | `missing` | package stub, README only, no Dockerfiles |
+| Deployment (compose, Kubernetes, Vercel) | `missing` | target documented in ADR-0004 |
+
+The only executable pipeline today is CI: lint, type-check and the six dataset
+tests. That is deliberate — the protocol and the data contract were frozen
+before any model code existed.
+
+## 3. Target architecture
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/architecture-dark.png">
+  <img alt="RoadAnomaly target architecture: Deep learning pipeline, serving stack and CI/CD delivery" src="assets/architecture.png" width="100%">
+</picture>
+
+**This is the target, not the current state.** Three bands, one system:
+
+- **Deep learning pipeline** (`missing`) — normal-road corpora pre-train three
+  models; RoadAnomaly is scored held-out. See
+  [ADR-0002](docs/adr/0002-three-model-families.md).
+- **Serving stack** (`missing`) — exported TorchScript/ONNX artifacts load into
+  FastAPI, which returns masks and heatmaps to the Next.js dashboard.
+- **Delivery** (`implemented` workflow, `missing` deployment) — GitHub Actions
+  gates every pull request and publishes tagged images to GHCR. The target
+  deployment is Vercel (frontend) plus Kubernetes/Minikube and Argo CD
+  (inference), recorded in [ADR-0004](docs/adr/0004-vercel-and-gitops-deployment.md).
+
+The diagram is generated from
+[`docs/architecture/architecture.json`](docs/architecture/architecture.json)
+with [archify](https://github.com/tt-a1i/archify); open
+[`architecture.html`](docs/architecture/architecture.html) for the interactive
+version (pan, zoom, dark mode, guided tours). Regenerate it from the spec rather
+than editing the HTML — the HTML is a build artifact.
+
+## 4. Dataset and evaluation protocol
 
 `data/` is tracked in this repository (15 MB) so a clone is reproducible. Every
 number in this table is asserted by
-[`tests/test_dataset_integrity.py`](tests/test_dataset_integrity.py) — if the
-dataset is ever swapped, CI fails rather than letting the documentation drift.
+[`tests/dataset/test_dataset_integrity.py`](tests/dataset/test_dataset_integrity.py) —
+if the dataset is ever swapped, CI fails rather than letting the documentation
+drift.
 
 | Property | Value |
 |---|---|
@@ -116,17 +154,7 @@ the authority if this table and that file ever disagree.
   measure *localisation* but not *recognition* — we cannot claim to know a deer
   from a cone, and we do not try to.
 
-### Licensing — read before publishing figures
-
-The code in this repository is MIT. The data is not: images are third-party
-photographs provided for research use with per-image terms (`data/credits.txt`),
-and the annotations are **CC BY-SA 4.0**. Republishing frames in a paper,
-figure or slide deck requires the attribution in that file to travel with them.
-See [`LICENSE`](LICENSE) for the full carve-out.
-
----
-
-## The constraint that shapes everything
+### The constraint that shapes everything
 
 > **RoadAnomaly is an evaluation-only benchmark. We never fit weights on its 60
 > frames.**
@@ -153,13 +181,20 @@ This is the single most important design decision in the project, and the one
 we expect to be challenged on in the defence. It is written down before any
 model code exists, deliberately.
 
----
+### Licensing — read before publishing figures
 
-## Methodology
+The code in this repository is MIT. The data is not: images are third-party
+photographs provided for research use with per-image terms
+(`data/credits.txt`), and the annotations are **CC BY-SA 4.0**. Republishing
+frames in a paper, figure or slide deck requires the attribution in that file
+to travel with them. See [`LICENSE`](LICENSE) for the full carve-out.
 
-Three approaches behind **one shared scoring harness**, so the comparison is a
-config change rather than three parallel projects. Rationale and rejected
-alternatives are in [**ADR-0002**](docs/adr/0002-three-model-families.md).
+## 5. Model approaches
+
+**Status: `missing`.** Three approaches behind **one shared scoring harness**, so
+the comparison is a config change rather than three parallel projects. Rationale
+and rejected alternatives are in
+[**ADR-0002**](docs/adr/0002-three-model-families.md).
 
 | | Approach | Anomaly score | Why this one |
 |---|---|---|---|
@@ -176,81 +211,16 @@ model.save(path); model.load(path)       # -> exportable artifact
 ```
 
 `dl/evaluation/` turns *any* score map plus a ground-truth mask into *the same*
-metric set. No model can be evaluated more favourably than another, and a metric
-is implemented exactly once, in one file, for all three.
+metric set. No model can be evaluated more favourably than another, and a
+metric is implemented exactly once, in one file, for all three.
 
----
+**Explainability (XAI) is required by the technical validation and is not yet
+planned.** No saliency, occlusion, Grad-CAM or SHAP method has been chosen, and
+there is no record of the decision. It is tracked as gap G1 in the validation
+matrix; the method and its justification must be written down before it can be
+implemented.
 
-## Evaluation
-
-Pixel-level, on the anomaly class, with `0` (normal) as the negative class.
-Every metric is implemented exactly once, in `dl/evaluation/metrics.py`, so all
-three models are scored by identical code.
-
-| Metric | What it answers | Why it is here |
-|---|---|---|
-| **Precision / Recall / F1** | How much of what we flagged is real, and how much of the real thing we found | The module asks for these explicitly; they are the language a reader expects |
-| **IoU (Jaccard)** | Overlap between predicted and true anomaly regions | Standard for segmentation, and directly comparable to published RoadAnomaly numbers |
-| **Dice** | Harmonic overlap, more forgiving of small regions than IoU | Sensitivity to the small objects that dominate this dataset's distribution |
-| **AUPRC** | Ranking quality across *all* thresholds | Threshold-free; the recommended primary metric for heavily imbalanced anomaly segmentation |
-| **FPR @ 95 % TPR** | How often we cry wolf to catch 95 % of anomalies | The number that matters to a car: a false alarm is not free |
-| **sIoU** | IoU with component-wise penalties for split/merged regions | Distinguishes "missed it" from "found it in three pieces" — which IoU alone conflates |
-
-**Reporting rules.** Every frame carries at least some anomalous pixels (the
-minimum is 0.4 % of the image), so no frame is dropped from the per-frame
-statistics. IoU percentiles are published alongside the mean, and every table
-states which split and which threshold regime produced it. A number that is not
-traceable to a file in `docs/experiments/` is treated as a bug — the pull request
-template asks about this on every change.
-
----
-
-## Results
-
-> **Status: not yet run.** This table is populated as experiments land in
-> [`docs/experiments/`](docs/experiments/). It is deliberately empty rather than
-> pre-filled with plausible-looking placeholders — see
-> [Project status](#project-status) for what exists today.
-
-| Model | Regime | IoU ↑ | Dice ↑ | F1 ↑ | AUPRC ↑ | FPR@95 ↓ |
-|---|---|---|---|---|---|---|
-| A · Autoencoder | zero-shot | — | — | — | — | — |
-| B · Resynthesis | zero-shot | — | — | — | — | — |
-| C · DeepLabv3+ / SegFormer (MSP) | zero-shot | — | — | — | — | — |
-| *threshold-tuned variants* | tuned (k-fold) | — | — | — | — | — |
-
-Alongside the table, the report carries: a qualitative grid (input │ ground
-truth │ A │ B │ C, chosen to include the worst frames, not the best), the
-per-frame IoU distribution, and a failure analysis of the four most common
-misses — small objects, occlusion, reflective or cluttered surfaces, and the
-"reconstructed too well" case that is specific to autoencoders.
-
----
-
-## Project status
-
-Honest state of the repository at this commit, so nobody has to guess whether a
-directory is real or aspirational.
-
-| Component | State |
-|---|---|
-| Dataset + integrity tests + CI gates | ✅ **Working** — 6 tests, green on every push and PR |
-| Architecture diagram + decision records | ✅ **Working** |
-| Scaffold, Makefile, PR/issue templates, CODEOWNERS | ✅ **Working** |
-| `dl/data/` loader, EDA notebook, splits | 🚧 Week 1 |
-| Model A — autoencoder baseline | 🚧 Week 1 |
-| Model B — resynthesis · Model C — segmentation | 🚧 Week 2 |
-| Shared metric harness + comparison | 🚧 Week 2 |
-| FastAPI service, dashboard, compose stack | 🚧 Week 3 |
-| Technical report | 🚧 Week 3 |
-
-CI jobs for the frontend and the container builds are **gated on the relevant
-files existing**, so they activate on their own as the code lands instead of
-failing on an empty repository.
-
----
-
-## Quick start
+## 6. Development workflow
 
 ```bash
 git clone https://github.com/adriansalvadorekomo/RoadAnomaly.git
@@ -259,21 +229,180 @@ cd RoadAnomaly
 make install            # venv + dev, deep learning and API dependencies
 make data-check         # verify the dataset contract (fast, no GPU)
 make lint type test     # what CI runs
-
-make train CONFIG=dl/configs/ae.yaml      # train one model
-make eval  CKPT=artifacts/best.pt         # score all 60 frames
-make serve                               # FastAPI on :8000
-make ui                                  # dashboard on :3000
-make up                                  # or the whole stack via compose
 ```
 
-Run `make help` for the target list. The dataset is already in the repository —
-there is no download step. The last four targets depend on code that lands in
-weeks 1–3; [Project status](#project-status) says exactly which.
+| Target | Purpose | Status |
+|---|---|---|
+| `make install` | Create `.venv` and install `requirements/*.txt` | `implemented` |
+| `make data-check` | Six dataset integrity tests | `implemented` |
+| `make lint` / `make fmt` | Ruff lint and format | `implemented` |
+| `make type` | Mypy over `dl`, `backend`, `tests` | `implemented` |
+| `make test` | Full pytest suite | `implemented` |
+| `make train CONFIG=configs/ae.yaml` | Training loop | `missing` — `dl/training/train.py` |
+| `make eval CKPT=artifacts/best.pt` | Shared evaluation | `missing` — `dl/evaluation/evaluate.py` |
+| `make export CKPT=artifacts/best.pt` | TorchScript/ONNX export | `missing` — `dl/inference/to_onnx.py` |
+| `make serve` | FastAPI on `:8000` | `missing` — `backend/app/main.py` |
+| `make ui` | Next.js on `:3000` | `missing` — `frontend/package.json` |
+| `make up` / `make down` | Local compose stack | `missing` — `infra/compose/docker-compose.yml` |
 
+The dataset is already in the repository; there is no download step.
 **Requirements:** Python 3.10+ and, for the dashboard, Node 20+. Training is
 happiest with a GPU, but every model runs CPU-only at reduced throughput;
 `requirements/dl.txt` documents the CPU wheel index.
+
+## 7. Testing and code quality
+
+**Status: `implemented` for the dataset tier.**
+
+| Tier | Scope | Status |
+|---|---|---|
+| `tests/dataset/` | Frame ↔ label contract, mask vocabulary, instance consistency | `implemented` — 6 tests |
+| `tests/unit/` | Pure functions: metrics, mask decoding, thresholding | `missing` — appears with the first model module |
+| `tests/integration/` | API contract, artifact loading, end-to-end inference | `missing` — appears with the backend |
+
+The dataset tests are the interesting ones: they re-derive every documented
+fact — 60 frames, the `{0, 2}` label vocabulary, 201 instances, 46
+instance-annotated directories, 14 semantic-only ones — and fail the build if
+the data and the documentation disagree. Documentation that cannot rot is worth
+more than documentation that is merely correct today.
+
+`ruff check`, `ruff format --check` and `mypy` run over the whole repository
+(Markdown excluded from formatting so the illustrative snippets keep their
+alignment). CI runs the same commands; see
+[`tests/README.md`](tests/README.md) for the tier contract and
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for the suppression rule.
+
+## 8. Docker and local development
+
+**Status: `missing`.** There are no Dockerfiles and no compose file. The
+intended layout is documented in [`infra/README.md`](infra/README.md):
+
+```
+infra/
+├── docker/
+│   ├── Dockerfile.backend    python:3.12-slim, onnxruntime, no torch, non-root
+│   └── Dockerfile.frontend   node:20-alpine -> next build -> standalone runtime
+└── compose/
+    └── docker-compose.yml    api + web, pinned to GHCR image tags or local builds
+```
+
+When the files land, `make up` starts the API on `:8000` and the dashboard on
+`:3000`. The API image is CPU-only and does not ship torch: artifacts are
+exported by `dl/inference/` and served with ONNX Runtime.
+
+## 9. Planned CI/CD workflow with GitHub Actions
+
+**Status: CI `implemented`; CD workflow `implemented`, deployment `blocked` on
+missing images and report.** The workflows are in `.github/workflows/`.
+
+| Trigger | What runs | Status |
+|---|---|---|
+| Every PR and push to `main` | **CI** — ruff lint, ruff format check, mypy, 6 dataset-integrity tests | `implemented` |
+| Every PR and push to `main` | Dashboard build and container builds, gated on `frontend/package.json` and the Dockerfiles | `blocked` — files missing, jobs skip cleanly |
+| Tag `v*` | **CD** — publish `-api` and `-web` images to GHCR, re-run the training smoke test, publish the report to GitHub Pages | `blocked` — Dockerfiles, `dl/training/train.py` and `docs/report/_quarto.yml` missing |
+
+The optional jobs are gated by a small `changes` job that checks for the files
+and exposes the result as a job output. This is deliberate: job-level
+`if: hashFiles(...)` is invalid GitHub Actions syntax (the function only exists
+in a step), and using it made both workflows fail to parse with zero jobs. The
+gates are a fix, not a feature.
+
+## 10. Planned Kubernetes, Minikube and Argo CD workflow
+
+**Status: `missing`.** The target is documented in
+[**ADR-0004**](docs/adr/0004-vercel-and-gitops-deployment.md) and
+[`docs/architecture/`](docs/architecture/README.md); no manifests exist.
+
+1. CD publishes a pinned image tag to GHCR.
+2. `k8s/base/` holds the Deployment, Service and ConfigMap;
+   `k8s/overlays/local/` targets Minikube.
+3. An Argo CD application watches this repository and syncs the local overlay,
+   so a cluster change is a commit rather than a manual edit.
+4. `docker compose` remains the local developer path. Kubernetes is the demo
+   target, not a requirement for contributing.
+
+The fallback is explicit: if Minikube or Argo CD cannot be made reproducible by
+the end of week 2, the demo runs on compose and the reversal is recorded in
+ADR-0004 rather than left unspoken.
+
+## 11. Frontend and Vercel
+
+**Status: `missing`.** `frontend/` currently contains a README only. The target
+is Next.js (App Router) + Tailwind + shadcn/ui, deployed to **Vercel**.
+
+| Route | Purpose |
+|---|---|
+| `/` | Landing: what the project does, headline metrics, one example |
+| `/demo` | Upload or pick a sample, run inference, overlay + heatmap |
+| `/compare` | Same frame through all three models, score table |
+| `/about` | Method summary, dataset caveats (ADR-0001), credits |
+
+The backend contract is the OpenAPI schema at `/docs`; frontend types are
+generated from it, never hand-written. The Vercel project reads the API base URL
+from an environment variable. No Vercel project exists yet.
+
+## 12. Technical and commercial validation
+
+The module grades two independent validations. The full traceability matrix —
+every requirement, its evidence, its file and its status — is
+[`docs/validation/requirements-matrix.md`](docs/validation/requirements-matrix.md).
+This table is only a summary; the matrix is the authority.
+
+| Validation | Weight | `implemented` | `in progress` | `missing` | `blocked` |
+|---|---:|---:|---:|---:|---:|
+| Technical (W9) | 60 % | 0 | 1 | 5 | 2 |
+| Commercial (W10) | 40 % | 0 | 4 | 9 | 2 |
+| **Both** | 100 % | **0** | **5** | **14** | **4** |
+
+The zeros are the honest state at this commit. In particular:
+
+- **XAI is not planned** (gap G1). It is not in ADR-0002 or the roadmap, and no
+  method has been chosen. This is a technical-validation requirement, not an
+  optional extra.
+- **No model exists**, so the comparison, the selected-model deployment and the
+  commercial demo are all downstream of the same dependency.
+- **No commercial artefact exists** — no canvas, no 4Ps, no penetration
+  strategy, no logo/flyer, no teaser and no report.
+- **Ownership is unassigned**; every CODEOWNERS path routes to the repository
+  owner until the kickoff meeting.
+
+## 13. Limitations and pending work
+
+**Scientific limitations.**
+
+- **60 evaluation frames** mean every metric has a wide confidence interval.
+  Results are reported as per-frame distributions, and differences smaller than
+  the spread are not argued about.
+- **One anomaly class** means localisation is measurable but recognition is not.
+- **No anomaly training data** by construction; the protocol is zero-shot or
+  threshold-tuned on held-out folds, and the two regimes are never mixed.
+
+**Implementation gaps.** No loader, model, training loop, metric harness,
+experiment record, API, dashboard, container, Kubernetes manifest, Argo CD
+application or Vercel project exists. The results table stays empty until a
+number can be traced to `docs/experiments/`.
+
+**Commercial gaps.** No introduction, context, existing/deployed-solutions
+survey, Business Model Canvas, 4Ps, penetration strategy, brand assets, teaser
+or complete report exists. The plan and statuses are in
+[`docs/report/README.md`](docs/report/README.md).
+
+**People.** Workstream ownership is assigned at the kickoff meeting; until then
+the tables describe roles, not people. The one edit that turns review routing on
+is replacing the placeholder handles in [`.github/CODEOWNERS`](.github/CODEOWNERS).
+
+**Risks, named.** *Compute:* three models on limited GPUs — mitigated by model A
+being cheap and C using pretrained backbones. *Scope:* the demo layer is week 3
+work and is the first thing to be cut to a single Streamlit page if week 2
+slips; the graded deliverable is the deep learning work and the report. *Time:*
+three weeks for six people, with the commercial validation landing after the
+technical one.
+
+| Week | Dates | Goal | Milestone |
+|---|---|---|---|
+| **1** | Oct 19–25 | Foundations | Dataset loader + EDA; harness interface frozen; **autoencoder baseline producing a real number**; CI green |
+| **2** | Oct 26 – Nov 1 | The comparison | Resynthesis and segmentation models; threshold selection; ablations; per-frame and failure analysis |
+| **3** | Nov 2–8 | Deliverables | FastAPI + dashboard + compose; report written and rendered; README results table filled; reproducibility pass on a clean clone; tag `v1.0.0` |
 
 ---
 
@@ -281,47 +410,66 @@ happiest with a GPU, but every model runs CPU-only at reduced throughput;
 
 ```
 RoadAnomaly/
-├── dl/                 models, training, evaluation, export, notebooks
-│   ├── data/           loader, mask decoding, scene-grouped splits
-│   ├── models/         autoencoder.py · resynthesis.py · segmentation.py
-│   ├── evaluation/     metrics.py — the one place a metric is defined
-│   └── notebooks/      EDA and result narratives (no model logic)
-├── backend/            FastAPI inference service (ONNX Runtime, no torch)
-├── frontend/           Next.js dashboard: upload → overlay → compare
-├── infra/              Dockerfiles + docker-compose
-├── data/               60 frames + labels + credits (tracked, 15 MB)
-├── tests/              dataset integrity and model tests
+├── README.md               this file
+├── AGENTS.md               instructions for coding agents
+├── CONTRIBUTING.md         branching, review and suppression rules
+├── Makefile                developer targets (status table in §6)
+├── pyproject.toml          ruff, mypy, pytest and coverage configuration
+├── requirements/           dev · dl · api dependency sets
+├── data/                   60 frames + labels + credits        (implemented)
+├── dl/
+│   ├── data/               loader, mask decoding, splits        (missing)
+│   ├── models/             autoencoder · resynthesis · seg      (missing)
+│   ├── training/           one loop for all three models        (missing)
+│   ├── evaluation/         metrics.py — defined once            (missing)
+│   ├── inference/          TorchScript/ONNX export + scoring    (missing)
+│   └── notebooks/          EDA and result narratives            (missing)
+├── configs/                one YAML per experiment              (missing)
+├── backend/                FastAPI inference service            (missing — stub)
+├── frontend/               Next.js dashboard                    (missing — README)
+├── prototypes/             intended experimental workflow       (README only)
+├── tests/
+│   ├── dataset/            frame ↔ label contract (6 tests)     (implemented)
+│   ├── unit/               pure functions                       (missing)
+│   └── integration/        API and artifact contracts           (missing)
+├── infra/                  README; docker/ + compose/ planned   (missing)
 ├── docs/
-│   ├── adr/            decisions with reasoning (start at 0001)
-│   ├── experiments/    one file per run set — the source of every number
-│   ├── report/         technical report (Quarto)
-│   └── assets/         architecture diagram spec + interactive HTML
-├── assets/             README images (generated)
-└── .github/            CI/CD, CODEOWNERS, PR and issue templates
+│   ├── architecture/       archify spec, HTML and Mermaid docs
+│   ├── adr/                0001–0004
+│   ├── experiments/        one file per run set                 (empty log)
+│   ├── report/             technical outline + commercial plan  (outline only)
+│   └── validation/         requirements traceability matrix
+├── assets/                 generated README images
+└── .github/                CI/CD, CODEOWNERS, PR and issue templates
 ```
 
-Each directory has its own README explaining what belongs in it and who owns it.
+`k8s/` and `argocd/` do not exist yet. Creating them empty would imply a
+deployment that is not there; they are documented as the target in §10 and
+ADR-0004. Each existing directory has its own README explaining what belongs in
+it.
 
----
+## Reproducibility
 
-## CI/CD
+```bash
+# Every published number must be reproducible from these three things:
+#   1. the commit          2. the config in configs/         3. this command
+make train CONFIG=configs/<name>.yaml
+make eval  CKPT=artifacts/<name>.pt
+```
 
-| Trigger | What runs | Needs |
-|---|---|---|
-| Every PR and push to `main` | **CI** — ruff lint, ruff format check, mypy, 6 dataset-integrity tests, then the dashboard build and container builds once those files exist | nothing: no secrets, no GPU, ~1 min |
-| Tag `v*` | **CD** — publish `-api` and `-web` images to GHCR, re-run the training smoke test (2 images, 2 steps), publish the report to GitHub Pages | `GITHUB_TOKEN` only |
-
-The dataset-integrity test is the interesting one: it re-derives every
-documented dataset fact — 60 frames, the `{0, 2}` label vocabulary, 201
-instances, 46 instance-annotated directories, 14 semantic-only ones — and fails
-the build if the data and the documentation disagree. Documentation that cannot
-rot is worth more than documentation that is merely correct today.
-
-Deployment is a local `docker compose up` against pinned GHCR tags. The
-reasoning for that, and for the rest of the stack, is in
-[**ADR-0003**](docs/adr/0003-monorepo-and-serving-stack.md).
-
----
+- **Seeds are fixed and recorded** in the config; data-loader worker seeding is
+  explicit, not inherited from the clock.
+- **Notebook outputs are stripped before commit.** `.gitattributes` declares the
+  `nbstripout` filter; each clone runs `nbstripout --install` once (see
+  [`CONTRIBUTING.md`](CONTRIBUTING.md)) so diffs show code changes, not image
+  bytes.
+- **Artefacts are not committed.** Checkpoints, ONNX exports and run logs are
+  regenerated; `artifacts/` is ignored.
+- **The environment is pinned** by `requirements/*.txt` and, in CI, by the exact
+  Python/Node versions in `.github/workflows/`.
+- **Known non-determinism:** cuDNN autotuning and non-deterministic reduction
+  kernels can shift metrics in the third decimal. Where that matters, the
+  experiment file records the observed spread rather than pretending it is zero.
 
 ## Team
 
@@ -339,8 +487,8 @@ ranking.
 
 The project is split into six workstreams so that each has exactly one owner
 and no file has two. **Owners are assigned at the kickoff meeting** — until
-then the table describes the roles, not the people, and every path is reviewed
-by the repository owner (see [`.github/CODEOWNERS`](.github/CODEOWNERS)).
+then every path is reviewed by the repository owner (see
+[`.github/CODEOWNERS`](.github/CODEOWNERS)).
 
 | | Workstream | Scope | Also responsible for |
 |---|---|---|---|
@@ -354,60 +502,6 @@ by the repository owner (see [`.github/CODEOWNERS`](.github/CODEOWNERS)).
 Everyone writes their own section of the report. **M4's harness is the critical
 path**: it is the interface the other two models plug into, so its signature is
 frozen in week 1 and changes to it need M2, M3 and M4 to agree.
-
-### After the kickoff meeting
-
-Two edits turn review routing on, and they are the only place a name appears:
-
-1. add one name per workstream in the table above;
-2. replace the placeholder `@handles` in `.github/CODEOWNERS` with each
-   member's GitHub username — that is what makes GitHub request the right
-   reviewer on the right path.
-
----
-
-## Roadmap
-
-Deadline: **8 November 2026**.
-
-| Week | Dates | Goal | Milestone |
-|---|---|---|---|
-| **1** | Oct 19–25 | Foundations | Dataset loader + EDA; harness interface frozen; **autoencoder baseline producing a real number**; CI green |
-| **2** | Oct 26 – Nov 1 | The comparison | Resynthesis and segmentation models; threshold selection; ablations; per-frame and failure analysis |
-| **3** | Nov 2–8 | Deliverables | FastAPI + dashboard + compose; report written and rendered; README results table filled; reproducibility pass on a clean clone; tag `v1.0.0` |
-
-**Risks, named.** *Compute:* three models on limited GPUs — mitigated by model A
-being cheap and C using pretrained backbones. *Scope:* the demo layer is week 3
-work and is the first thing to be cut to a single Streamlit page if week 2
-slips; the graded deliverable is the deep learning work and the report. *Data:* 60
-evaluation frames mean every metric has a wide confidence interval, so we report
-distributions and never argue over differences smaller than the spread.
-
----
-
-## Reproducibility
-
-```bash
-# Every published number must be reproducible from these three things:
-#   1. the commit          2. the config in dl/configs/     3. this command
-make train CONFIG=dl/configs/<name>.yaml
-make eval  CKPT=artifacts/<name>.pt
-```
-
-- **Seeds are fixed and recorded** in the config; data-loader worker seeding is
-  explicit, not inherited from the clock.
-- **Notebook outputs are stripped before commit.** `.gitattributes` declares the
-  `nbstripout` filter; each clone runs `nbstripout --install` once (see
-  [CONTRIBUTING.md](CONTRIBUTING.md)) so diffs show code changes, not image bytes.
-- **Artefacts are not committed.** Checkpoints, ONNX exports and run logs are
-  regenerated; `artifacts/` is ignored.
-- **The environment is pinned** by `requirements/*.txt` and, in CI, by the exact
-  Python/Node versions in `.github/workflows/`.
-- **Known non-determinism:** cuDNN autotuning and non-deterministic reduction
-  kernels can shift metrics in the third decimal. Where that matters, the
-  experiment file records the observed spread rather than pretending it is zero.
-
----
 
 ## Citation
 

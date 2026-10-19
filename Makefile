@@ -41,16 +41,16 @@ test-fast: ## Tests that need no GPU and no training
 	$(BIN)/pytest -m "not slow"
 
 data-check: ## Validate the RoadAnomaly checkout (frame <-> label contract)
-	$(BIN)/pytest tests/test_dataset_integrity.py -v
+	$(BIN)/pytest tests/dataset -v
 
-train: ## Train one model. Usage: make train CONFIG=dl/configs/ae.yaml
+train: ## Train one model. Usage: make train CONFIG=configs/ae.yaml
 	$(BIN)/python -m dl.training.train --config $(CONFIG)
 
 eval: ## Evaluate a checkpoint. Usage: make eval CKPT=artifacts/best.pt
 	$(BIN)/python -m dl.evaluation.evaluate --ckpt $(CKPT)
 
 export: ## Export a checkpoint to TorchScript/ONNX for the API
-	$(BIN)/python -m dl.export.to_onnx --ckpt $(CKPT)
+	$(BIN)/python -m dl.inference.to_onnx --ckpt $(CKPT)
 
 serve: ## Run the FastAPI inference service on :8000
 	cd backend && ../$(BIN)/uvicorn app.main:app --reload --port 8000
@@ -59,10 +59,10 @@ ui: ## Run the Next.js dashboard on :3000
 	cd frontend && npm run dev
 
 up: ## Bring up the whole stack (API + dashboard) with compose
-	docker compose -f infra/docker-compose.yml up --build
+	docker compose -f infra/compose/docker-compose.yml up --build
 
 down: ## Stop the stack
-	docker compose -f infra/docker-compose.yml down
+	docker compose -f infra/compose/docker-compose.yml down
 
 clean: ## Remove caches and local artifacts
 	rm -rf .pytest_cache .mypy_cache .ruff_cache htmlcov .coverage

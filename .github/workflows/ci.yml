@@ -21,6 +21,24 @@ permissions:
   contents: read
 
 jobs:
+  # `hashFiles()` is only available inside a step, not in a job-level `if:`.
+  # Calling it there makes the whole workflow invalid ("Unrecognized
+  # function"), so detect the optional components once and gate on outputs.
+  changes:
+    name: Detect optional components
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.detect.outputs.frontend }}
+      containers: ${{ steps.detect.outputs.containers }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: detect
+        name: Check for optional files
+        run: |
+          echo "frontend=$(test -f frontend/package.json && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "containers=$(test -f infra/docker/Dockerfile.backend && test -f infra/docker/Dockerfile.frontend && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
   quality:
     name: Lint, types, tests
     runs-on: ubuntu-latest
@@ -55,8 +73,9 @@ jobs:
 
   frontend:
     name: Dashboard build
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('frontend/package.json') != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -84,8 +103,9 @@ jobs:
 
   containers:
     name: Container build
+    needs: changes
+    if: needs.changes.outputs.containers == 'true'
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('infra/Dockerfile.backend') != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -95,7 +115,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: infra/Dockerfile.backend
+          file: infra/docker/Dockerfile.backend
           push: false
           tags: roadanomaly-api:ci
           cache-from: type=gha
@@ -105,7 +125,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: frontend
-          file: infra/Dockerfile.frontend
+          file: infra/docker/Dockerfile.frontend
           push: false
           tags: roadanomaly-web:ci
           cache-from: type=gha

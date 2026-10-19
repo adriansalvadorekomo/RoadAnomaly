@@ -1,7 +1,8 @@
 # Contributing
 
 Six people, three weeks, one deadline. This file exists so nobody has to ask
-"how do we do this here?" twice.
+"how do we do this here?" twice. Coding agents also follow
+[`AGENTS.md`](AGENTS.md), which is the short, strict version of this file.
 
 ## One-time setup
 
@@ -24,6 +25,7 @@ directly to `main`.
 feat/ae-baseline        new capability
 fix/mask-decode-edge    a bug
 exp/resynth-threshold   an experiment that might not work out
+refactor/repo-structure structural change, no behaviour change
 docs/adr-0004           documentation
 ```
 
@@ -31,7 +33,7 @@ docs/adr-0004           documentation
 and delete the branch — a negative result written into `docs/experiments/` is a
 contribution, and an abandoned branch is not a failure.
 
-## The five rules
+## The six rules
 
 1. **`main` stays green.** If your change breaks CI, fixing it is the next
    thing you do — not the thing you do after lunch.
@@ -47,6 +49,11 @@ contribution, and an abandoned branch is not a failure.
 5. **No silent suppressions.** A `# type: ignore`, `@ts-ignore`, skipped test or
    lowered threshold needs a comment on the line above saying why. If the reason
    is "it was failing", the fix is not a suppression.
+6. **Status words are evidence claims.** `implemented` means a file or command
+   proves it; `in progress`, `missing` and `blocked` are defined in
+   [`docs/validation/requirements-matrix.md`](docs/validation/requirements-matrix.md).
+   A README sentence is not evidence, and neither is a directory that contains
+   only `.gitkeep`.
 
 ## Definition of done
 
@@ -54,6 +61,7 @@ contribution, and an abandoned branch is not a failure.
 - [ ] New behaviour has a test, or the PR says why it cannot have one
 - [ ] Docstrings on anything another person will import
 - [ ] If it changes what the report claims, `docs/experiments/` is updated
+- [ ] If it changes a capability, `docs/validation/requirements-matrix.md` is updated
 - [ ] One reviewer from the affected workstream (CODEOWNERS does this for you)
 - [ ] No secrets, no `data/credits.txt` edits, no committed artefacts
 

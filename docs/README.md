@@ -4,8 +4,9 @@
 |---|---|
 | `adr/` | Architecture and experiment decisions with the reasoning (start with [0001](adr/0001-evaluation-only-benchmark.md)) |
 | `experiments/` | One file per run set: what was run, with which config, and what came out |
-| `report/` | The technical report (Quarto → PDF/HTML, published to Pages by CD) |
-| `assets/` | Diagram source: `architecture.json` (archify spec) and the generated `architecture.html` |
+| `report/` | The technical report (Quarto → PDF/HTML, published to Pages by CD) and the commercial deliverable plan |
+| `validation/` | Traceability matrix for the technical and commercial validations |
+| `architecture/` | Component and deployment documentation; `architecture.json` (archify spec) and the generated `architecture.html` |
 
 ## Experiment log convention
 
@@ -16,9 +17,9 @@ Every run set gets one file, `docs/experiments/NNNN-short-name.md`:
 
 - Date: 2026-10-29
 - Commit: abc1234
-- Config: dl/configs/resynthesis.yaml
+- Config: configs/resynthesis.yaml
 - Hardware: Colab T4, 41 min
-- Command: make train CONFIG=dl/configs/resynthesis.yaml
+- Command: make train CONFIG=configs/resynthesis.yaml
 
 ## What changed
 One paragraph. One variable.
@@ -37,7 +38,7 @@ bug. The pull request template asks about this explicitly.
 
 ## Diagrams
 
-`assets/architecture.json` is the source of truth for the architecture diagram;
+`architecture/architecture.json` is the source of truth for the architecture diagram;
 `architecture.html` and the PNGs in `/assets` are generated from it. Regenerate
 with the [archify](https://github.com/tt-a1i/archify) skill rather than editing
 the HTML by hand — the HTML is a build artifact.

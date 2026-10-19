@@ -7,7 +7,8 @@ code so nobody has to reconstruct the reasoning from a group chat.
 |---|---|---|
 | [0001](0001-evaluation-only-benchmark.md) | Treat RoadAnomaly as an evaluation-only benchmark | Accepted |
 | [0002](0002-three-model-families.md) | Compare three model families, not one | Accepted |
-| [0003](0003-monorepo-and-serving-stack.md) | Monorepo, FastAPI + Next.js, GHCR delivery | Accepted |
+| [0003](0003-monorepo-and-serving-stack.md) | Monorepo, FastAPI + Next.js, GHCR delivery | Accepted; deployment clause superseded by 0004 |
+| [0004](0004-vercel-and-gitops-deployment.md) | Vercel frontend, Kubernetes + Argo CD inference target | Accepted (not implemented) |
 
 ## Adding one
 

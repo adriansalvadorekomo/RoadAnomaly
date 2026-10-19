@@ -8,11 +8,13 @@ dl/
 ├── models/       autoencoder.py · resynthesis.py · segmentation.py       (M2 M3 M4)
 ├── training/     train.py, one loop for all three models                 (M2)
 ├── evaluation/   metrics.py + evaluate.py — the shared scoring harness   (M4)
-├── export/       checkpoint -> TorchScript/ONNX for the API              (M4)
-├── configs/      one YAML per experiment, e.g. ae.yaml, smoke.yaml        (all)
+├── inference/    checkpoint -> TorchScript/ONNX + scoring helpers         (M4)
 └── notebooks/    01_dataset_eda · 02_baseline_ae · 03_resynthesis
                   04_comparison — narrative only, no model logic           (all)
 ```
+
+Experiment configs live at the repository root in `configs/`, one YAML per
+run (e.g. `configs/ae.yaml`, `configs/smoke.yaml`).
 
 ## The three rules that keep this package coherent
 
