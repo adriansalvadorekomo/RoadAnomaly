@@ -62,7 +62,7 @@ more than the model choice.
 
 `data/` is tracked in this repository (15 MB) so a clone is reproducible. Every
 number in this table is asserted by
-[`tests/test_dataset_integrity.py`](tests/test_dataset_integrity.py) — if the
+[`tests/dataset/test_dataset_integrity.py`](tests/dataset/test_dataset_integrity.py) — if the
 dataset is ever swapped, CI fails rather than letting the documentation drift.
 
 | Property | Value |

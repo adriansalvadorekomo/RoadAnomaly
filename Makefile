@@ -41,7 +41,7 @@ test-fast: ## Tests that need no GPU and no training
 	$(BIN)/pytest -m "not slow"
 
 data-check: ## Validate the RoadAnomaly checkout (frame <-> label contract)
-	$(BIN)/pytest tests/test_dataset_integrity.py -v
+	$(BIN)/pytest tests/dataset -v
 
 train: ## Train one model. Usage: make train CONFIG=dl/configs/ae.yaml
 	$(BIN)/python -m dl.training.train --config $(CONFIG)

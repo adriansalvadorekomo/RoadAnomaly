@@ -12,15 +12,6 @@ DATA_DIR = REPO_ROOT / "data"
 FRAMES_DIR = DATA_DIR / "frames"
 FRAME_LIST = DATA_DIR / "frame_list.json"
 
-# Documented dataset contract. These numbers are asserted by
-# tests/test_dataset_integrity.py and quoted verbatim in README.md.
-EXPECTED_FRAME_COUNT = 60
-EXPECTED_FRAME_SIZE = (1280, 720)
-EXPECTED_INSTANCE_COUNT = 201
-BACKGROUND_CLASS = 0
-ANOMALY_CLASS = 2
-VALID_SEMANTIC_CLASSES = {BACKGROUND_CLASS, ANOMALY_CLASS}
-
 
 @pytest.fixture(scope="session")
 def data_dir() -> Path:
