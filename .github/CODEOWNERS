@@ -47,5 +47,7 @@
 
 # --- Shared contract: every change to these needs a second pair of eyes ---
 /README.md                      @adriansalvadorekomo
+/AGENTS.md                      @adriansalvadorekomo
 /pyproject.toml                 @adriansalvadorekomo
 /requirements/                  @adriansalvadorekomo
+/prototypes/                    @adriansalvadorekomo
