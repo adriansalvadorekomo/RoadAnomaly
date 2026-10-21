@@ -4,6 +4,12 @@
 - **Date:** 2026-10-19
 - **Deciders:** whole team
 
+> **Selection and identifier note (2026-10-21).** [ADR-0010](0010-model-lineup-and-evaluation-contract.md)
+> fixes the model IDs (`autoencoder`, `unet`, `deeplabv3plus`) and defines the
+> written normal-road scorecard used to choose the alias. The promotion and
+> registry decision below is unchanged: all three candidates remain, and there
+> is no benchmark-to-registry path.
+
 ## Context
 
 The first architecture draft put the shared evaluation harness between the

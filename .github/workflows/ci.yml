@@ -79,6 +79,26 @@ jobs:
           python -m pytest --cov --cov-report=term-missing --cov-fail-under=0
         continue-on-error: true
 
+  architecture:
+    name: Structurizr DSL validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Validate C4 workspace
+        run: |
+          curl -fsSL \
+            https://github.com/structurizr/cli/releases/download/v2025.11.09/structurizr-cli.zip \
+            -o /tmp/structurizr-cli.zip
+          unzip -q /tmp/structurizr-cli.zip -d /tmp/structurizr-cli
+          /tmp/structurizr-cli/structurizr.sh validate \
+            -w docs/architecture/workspace.dsl
+
   ml-smoke:
     name: TensorFlow smoke test
     needs: changes

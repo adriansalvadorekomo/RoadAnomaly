@@ -65,9 +65,6 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 
-# Archify visual-review sidecars (regenerated on demand, not source)
-docs/architecture/*.visual-check.*
-
 # Data: the RoadAnomaly dataset IS tracked in git (15 MB, required for
 # reproducibility). Only derived/cached tensors are ignored.
 data/cache/

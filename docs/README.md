@@ -6,7 +6,9 @@
 | `experiments/` | One file per run set: what was run, with which config, and what came out |
 | `report/` | Technical report outline, commercial deliverable plan, and a standalone preliminary Business Understanding report (TeX/PDF) |
 | `validation/` | Traceability matrix for the technical and commercial validations |
-| `architecture/` | Component and deployment documentation; `architecture.json` (archify spec) and the generated `architecture.html` / README PNGs |
+| `architecture/` | Structurizr C4 source, render script and committed C1/C2 PNGs |
+| `metrics.md` | Normative metric contract; not an implementation |
+| `xai.md` | XAI methods, faithfulness checks and evidence format; not an implementation |
 
 ## Experiment log convention
 
@@ -26,13 +28,14 @@ bug. The pull request template asks about this explicitly.
 
 ## Diagrams
 
-`architecture/architecture.json` is the source of truth for the architecture
-diagram; `architecture.html` and the PNGs in `/assets` are generated from it.
-The spec follows the six CRISP-DM phases in
-[ADR-0007](adr/0007-crisp-dm-methodology.md) and describes the **target**
-architecture; the current-state diagram is the Mermaid block in
-[`architecture/README.md`](architecture/README.md). Regenerate with the
-[archify](https://github.com/tt-a1i/archify) skill rather than editing the HTML
-by hand — the HTML is a build artifact. `tests/architecture/` enforces the
-semantic rules (no benchmark-to-registry path, XAI present, six regions, PNG
-dimensions).
+[`architecture/workspace.dsl`](architecture/workspace.dsl) is the single source
+of truth for the C4 model. The committed C1 system-context and C2 offline-pipeline
+PNGs are rendered from it into [`architecture/diagrams/`](architecture/diagrams/).
+The model is target-state: the dataset and contract tests exist; models, metrics,
+XAI, serving and deployment are planned.
+
+Run `make architecture` (Java 21 + Chromium) to re-render; commit the PNGs and
+`diagrams/manifest.json` with the DSL. Do not hand-edit the PNGs or add a second
+architecture source. `tests/architecture/` enforces the semantic rules (no
+benchmark-to-registry path, normal-road selection, XAI gate, metric/XAI contracts
+and PNG dimensions), and CI validates the DSL with Structurizr.

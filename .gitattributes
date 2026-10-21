@@ -19,5 +19,3 @@
 
 # --- Large generated artefacts: exclude from language statistics ----------
 data/frames/** linguist-vendored
-assets/*.png linguist-documentation
-docs/architecture/*.html linguist-generated

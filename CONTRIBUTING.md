@@ -67,9 +67,11 @@ contribution, and an abandoned branch is not a failure.
 - **Selection comes from normal-road validation.** The registry keeps all three
   candidate SavedModels and manifests; `selected.json` is an alias. There is no
   RoadAnomaly-to-registry path ([ADR-0008](docs/adr/0008-promotion-and-model-registry.md)).
-- **XAI is a gate, not a promotion signal.** The method is undecided (G1). Do not
-  invent one, and do not render a placeholder explanation
-  ([ADR-0009](docs/adr/0009-xai-evaluation-gate.md)).
+- **XAI is a gate, not a promotion signal.** The methods are fixed in
+  [ADR-0011](docs/adr/0011-xai-methods-and-faithfulness.md). Do not substitute a
+  method, and do not render a placeholder explanation
+  ([ADR-0009](docs/adr/0009-xai-evaluation-gate.md),
+  [`docs/xai.md`](docs/xai.md)).
 - **No weights in Git or images.** Build a versioned model bundle, publish it to
   GHCR, and mount it read-only. Compose uses a local `artifacts/` mount.
 - **Deploy immutable references.** Pin images and model bundles by digest; no

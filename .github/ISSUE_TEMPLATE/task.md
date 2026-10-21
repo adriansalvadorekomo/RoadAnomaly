@@ -17,8 +17,8 @@ labels: ["task"]
 
 ## Workstream
 
-- [ ] M1 Data · [ ] M2 Autoencoder · [ ] M3 Resynthesis
-- [ ] M4 Segmentation + metrics · [ ] M5 Backend/CI · [ ] M6 Frontend/report
+- [ ] M1 Data · [ ] M2 Autoencoder · [ ] M3 U-Net
+- [ ] M4 DeepLabV3+ + metrics · [ ] M5 Backend/CI · [ ] M6 Frontend/report
 
 ## Week
 

@@ -1,5 +1,8 @@
 # `backend/` — inference API
 
+> **Status: `missing`.** This is the target contract; only a package stub exists.
+> There is no FastAPI app, model artifact or container yet.
+
 Owner: **M5**. Stack: FastAPI + TensorFlow runtime (CPU), same language as
 `dl/` so a model bug never requires switching ecosystems.
 
@@ -16,7 +19,7 @@ backend/
 ## Contract the prototype depends on
 
 The full field table and example live in
-[`docs/architecture/README.md`](../docs/architecture/README.md#frontendbackend-boundary).
+[`docs/architecture/README.md`](../docs/architecture/README.md#planned-api-and-frontend-boundary).
 This page repeats the parts the backend must not change silently.
 
 | Method | Path | Purpose |
@@ -30,14 +33,14 @@ This page repeats the parts the backend must not change silently.
 | Field | Type | Required | Meaning |
 |---|---|---|---|
 | `file` | image file | yes | RGB road frame |
-| `model` | `"A" \| "B" \| "C"` | yes | Candidate id present in the mounted bundle |
+| `model` | `"autoencoder" \| "unet" \| "deeplabv3plus"` | yes | Candidate id present in the mounted bundle |
 | `threshold` | float in `[0, 1]` | no | Overrides the manifest default; the response echoes it |
 
 The response is JSON:
 
 ```json
 {
-  "model": "A",
+  "model": "autoencoder",
   "model_digest": "sha256:6f1c...",
   "threshold": 0.62,
   "input": {"width": 1280, "height": 720},
@@ -60,7 +63,7 @@ an 8-bit grayscale score map so the prototype can re-threshold locally;
 for display.
 
 **`pixel_stats` are not evaluation metrics.** An upload has no ground truth, so
-the API must not compute or return IoU, Dice or AUPRC. Those live only in
+the API must not compute or return IoU, Dice, AUROC or AUPRO. Those live only in
 `dl/evaluation/` and `docs/experiments/`.
 
 Error responses use a JSON body `{"detail": "..."}`:
@@ -72,7 +75,7 @@ Error responses use a JSON body `{"detail": "..."}`:
 | `500` | an unexpected inference failure; do not return a fake mask |
 
 `GET /health` returns
-`{"status": "ok", "models": ["A", "B", "C"], "selected": "A", "artifact_digest": "sha256:..."}`.
+`{"status": "ok", "models": ["autoencoder", "unet", "deeplabv3plus"], "selected": "autoencoder", "artifact_digest": "sha256:..."}`.
 `GET /models` reads the same manifests and never guesses a default threshold.
 
 ## Serving notes

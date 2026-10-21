@@ -1,15 +1,14 @@
 # RoadAnomaly — developer workflow
 #
 # Run `make help` for the target list. Anything not yet implemented is
-# written down here on purpose: the roadmap in README.md maps each target
-# to the week it lands.
+# written down here on purpose: README.md maps each target to its status.
 
 .DEFAULT_GOAL := help
 PY ?= python3
 VENV ?= .venv
 BIN := $(VENV)/bin
 
-.PHONY: help venv install lint fmt type test test-fast data-check \
+.PHONY: help venv install lint fmt type test test-fast data-check architecture \
         train eval export serve landing prototype up down clean
 
 help: ## Show this help
@@ -43,7 +42,10 @@ test-fast: ## Tests that need no GPU and no training
 data-check: ## Validate the RoadAnomaly checkout (frame <-> label contract)
 	$(BIN)/pytest tests/dataset -v
 
-train: ## Train one model. Usage: make train CONFIG=configs/ae.yaml
+architecture: ## Render the C4 diagrams (Java + Chromium) and refresh the manifest
+	./docs/architecture/render.sh
+
+train: ## Train one model. Usage: make train CONFIG=configs/autoencoder.yaml
 	$(BIN)/python -m dl.training.train --config $(CONFIG)
 
 eval: ## Evaluate a checkpoint. Usage: make eval CKPT=artifacts/best.keras
