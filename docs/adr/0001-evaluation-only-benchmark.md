@@ -4,6 +4,12 @@
 - **Date:** 2026-10-18
 - **Deciders:** whole team
 
+> **Metric contract note (2026-10-21).** [ADR-0010](0010-model-lineup-and-evaluation-contract.md)
+> revises the reported metric set and selects the model lineup; the
+> evaluation-only protocol in this ADR is unchanged. Common binary-mask
+> metrics, complementary diagnostics and the AUPRO cap are specified in
+> [`docs/metrics.md`](../metrics.md).
+
 > **CRISP-DM and split clarification (2026-10-19).** This ADR is the phase 1
 > (Business understanding) guardrail; phase 5 (Evaluation) enforces it. The
 > scene-grouped folds named below are for the **threshold-tuned evaluation

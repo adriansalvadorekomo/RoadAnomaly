@@ -12,11 +12,11 @@
 # workstream definitions are in the README "Team" section.
 #
 #   M1  data & protocol         dl/data, tests
-#   M2  model A autoencoder     dl/models/autoencoder.py, dl/training
-#   M3  model B resynthesis     dl/models/resynthesis.py
-#   M4  model C + metrics       dl/models/segmentation.py, dl/evaluation
+#   M2  autoencoder             dl/models/autoencoder.py, dl/training
+#   M3  U-Net                   dl/models/unet.py
+#   M4  DeepLabV3+ + metrics    dl/models/deeplabv3plus.py, dl/evaluation
 #   M5  backend & delivery      backend, infra, .github/workflows
-#   M6  frontend & report       frontend, docs, assets
+#   M6  frontend & report       frontend, docs, diagrams
 #
 # GitHub usernames only — a name that is not a real account is ignored
 # (or reported as an error on the pull request), it does not fall back.
@@ -42,7 +42,6 @@
 
 # --- M6: landing page, prototype, README, report, diagrams ------------------
 /frontend/                      @adriansalvadorekomo
-/assets/                        @adriansalvadorekomo
 /docs/                          @adriansalvadorekomo
 
 # --- Shared contract: every change to these needs a second pair of eyes ---

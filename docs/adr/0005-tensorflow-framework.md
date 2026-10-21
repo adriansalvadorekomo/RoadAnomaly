@@ -4,10 +4,14 @@
 - **Date:** 2026-10-19
 - **Deciders:** whole team
 
+> **Model-family amendment (2026-10-21).** [ADR-0010](0010-model-lineup-and-evaluation-contract.md)
+> retires image resynthesis and fixes the current lineup as autoencoder, U-Net
+> and DeepLabV3+. The TensorFlow/Keras decision below is unchanged.
+
 > **Supersedes in part:** the TorchScript/ONNX artifact and ONNX Runtime clauses
 > in [ADR-0003](0003-monorepo-and-serving-stack.md) and the SegFormer option in
-> [ADR-0002](0002-three-model-families.md). It does not change ADR-0001, the
-> evaluation-only protocol, or the three-model-family decision.
+> [ADR-0002](0002-three-model-families.md). It does not change ADR-0001 or the
+> evaluation-only protocol; the model-family clause is amended by ADR-0010.
 
 ## Context
 

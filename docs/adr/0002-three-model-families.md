@@ -1,16 +1,21 @@
 # 0002. Compare three model families, not one
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0010](0010-model-lineup-and-evaluation-contract.md)
 - **Date:** 2026-10-18
 - **Deciders:** whole team
 
-> **Framework note (ADR-0005).** The three-family decision stands. Model C is
-> implemented with TensorFlow-native DeepLabV3+ / U-Net instead of SegFormer;
-> the MSP baseline and the shared evaluation harness are unchanged.
+> **Superseded (2026-10-21).** ADR-0010 replaces image resynthesis with U-Net
+> and fixes the current model lineup, metric contract and selection scorecard.
+> This record is retained as history.
+
+> **Framework note (ADR-0005, historical).** At that point the three-family
+> decision stood; model C was to use TensorFlow-native DeepLabV3+ / U-Net
+> instead of SegFormer. ADR-0010 later replaced the lineup, so this note records
+> the state before that revision.
 >
-> **XAI note (ADR-0009).** Explainability is required evaluation evidence for
-> the selected model, not a fourth model family. The method is still undecided
-> (gap G1) and does not change the three-family comparison.
+> **XAI note (ADR-0009/ADR-0011, historical).** Explainability was required
+> evaluation evidence for the selected model, not a fourth model family. The
+> method was later fixed by ADR-0011 and never changed the model comparison.
 
 ## Context
 

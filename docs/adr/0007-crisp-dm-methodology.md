@@ -4,6 +4,11 @@
 - **Date:** 2026-10-19
 - **Deciders:** whole team
 
+> **Current references (2026-10-21).** The CRISP-DM methodology is unchanged.
+> Phase 4 model references are updated by [ADR-0010](0010-model-lineup-and-evaluation-contract.md),
+> phase 5 XAI methods by [ADR-0011](0011-xai-methods-and-faithfulness.md), and
+> the architecture diagram source by [ADR-0012](0012-structurizr-c4-architecture.md).
+
 ## Context
 
 The module assesses both the deep-learning work and the process used to reach
@@ -30,9 +35,9 @@ Use **CRISP-DM** as the project methodology:
 |---|---|---|
 | 1. Business understanding | Objectives, success criteria, evaluation-only protocol, scope and non-goals | `README.md` §1, [ADR-0001](0001-evaluation-only-benchmark.md) |
 | 2. Data understanding | RoadAnomaly dataset facts and EDA; normal-road source audit and licence review | `tests/dataset/`, `data/readme.md`, `dl/notebooks/` (missing) |
-| 3. Data preparation | Normal-road loading, decoding, augmentation, scene-grouped train/validation splits and a pinned dataset manifest | `dl/data/` (missing), `configs/` (empty) |
-| 4. Modeling | Three Keras families behind one interface and one training loop | [ADR-0002](0002-three-model-families.md), [ADR-0005](0005-tensorflow-framework.md) |
-| 5. Evaluation | Shared metric harness, normal-road selection, RoadAnomaly held-out scoring, threshold regimes and XAI | `dl/evaluation/` (missing), [ADR-0008](0008-promotion-and-model-registry.md), [ADR-0009](0009-xai-evaluation-gate.md) |
+| 3. Data preparation | Normal-road loading, decoding, augmentation, scene-grouped train/validation splits and a pinned dataset manifest | `dl/data/` (missing), `configs/` (README only) |
+| 4. Modeling | Three Keras models behind one interface and one training loop | [ADR-0010](0010-model-lineup-and-evaluation-contract.md), [ADR-0005](0005-tensorflow-framework.md) |
+| 5. Evaluation | Shared metric harness, normal-road selection, RoadAnomaly held-out scoring, threshold regimes and XAI | `dl/evaluation/` (missing), [ADR-0008](0008-promotion-and-model-registry.md), [ADR-0009](0009-xai-evaluation-gate.md), [ADR-0011](0011-xai-methods-and-faithfulness.md) |
 | 6. Deployment | SavedModel export and registry, FastAPI, Streamlit, Astro/Vercel, containers, Minikube and Argo CD | [ADR-0004](0004-vercel-and-gitops-deployment.md), [ADR-0006](0006-astro-and-streamlit-frontend.md) |
 
 The phases are **iterative and evidence-gated**, not a one-way waterfall:

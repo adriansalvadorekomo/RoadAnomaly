@@ -1,16 +1,18 @@
-"""Semantic guardrails for the committed architecture map.
+"""Semantic guardrails for the committed Structurizr C4 model.
 
-These checks do not need archify. They fail if the diagram, docs and PNG assets
-drift apart on the rules that matter most: six CRISP-DM regions, no promotion
-from RoadAnomaly, an explicit XAI gate and a registry that keeps every candidate.
+The checks read the DSL directly, so they fail when the model, documentation and
+rendered PNGs drift apart on the rules that matter: evaluation-only data, a
+normal-road selection path, a registry that keeps every candidate, and XAI as a
+non-promoting gate.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 from collections import defaultdict, deque
 from pathlib import Path
-from typing import Any
 
 import pytest
 from PIL import Image
@@ -18,33 +20,29 @@ from PIL import Image
 pytestmark = pytest.mark.architecture
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SPEC_PATH = REPO_ROOT / "docs" / "architecture" / "architecture.json"
-LIGHT_PNG = REPO_ROOT / "assets" / "architecture.png"
-DARK_PNG = REPO_ROOT / "assets" / "architecture-dark.png"
+ARCH_DIR = REPO_ROOT / "docs" / "architecture"
+DSL_PATH = ARCH_DIR / "workspace.dsl"
+MANIFEST_PATH = ARCH_DIR / "diagrams" / "manifest.json"
+README_PATH = REPO_ROOT / "README.md"
 
-REQUIRED_REGION_PREFIXES = {
-    "1 · Business understanding",
-    "2 · Data understanding",
-    "3 · Data preparation",
-    "4 · Modeling",
-    "5 · Evaluation",
-    "6 · Deployment",
-}
+EDGE_RE = re.compile(
+    r'^\s*([A-Za-z_]\w*)\s*->\s*([A-Za-z_]\w*)\s+"([^"]*)"',
+    re.MULTILINE,
+)
+REQUIRED_VIEWS = {"c1-system-context", "c2-offline-pipeline"}
 
 
-def _spec() -> dict[str, Any]:
-    return json.loads(SPEC_PATH.read_text(encoding="utf-8"))
+def _dsl() -> str:
+    return DSL_PATH.read_text(encoding="utf-8")
 
 
-def _component_ids(spec: dict[str, Any]) -> set[str]:
-    return {component["id"] for component in spec["components"]}
-
-
-def _adjacency(spec: dict[str, Any]) -> dict[str, set[str]]:
+def _graph() -> tuple[dict[str, set[str]], dict[tuple[str, str], str]]:
     graph: dict[str, set[str]] = defaultdict(set)
-    for connection in spec["connections"]:
-        graph[connection["from"]].add(connection["to"])
-    return graph
+    labels: dict[tuple[str, str], str] = {}
+    for source, target, label in EDGE_RE.findall(_dsl()):
+        graph[source].add(target)
+        labels[(source, target)] = label
+    return graph, labels
 
 
 def _reachable(graph: dict[str, set[str]], start: str) -> set[str]:
@@ -59,83 +57,106 @@ def _reachable(graph: dict[str, set[str]], start: str) -> set[str]:
     return seen
 
 
-def test_spec_structure_and_edges_are_consistent() -> None:
-    spec = _spec()
-    assert spec["diagram_type"] == "architecture"
-    assert spec["schema_version"] == 1
+def test_two_c4_views_and_no_legacy_archify_assets() -> None:
+    dsl = _dsl()
+    assert dsl.count("systemContext roadAnomaly") == 1
+    assert dsl.count("container roadAnomaly") == 1
+    for view in REQUIRED_VIEWS:
+        assert f'"{view}"' in dsl
+    for tag in ("Element,Implemented", "Element,Planned", "Element,Template"):
+        assert tag in dsl, f"C4 status tag missing: {tag}"
 
-    ids = [component["id"] for component in spec["components"]]
-    assert len(ids) == len(set(ids)), f"duplicate component ids: {ids}"
-
-    known = set(ids)
-    for connection in spec["connections"]:
-        assert connection["from"] in known, f"unknown source: {connection['from']}"
-        assert connection["to"] in known, f"unknown target: {connection['to']}"
-        assert connection["from"] != connection["to"], "self-loop in the system map"
-
-    for boundary in spec["boundaries"]:
-        assert set(boundary["wraps"]) <= known, f"unknown wrapped node: {boundary['wraps']}"
-
-
-def test_six_crisp_dm_regions_are_present() -> None:
-    labels = [boundary["label"] for boundary in _spec()["boundaries"]]
-    for prefix in REQUIRED_REGION_PREFIXES:
-        assert any(label.startswith(prefix) for label in labels), f"missing region: {prefix}"
-    assert len(labels) == 6, f"expected six CRISP-DM regions, found {len(labels)}"
-
-
-def test_roadanomaly_and_xai_cannot_reach_the_registry() -> None:
-    spec = _spec()
-    graph = _adjacency(spec)
-    assert "registry" in _reachable(graph, "validation"), "selection must feed the registry"
-    assert "registry" not in _reachable(graph, "bench_eval"), (
-        "RoadAnomaly evaluation must never promote a model"
-    )
-    assert "registry" not in _reachable(graph, "xai"), "XAI must never promote a model"
-
-    direct = {(c["from"], c["to"]) for c in spec["connections"]}
-    assert ("bench_eval", "registry") not in direct
-    assert ("xai", "registry") not in direct
-
-
-def test_selection_is_normal_road_and_registry_keeps_every_candidate() -> None:
-    spec = _spec()
-    components = {component["id"]: component for component in spec["components"]}
-    validation = components["validation"]
-    registry = components["registry"]
-
-    assert "validation" in validation["label"].lower()
-    assert "never benchmark" in validation.get("tag", "").lower()
-    assert "3 savedmodels" in registry["sublabel"].lower()
-    assert "alias" in registry["sublabel"].lower()
-
-    selection_edges = [
-        connection
-        for connection in spec["connections"]
-        if connection["from"] == "validation" and connection["to"] == "registry"
+    obsolete = [
+        ARCH_DIR / "architecture.json",
+        ARCH_DIR / "architecture.html",
+        REPO_ROOT / "assets" / "architecture.png",
+        REPO_ROOT / "assets" / "architecture-dark.png",
     ]
-    assert selection_edges, "validation -> registry edge is missing"
-    assert "retain all 3" in selection_edges[0].get("label", "").lower()
+    for path in obsolete:
+        assert not path.exists(), f"legacy architecture asset remains: {path}"
 
 
-def test_xai_is_an_explicit_blocked_gate() -> None:
-    spec = _spec()
-    components = {component["id"]: component for component in spec["components"]}
-    xai = components["xai"]
-    assert "xai" in xai["label"].lower()
-    assert "g1" in xai.get("tag", "").lower()
+def test_benchmark_and_xai_cannot_reach_training_or_registry() -> None:
+    graph, _ = _graph()
+    benchmark_reach = _reachable(graph, "benchmarkDataset")
+    assert "benchmarkEvaluation" in benchmark_reach
+    for forbidden in ("training", "selectionScorecard", "registry"):
+        assert forbidden not in benchmark_reach, f"RoadAnomaly must not reach {forbidden}"
 
-    edges = {(c["from"], c["to"]) for c in spec["connections"]}
-    assert ("validation", "xai") in edges, "XAI must consume the selected model"
-    assert ("xai", "prototype") in edges, "XAI explanations belong in the prototype"
+    assert "registry" not in _reachable(graph, "benchmarkEvaluation")
+    assert "registry" not in _reachable(graph, "xai")
 
 
-def test_png_assets_match_the_two_x_export() -> None:
-    spec = _spec()
-    width, height = spec["meta"]["viewBox"]
-    for path in (LIGHT_PNG, DARK_PNG):
-        assert path.is_file(), f"missing architecture asset: {path}"
-        with Image.open(path) as image:
-            assert image.size == (width * 2, height * 2), (
-                f"{path.name} is {image.size}, expected {(width * 2, height * 2)}"
+def test_selection_is_normal_road_and_registry_retains_all_three() -> None:
+    dsl = _dsl()
+    _, labels = _graph()
+    assert ("normalRoadValidation", "selectionScorecard") in labels
+    assert ("selectionScorecard", "registry") in labels
+    assert "retains all three" in labels[("selectionScorecard", "registry")]
+    assert "All three candidate SavedModels" in dsl
+    assert "no RoadAnomaly number" in dsl
+
+
+def test_xai_is_a_selected_non_promoting_gate() -> None:
+    dsl = _dsl()
+    assert "XAI evidence" in dsl
+    assert "Seg-Grad-CAM" in dsl
+    assert "Integrated Gradients" in dsl
+    assert "reconstruction-error" in dsl.lower()
+
+    adr = (REPO_ROOT / "docs" / "adr" / "0011-xai-methods-and-faithfulness.md").read_text(
+        encoding="utf-8"
+    )
+    assert "methods selected; implementation not started" in adr
+    matrix = (REPO_ROOT / "docs" / "validation" / "requirements-matrix.md").read_text(
+        encoding="utf-8"
+    )
+    v18 = next(line for line in matrix.splitlines() if line.startswith("| V1.8 |"))
+    assert "`in progress`" in v18
+
+
+def test_metric_and_xai_contracts_are_recorded() -> None:
+    metrics = (REPO_ROOT / "docs" / "metrics.md").read_text(encoding="utf-8")
+    assert "F1 equals Dice" in metrics
+    assert "AUPRO@30%" in metrics
+    assert "HD95" in metrics
+    assert "Boundary IoU" in metrics
+
+    xai = (REPO_ROOT / "docs" / "xai.md").read_text(encoding="utf-8")
+    assert "Seg-Grad-CAM" in xai
+    assert "Integrated Gradients" in xai
+    assert "deletion and insertion" in xai.lower()
+    assert "pointing game" in xai.lower()
+
+
+def test_manifest_matches_dsl_and_png_dimensions() -> None:
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    digest = hashlib.sha256(DSL_PATH.read_bytes()).hexdigest()
+    assert manifest["workspace_sha256"] == digest, "re-render after editing workspace.dsl"
+
+    views = manifest["views"]
+    assert set(views) == REQUIRED_VIEWS
+    for key, entry in views.items():
+        png = ARCH_DIR / "diagrams" / entry["file"]
+        assert png.is_file(), f"missing rendered view: {png}"
+        with Image.open(png) as image:
+            assert image.size == (entry["width"], entry["height"]), (
+                f"{key} is {image.size}, manifest says ({entry['width']}, {entry['height']})"
             )
+            assert image.width >= 1200 and image.height >= 600
+
+
+def test_readme_embeds_c4_and_architecture_docs_are_textual() -> None:
+    readme = README_PATH.read_text(encoding="utf-8")
+    assert "docs/architecture/diagrams/c1-system-context.png" in readme
+    assert "docs/architecture/diagrams/c2-offline-pipeline.png" in readme
+    for stale in ("architecture.json", "architecture.html", "assets/architecture", "archify"):
+        assert stale not in readme, f"README still references removed artifact: {stale}"
+
+    architecture = (ARCH_DIR / "README.md").read_text(encoding="utf-8")
+    for stale in ("architecture.json", "architecture.html", "assets/architecture", "archify"):
+        assert stale not in architecture, (
+            f"architecture README still references removed artifact: {stale}"
+        )
+    assert "| 1. Business understanding |" in architecture
+    assert "```mermaid" not in architecture

@@ -17,6 +17,7 @@
 | Seed | e.g. `1337` |
 | Python / TensorFlow | `3.12` / `2.21.x` |
 | Hardware | CPU model or GPU, driver/CUDA if relevant |
+| Model ID | `autoencoder` / `unet` / `deeplabv3plus` |
 | Normal-road dataset manifest | `configs/datasets/<name>.yaml` + `sha256:...` |
 | Scene-grouped split hash | `sha256:...` |
 | RoadAnomaly benchmark | `data/` at commit `<sha>`; `data/credits.txt` unchanged |
@@ -27,15 +28,30 @@ experiment, even if it produced a number.
 
 ## Results
 
-| Regime | Set | Metric | Value | Notes |
-|---|---|---|---|---|
-| Normal-road validation (selection) | scene-grouped fold | IoU / Dice / F1 / AUPRC | | This is the only selection signal |
-| RoadAnomaly held-out — zero-shot | all 60 frames | IoU / Dice / F1 / AUPRC | | Report only; never tuned |
-| RoadAnomaly held-out — threshold-tuned | held-out folds | IoU / Dice / F1 / AUPRC | | One scalar threshold; report separately |
-| XAI | selected model | method + faithfulness check | | Only when the method is chosen (G1) |
+Common binary-mask metrics are Precision, Recall, F1, IoU and Dice. F1 and Dice
+are identical for a binary mask; report that once instead of treating them as
+independent evidence.
+
+| Regime | Set | Model | Common metrics | Complementary diagnostic | Notes |
+|---|---|---|---|---|---|
+| Normal-road validation (selection) | scene-grouped fold | | P / R / F1 / IoU / Dice | AE: reconstruction loss; U-Net: Dice/IoU/F1/HD95; DeepLab: mIoU/Boundary IoU | Only selection signal |
+| RoadAnomaly held-out — zero-shot | all 60 frames | | P / R / F1 / IoU / Dice | AE: AUROC/AUPRO@30%; U-Net: HD95; DeepLab: mIoU/Boundary IoU | Report only; never tuned |
+| RoadAnomaly held-out — threshold-tuned | held-out folds | | P / R / F1 / IoU / Dice | same as above | One scalar threshold; separate column |
 
 Do not put RoadAnomaly metrics in the selection column. Do not mix zero-shot and
-threshold-tuned values in one cell.
+threshold-tuned values in one cell. Record the AUPRO FPR cap, HD95 spacing and
+empty-mask policy, and Boundary IoU band width with the value.
+
+## XAI evidence
+
+XAI is report-only and never enters the selection scorecard.
+
+| Model | Method | Target layer/class/pixel | Faithfulness checks | Baselines | Artefact |
+|---|---|---|---|---|---|
+| | reconstruction error / Seg-Grad-CAM / Integrated Gradients | | deletion-insertion AUC, pointing game (segmentation only) | deletion/insertion: random, center prior; pointing: random hit | heatmap/error-map path + digest |
+
+The method decision and evidence format are in
+[`docs/xai.md`](../xai.md) and [ADR-0011](../adr/0011-xai-methods-and-faithfulness.md).
 
 ## Interpretation
 
@@ -45,5 +61,7 @@ per-frame worst case, not only the mean, when RoadAnomaly is scored.
 ## Links
 
 - Architecture: [`docs/architecture/README.md`](../architecture/README.md)
+- Metric contract: [`docs/metrics.md`](../metrics.md)
+- Model and evaluation contract: [`ADR-0010`](../adr/0010-model-lineup-and-evaluation-contract.md)
 - Promotion rule: [`ADR-0008`](../adr/0008-promotion-and-model-registry.md)
-- XAI gate: [`ADR-0009`](../adr/0009-xai-evaluation-gate.md)
+- XAI methods: [`docs/xai.md`](../xai.md), [`ADR-0011`](../adr/0011-xai-methods-and-faithfulness.md)

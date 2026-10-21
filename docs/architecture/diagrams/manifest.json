@@ -1,0 +1,16 @@
+{
+  "renderer": "structurizr-cli v2025.11.09 + headless Chromium (static site)",
+  "workspace_sha256": "7cd4e2e14317c1b3621b33eed377cd6208990facf0b8ca33549ba8ef0a32c16c",
+  "views": {
+    "c1-system-context": {
+      "file": "c1-system-context.png",
+      "width": 2678,
+      "height": 923
+    },
+    "c2-offline-pipeline": {
+      "file": "c2-offline-pipeline.png",
+      "width": 2587,
+      "height": 5821
+    }
+  }
+}

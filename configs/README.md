@@ -13,7 +13,7 @@ is allowed to see:
 # Illustrative shape, not a runnable config. The keys will be frozen with the
 # loader interface in week 1.
 name: ae-baseline
-model: A
+model: autoencoder
 seed: 1337
 dataset_manifest: configs/datasets/cityscapes-normal-2026-10.yaml
 split: train

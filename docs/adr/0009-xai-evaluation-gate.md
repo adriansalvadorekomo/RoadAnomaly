@@ -1,8 +1,15 @@
-# 0009. XAI is an evaluation gate; the method remains open
+# 0009. XAI is an evaluation gate
 
-- **Status:** Accepted (placement and gate); method decision `blocked` (G1)
+- **Status:** Accepted (placement and gate); methods selected in
+  [ADR-0011](0011-xai-methods-and-faithfulness.md)
 - **Date:** 2026-10-19
 - **Deciders:** whole team
+
+> **Method decision note (2026-10-21).** ADR-0011 selects reconstruction-error
+> maps plus Integrated Gradients for the autoencoder and Seg-Grad-CAM plus
+> Integrated Gradients for U-Net/DeepLabV3+. The placement, evidence format and
+> no-promotion rule below are unchanged. G1 is resolved; V1.8 remains in
+> progress until the implementation and artifacts exist.
 
 ## Context
 
@@ -23,17 +30,17 @@ unmentioned would make V1.8 `missing` even after the model lands.
    **selected** model and its score maps on evaluation frames. It does not
    consume the benchmark to choose a model, and it does not alter weights,
    thresholds or the selected alias.
-2. **Gate.** V1.8 stays `blocked` on **G1: no method chosen**. Before
-   implementation, the team must record a method decision (a new ADR or a
-   dated addendum to this one) that states:
+2. **Gate.** At the time of this record, V1.8 stayed `blocked` on **G1: no
+   method chosen**. Before implementation, the team had to record a method
+   decision (a new ADR or a dated addendum to this one) that states:
    - the method and why it fits the selected model family;
    - what is explained (per-pixel score, region, or whole frame);
    - the faithfulness check and the baseline it is compared with;
    - the compute and UI cost;
    - how the explanation is stored and linked to the model digest.
 3. **Candidates, not a decision.** Grad-CAM, occlusion sensitivity, integrated
-   gradients and plain saliency are all plausible. Naming them here does not
-   select one.
+   gradients and plain saliency were all plausible at this point. Naming them
+   here did not select one; ADR-0011 later made the choice.
 4. **Evidence format.** Each XAI run must produce per-frame explanation
    artifacts, a short written interpretation and a link to the experiment
    record. The Streamlit prototype may display them only when they exist; it
