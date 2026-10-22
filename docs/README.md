@@ -9,6 +9,12 @@
 | `architecture/` | Structurizr C4 source, render script and committed C1/C2 PNGs |
 | `metrics.md` | Normative metric contract; not an implementation |
 | `xai.md` | XAI methods, faithfulness checks and evidence format; not an implementation |
+| `dataset.md` | Verified dataset facts, difficulty notes, evaluation-only protocol and licensing |
+| `sdd.md` | Spec-driven development workflow, artifact layout and command loop |
+| `../specs/` | Feature specs, plans and tasks produced by the SDD workflow |
+
+Feature work starts in `specs/`; see [ADR-0013](adr/0013-spec-driven-development.md)
+and [`sdd.md`](sdd.md). A spec is a plan, not evidence for a requirement.
 
 ## Experiment log convention
 

@@ -60,11 +60,15 @@ before claiming that anything works.
 | `frontend/` | Astro landing page + Streamlit prototype | missing (READMEs) |
 | `infra/` | `docker/` + `compose/` container files | missing |
 | `tests/` | `dataset/` and `architecture/` implemented; `unit/`, `integration/` missing | in progress |
-| `docs/adr/` | ADRs 0001–0012 | implemented |
+| `docs/adr/` | ADRs 0001–0013 | implemented |
 | `docs/architecture/` | Structurizr DSL, render script and C4 PNGs | implemented |
 | `docs/experiments/` | template; no run records | template only |
 | `docs/metrics.md`, `docs/xai.md` | normative contracts, not implementations | in progress |
+| `docs/dataset.md`, `docs/sdd.md` | dataset facts + protocol; SDD workflow | implemented |
 | `docs/validation/` | requirements traceability matrix | implemented |
+| `specs/` | feature specs, plans and tasks (SDD) | empty (workflow ready) |
+| `.specify/` | Spec Kit 1.2.2 scaffolding; constitution is a placeholder | tooling |
+| `.opencode/commands/speckit.*` | generated SDD agent commands (only tracked `.opencode` files) | tooling |
 
 ## Commands
 
@@ -76,6 +80,12 @@ make data-check    # dataset contract only (fast, no GPU)
 make architecture  # render C1/C2 and diagrams/manifest.json (Java + Chromium)
 pytest -q tests/architecture -v  # C4 guardrails, promotion rule, XAI gate, PNGs
 ```
+
+Non-trivial feature work uses the Spec Kit loop
+`/speckit.specify` → `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`;
+these are agent commands, not shell targets. Specs live in `specs/NNN-name/` and
+are plans, not evidence. See [`docs/sdd.md`](docs/sdd.md) and
+[ADR-0013](docs/adr/0013-spec-driven-development.md).
 
 CI (`.github/workflows/ci.yml`) runs ruff, mypy, the dataset tests, the
 architecture contract tests and Structurizr DSL validation on every pull
@@ -115,6 +125,9 @@ weakening the guardrail to fit the renderer.
 - CRISP-DM is the project methodology (ADR-0007). Each experiment record names
   its phase and separates normal-road selection from held-out RoadAnomaly
   scoring. Never mix the two in one column.
+- Non-trivial feature work starts with a spec in `specs/` (ADR-0013). Link the
+  ADR or contract the feature depends on; do not restate it. A checked task or a
+  spec is never evidence that a requirement is `implemented`.
 - Artifacts are never committed or baked into an image. Publish the model bundle
   to GHCR and mount it read-only; pin image and model references by immutable
   digest. `latest` and moving `major.minor` tags are not deployment references.
@@ -130,6 +143,7 @@ weakening the guardrail to fit the renderer.
 ## Before you finish
 
 Run `make lint type test`. If you moved a file, update every reference
-(`git grep` for the old path) and the repository map in `README.md`. If you
-changed the architecture or a promotion rule, also run
+(`git grep` for the old path) and the repository map in `README.md`. If the
+change came from a spec, update `specs/NNN-name/tasks.md` and the spec status.
+If you changed the architecture or a promotion rule, also run
 `pytest -q tests/architecture -v` and check the ADR/matrix links you touched.

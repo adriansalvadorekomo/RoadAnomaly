@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Dataset question
-    url: https://github.com/adriansalvadorekomo/RoadAnomaly/blob/main/README.md#the-dataset
-    about: Check the dataset section and docs/adr/0001 before filing an issue.
+    url: https://github.com/adriansalvadorekomo/RoadAnomaly/blob/main/docs/dataset.md
+    about: Check the dataset notes and docs/adr/0001 before filing an issue.
   - name: Architecture decision already made?
     url: https://github.com/adriansalvadorekomo/RoadAnomaly/tree/main/docs/adr
     about: Decisions we have already committed to, with the reasoning.

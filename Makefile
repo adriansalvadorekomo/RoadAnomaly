@@ -1,7 +1,7 @@
 # RoadAnomaly — developer workflow
 #
 # Run `make help` for the target list. Anything not yet implemented is
-# written down here on purpose: README.md maps each target to its status.
+# written down here on purpose: status lives in docs/validation/requirements-matrix.md.
 
 .DEFAULT_GOAL := help
 PY ?= python3

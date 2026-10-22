@@ -1,6 +1,9 @@
 ## What changed
 
-<!-- One or two sentences. Link the issue if there is one: Closes #12 -->
+<!-- One or two sentences. Link the issue if there is one: Closes #12.
+     Feature work: link the spec, e.g. specs/001-normal-road-manifest/. -->
+
+**Spec:** `specs/NNN-name/` or `N/A` (docs/chore)
 
 ## Type of change
 
@@ -38,6 +41,7 @@ $ make test
 
 - [ ] `make lint` and `make type` pass locally
 - [ ] `make test` passes locally (dataset + architecture contracts today)
+- [ ] Feature work links a spec in `specs/`; docs/chores say `N/A`
 - [ ] Dataset assumptions still hold (`make data-check`) if I touched `data/` or `dl/data/`
 - [ ] The normal-road dataset manifest and split hash are pinned if this is a training run
 - [ ] No notebook outputs committed by accident (`nbstripout` applied)
