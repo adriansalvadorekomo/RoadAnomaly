@@ -1,6 +1,7 @@
 # 0013. Adopt spec-driven development for feature work
 
-- **Status:** Accepted
+- **Status:** Accepted; decision 4 superseded by
+  [ADR-0014](0014-adopt-project-constitution.md)
 - **Date:** 2026-10-22
 - **Deciders:** repository owner
 - **Supersedes:** none
@@ -37,6 +38,11 @@ abandon halfway through the project.
 4. The Spec Kit constitution is committed as generated. It is not authored or
    treated as normative in this decision; `AGENTS.md` and the ADRs remain the
    project rules until a separate decision says otherwise.
+
+   > **Superseded (2026-10-22).** [ADR-0014](0014-adopt-project-constitution.md)
+   > adopts the project-authored constitution as normative. This item's
+   > “generated and non-normative” clause no longer applies; the rest of this
+   > ADR stands.
 5. A spec that depends on a model, metric or evaluation rule links the relevant
    ADR or contract instead of restating it. The first suggested feature is the
    normal-road manifest and loader (see `docs/sdd.md`).

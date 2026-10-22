@@ -17,7 +17,8 @@ code so nobody has to reconstruct the reasoning from a group chat.
 | [0010](0010-model-lineup-and-evaluation-contract.md) | Model lineup and evaluation contract | Accepted (target state; not implemented) |
 | [0011](0011-xai-methods-and-faithfulness.md) | XAI methods and faithfulness checks | Accepted (methods selected; not implemented) |
 | [0012](0012-structurizr-c4-architecture.md) | Use Structurizr DSL as the architecture source of truth | Accepted (tooling; target diagrams) |
-| [0013](0013-spec-driven-development.md) | Use spec-driven development for feature work | Accepted |
+| [0013](0013-spec-driven-development.md) | Use spec-driven development for feature work | Accepted; decision 4 superseded by 0014 |
+| [0014](0014-adopt-project-constitution.md) | Adopt the project constitution as normative | Accepted |
 
 ## Adding one
 
