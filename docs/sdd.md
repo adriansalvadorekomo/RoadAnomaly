@@ -74,7 +74,8 @@ shell gate stays `make lint type test`.
 | Irreversible design decision | `docs/adr/` (new numbered record) |
 | Normative metric definitions | [`docs/metrics.md`](metrics.md) |
 | Normative XAI methods and evidence | [`docs/xai.md`](xai.md) |
-| Run evidence and published numbers | `docs/experiments/NNNN-*.md` |
+| Run evidence and published numbers | `docs/experiments/NNNN-*.md` (official); `docs/experiments/learning/` (learning only) |
+| Notebook roles, concept checks and learning records | [`dl/notebooks/README.md`](../dl/notebooks/README.md), [spec 002](../specs/002-notebook-workflow/spec.md) |
 | Requirement status and evidence bar | [`docs/validation/requirements-matrix.md`](validation/requirements-matrix.md) |
 | Dataset facts and evaluation protocol | [`docs/dataset.md`](dataset.md), [ADR-0001](adr/0001-evaluation-only-benchmark.md) |
 

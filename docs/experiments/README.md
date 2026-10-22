@@ -1,17 +1,29 @@
 # Experiment log
 
 One file per run set. **Every number in the README and the report must trace
-back to a file here.** A metric with no experiment file behind it is a bug.
+back to an official file here.** A metric with no experiment file behind it is a
+bug.
 
-Copy `0000-template.md`, number it in order, and open a pull request. The pull
-request template asks whether your change can affect a reported number; if it
-can, this directory is where the new number is justified.
+Official records live at this level. Learning-profile records live in
+[`learning/`](learning/) and are not evidence for a published number. Every
+record declares `Profile: official` or `Profile: learning`; the profile decides
+which evidence chain it belongs to.
 
-## Index
+For an official record, copy `0000-template.md`, number it in order, and open a
+pull request. For a learning record, copy it into [`learning/`](learning/) and
+keep the learning profile. The pull request template asks whether your change
+can affect a reported number; if it can, this directory is where the new number
+is justified.
+
+## Official index
 
 | ID | Date | Model | One-line finding |
 |---|---|---|---|
 | _(empty — week 1)_ | | | |
+
+Learning records are never listed here. They live under
+[`learning/`](learning/) and cannot be cited in the README or report without an
+official rerun.
 
 ## Why files and not a spreadsheet
 

@@ -3,7 +3,7 @@
 | Directory | Contents |
 |---|---|
 | `adr/` | Architecture and experiment decisions with the reasoning (start with [0001](adr/0001-evaluation-only-benchmark.md); methodology is [0007](adr/0007-crisp-dm-methodology.md)) |
-| `experiments/` | One file per run set: what was run, with which config, and what came out |
+| `experiments/` | One file per run set: official evidence at the top level, learning records under `learning/` |
 | `report/` | Technical report outline, commercial deliverable plan, and a standalone preliminary Business Understanding report (TeX/PDF) |
 | `validation/` | Traceability matrix for the technical and commercial validations |
 | `architecture/` | Structurizr C4 source, render script and committed C1/C2 PNGs |
@@ -21,7 +21,9 @@ and [`sdd.md`](sdd.md). A spec is a plan, not evidence for a requirement.
 Every run set gets one file, `docs/experiments/NNNN-short-name.md`, copied from
 [`experiments/0000-template.md`](experiments/0000-template.md). It records the
 commit, config hash, command, seed, hardware, normal-road dataset manifest and
-split hash, and artifact digest.
+split hash, and artifact digest. Official records live at that level; learning
+records live under [`experiments/learning/`](experiments/learning/) and cannot
+support a README or report number.
 
 Results are split into two blocks that must not be merged:
 

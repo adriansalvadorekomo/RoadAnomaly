@@ -13,6 +13,7 @@ is allowed to see:
 # Illustrative shape, not a runnable config. The keys will be frozen with the
 # loader interface in week 1.
 name: ae-baseline
+profile: official
 model: autoencoder
 seed: 1337
 dataset_manifest: configs/datasets/cityscapes-normal-2026-10.yaml
@@ -25,14 +26,30 @@ early_stopping:
 
 Rules:
 
-- `seed`, `dataset_manifest` and `preprocessing_version` are required. A run
-  without them is not reproducible.
+- `profile`, `seed` and `preprocessing_version` are required, and `profile` is
+  `official` or `learning`. An `official` config also requires
+  `dataset_manifest`; a learning run that uses normal-road data must pin it, and
+  a fixture-based learning run must record its fixture path in the config or its
+  learning record. A run without this provenance is not reproducible.
 - The run config must not reference `data/frames/`, `data/frame_list.json` or a
   RoadAnomaly label directly. The benchmark is scored by the evaluation command,
-  never by the training loader.
+  never by the training loader, under either profile.
 - Paths are relative to the repository root.
 - Do not put secrets, absolute home paths or machine-specific device names in a
   committed config.
+
+## Run profiles
+
+| Profile | Use | Evidence |
+|---|---|---|
+| `official` | Training, evaluation, threshold selection and export for the project | Full provenance; record in `docs/experiments/`; can be cited after review |
+| `learning` | Notebook and local teaching runs with reduced scope | Record in `docs/experiments/learning/`; never evidence, never selection or promotion |
+
+Both profiles obey the evaluation-only benchmark rule. A learning config may use
+fewer epochs, a smaller normal-road subset or a fixture, but it must state that in
+its config and record. If a learning result should become official, create an
+official config and rerun it; do not copy the notebook number into an official
+record.
 
 ## Normal-road dataset manifest
 
