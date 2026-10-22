@@ -70,11 +70,13 @@ See [ADR-0001](../adr/0001-evaluation-only-benchmark.md),
 
 C4 models structure, not process. The six CRISP-DM phases are mapped here as a
 table instead of a second diagram; the methodology is recorded in
-[ADR-0007](../adr/0007-crisp-dm-methodology.md).
+[ADR-0007](../adr/0007-crisp-dm-methodology.md). Per-feature work uses SDD
+([ADR-0013](../adr/0013-spec-driven-development.md), [`docs/sdd.md`](../sdd.md));
+the C4 model stays runtime structure only.
 
 | Phase | What it owns | Where it appears | Status |
 |---|---|---|---|
-| 1. Business understanding | Scope, three-model comparison, evaluation-only protocol, success criteria | C1; README §1; ADR-0001/0010 | `in progress` |
+| 1. Business understanding | Scope, three-model comparison, evaluation-only protocol, success criteria | C1; [README §1](../../README.md#1-what-this-project-is); ADR-0001/0010 | `in progress` |
 | 2. Data understanding | RoadAnomaly facts and EDA; normal-road release, licence and scene audit | Benchmark container; dataset tests | `in progress` — EDA and normal-road manifest missing |
 | 3. Data preparation | Pinned manifest, class map, label hashes, scene-grouped splits, `tf.data` pipeline | Normal-road manifest and data pipeline | `missing` |
 | 4. Modeling | Autoencoder, U-Net, DeepLabV3+ training and exported artifacts | Training and model artifacts | `missing` |

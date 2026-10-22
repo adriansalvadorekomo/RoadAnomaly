@@ -70,3 +70,11 @@ Thumbs.db
 data/cache/
 data/**/*.npy
 !data/frames/*.labels/instance_*_gc_state.npy
+
+# Local agent state. Only the generated Spec Kit commands are project tooling;
+# everything else under .opencode/ and .commandcode/ stays on the machine.
+.opencode/*
+!.opencode/commands/
+.opencode/commands/*
+!.opencode/commands/speckit.*.md
+.commandcode/

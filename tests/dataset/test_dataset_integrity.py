@@ -1,7 +1,7 @@
 """Dataset integrity: the frame <-> label contract CI must never let drift.
 
-Every assertion here restates a fact published in README.md ("The dataset"
-section). If the dataset is swapped for a different release, this file is
+Every assertion here restates a fact published in README.md and
+docs/dataset.md. If the dataset is swapped for a different release, this file is
 expected to fail loudly rather than let the docs go stale.
 """
 
@@ -17,8 +17,8 @@ from PIL import Image
 pytestmark = pytest.mark.dataset
 
 # Documented dataset contract. These numbers are asserted here and quoted
-# verbatim in README.md. They live with the test rather than in conftest.py
-# so the contract cannot drift from the assertions that enforce it.
+# verbatim in README.md and docs/dataset.md. They live with the test rather than
+# in conftest.py so the contract cannot drift from the assertions that enforce it.
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FRAMES_DIR = REPO_ROOT / "data" / "frames"
 
@@ -39,7 +39,7 @@ def _label_dir_for(frame_name: str):
 def test_frame_list_matches_frames_on_disk(frame_names: list[str]) -> None:
     assert len(frame_names) == EXPECTED_FRAME_COUNT, (
         f"frame_list.json declares {len(frame_names)} frames, "
-        f"README documents {EXPECTED_FRAME_COUNT}"
+        f"the documented contract is {EXPECTED_FRAME_COUNT}"
     )
     on_disk = {p.name for p in FRAMES_DIR.glob("*.webp")}
     assert set(frame_names) == on_disk, "frame_list.json and frames/ disagree"
@@ -91,7 +91,7 @@ def test_instance_annotations_are_self_consistent(frame_names: list[str]) -> Non
     semantic_only = [n for n in frame_names if n not in instance_dirs]
 
     assert len(semantic_only) == SEMANTIC_ONLY_DIR_COUNT, (
-        f"{len(semantic_only)} semantic-only frames, README documents "
+        f"{len(semantic_only)} semantic-only frames, the documented contract is "
         f"{SEMANTIC_ONLY_DIR_COUNT}: {sorted(semantic_only)}"
     )
 
@@ -110,5 +110,5 @@ def test_instance_annotations_are_self_consistent(frame_names: list[str]) -> Non
         total_instances += len(instances)
 
     assert total_instances == EXPECTED_INSTANCE_COUNT, (
-        f"found {total_instances} instances, README documents {EXPECTED_INSTANCE_COUNT}"
+        f"found {total_instances} instances, the documented contract is {EXPECTED_INSTANCE_COUNT}"
     )

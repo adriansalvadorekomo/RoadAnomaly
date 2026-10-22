@@ -35,6 +35,22 @@ docs/adr-0004           documentation
 and delete the branch — a negative result written into `docs/experiments/` is a
 contribution, and an abandoned branch is not a failure.
 
+## Spec-driven development
+
+Non-trivial feature work starts with a spec in `specs/NNN-kebab-name/`:
+
+```text
+/speckit.specify  →  /speckit.plan  →  /speckit.tasks  →  /speckit.implement
+```
+
+Link the ADR, metric contract or issue the feature depends on from `spec.md`.
+Do not create a spec for a typo, a chore or a documentation-only change. A spec
+and its checked tasks are plans, not evidence: the
+[requirements matrix](docs/validation/requirements-matrix.md) still decides
+status, and `docs/experiments/` still decides published numbers. See
+[ADR-0013](docs/adr/0013-spec-driven-development.md) and
+[`docs/sdd.md`](docs/sdd.md).
+
 ## The six rules
 
 1. **`main` stays green.** If your change breaks CI, fixing it is the next

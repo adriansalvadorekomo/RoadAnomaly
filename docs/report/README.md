@@ -11,7 +11,7 @@ space, not the appendix.
 | § | Section | Pages | Owner | Content |
 |---|---|---|---|---|
 | 1 | Introduction | 1 | M1 | The operational problem: closed-set perception meets open-set reality |
-| 2 | Dataset | 2 | M1 | The verified table from the README, category balance, the scale histogram, the semantic-only caveat, licensing |
+| 2 | Dataset | 2 | M1 | The verified table in [`docs/dataset.md`](../dataset.md), category balance, the scale histogram, the semantic-only caveat, licensing |
 | 3 | Methodology and protocol | 2 | M1 | CRISP-DM phases (ADR-0007), ADR-0001 in prose, selection vs held-out scoring, and what the protocol costs |
 | 4 | Methods | 3 | M2 M3 M4 | Autoencoder reconstruction error, U-Net, DeepLabV3+; normal-road labels and MSP anomaly score |
 | 5 | Metrics | 1 | M4 | Common binary-mask metrics (P/R/F1/IoU/Dice), complementary diagnostics, why F1 equals Dice, AUPRO cap and HD95 policy |

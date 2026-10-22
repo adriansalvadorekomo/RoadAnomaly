@@ -1,7 +1,7 @@
 # Requirements traceability matrix
 
-> Snapshot: **2026-10-21** · branch `docs/structurizr-c4-refactor` ·
-> base `0f9d53f`. Update this file whenever a status changes; do not update it
+> Snapshot: **2026-10-22** · branch `docs/adopt-sdd` ·
+> base `f404308`. Update this file whenever a status changes; do not update it
 > from memory.
 
 Two validations are graded independently. This matrix maps every requirement to
@@ -22,12 +22,12 @@ the evidence that would satisfy it. **A README statement is not evidence.**
 | ID | Requirement | Evidence today | File / document | Status |
 |---|---|---|---|---|
 | V1.1 | Complete code review | PRs #3–#5 are merged, but no independent reviewer is recorded; the review history is still self/agent review. | `.github/PULL_REQUEST_TEMPLATE.md`, PR #3–#5 | `in progress` |
-| V1.2 | Individual contribution and oral explanation | Every CODEOWNERS path routes to `@adriansalvadorekomo`; workstreams M1–M6 are unassigned. | `.github/CODEOWNERS`, README §Team | `missing` |
-| V1.3 | Dataset comprehension | Verified 60 frames, 201 instances, 46 instance-annotated directories, 14 semantic-only directories, 9.8 % coverage; six integrity tests pass. No EDA notebook exists. | `README.md` §4, `tests/dataset/test_dataset_integrity.py`, `data/readme.md` | `in progress` |
+| V1.2 | Individual contribution and oral explanation | Every CODEOWNERS path routes to `@adriansalvadorekomo`; workstreams M1–M6 are unassigned. | `.github/CODEOWNERS`, [`README.md#team`](../../README.md#team) | `missing` |
+| V1.3 | Dataset comprehension | Verified 60 frames, 201 instances, 46 instance-annotated directories, 14 semantic-only directories, 9.8 % coverage; six integrity tests pass. No EDA notebook exists. | [`README.md#3-data-and-evaluation-protocol`](../../README.md#3-data-and-evaluation-protocol), [`docs/dataset.md`](../dataset.md), `tests/dataset/test_dataset_integrity.py`, `data/readme.md` | `in progress` |
 | V1.4 | At least three general models | 0 of 3 implemented; `dl/models/` contains only `.gitkeep`. ADR-0010 fixes autoencoder, U-Net and DeepLabV3+. | `docs/adr/0010-model-lineup-and-evaluation-contract.md`, `dl/models/` | `missing` |
-| V1.5 | One specific model per two members | Six members imply three specific models; M2/M3/M4 are defined but unassigned and empty. | `README.md` §Team, `dl/README.md` | `missing` |
-| V1.6 | Classification, anomaly detection and segmentation objectives | Objectives and the three-model comparison are stated; no model implements them. DeepLabV3+ and U-Net provide dense multi-class classification; there is no separate image-level classifier. | `README.md` §1 and §5, ADR-0010, ADR-0007 | `missing` |
-| V1.7 | Model comparison and selected-model deployment | No checkpoints, results, API or container exists. | `README.md` §Results, `docs/experiments/` | `blocked` on V1.4–V1.6 |
+| V1.5 | One specific model per two members | Six members imply three specific models; M2/M3/M4 are defined but unassigned and empty. | [`README.md#team`](../../README.md#team), `dl/README.md` | `missing` |
+| V1.6 | Classification, anomaly detection and segmentation objectives | Objectives and the three-model comparison are stated; no model implements them. DeepLabV3+ and U-Net provide dense multi-class classification; there is no separate image-level classifier. | [`README.md#1-what-this-project-is`](../../README.md#1-what-this-project-is), [`README.md#4-models-metrics-and-xai`](../../README.md#4-models-metrics-and-xai), ADR-0010, ADR-0007 | `missing` |
+| V1.7 | Model comparison and selected-model deployment | No checkpoints, results, API or container exists. | [`README.md#5-results`](../../README.md#5-results), `docs/experiments/` | `blocked` on V1.4–V1.6 |
 | V1.8 | XAI implementation and justification | ADR-0011 selects the methods and faithfulness checks, and `docs/xai.md` fixes the evidence format. No XAI code, heatmap or faithfulness result exists. | `docs/adr/0011-xai-methods-and-faithfulness.md`, `docs/xai.md` | `in progress`; implementation gated on V1.4 |
 
 ## Validation 2 — Commercial (40 %, W10)
@@ -38,10 +38,10 @@ the evidence that would satisfy it. **A README statement is not evidence.**
 | V2.2 | General context | Covered in the standalone preliminary Business Understanding report; the commercial report chapter is not yet integrated. | `docs/report/Buisness Understanding report.pdf` | `in progress` |
 | V2.3 | Existing solutions | No survey or comparison exists. | none | `missing` |
 | V2.4 | Deployed solutions | No survey or comparison exists. | none | `missing` |
-| V2.5 | Problem statement | The operational problem is written for a technical audience. | `README.md` §1 | `in progress` |
-| V2.6 | Methodology | CRISP-DM, the evaluation-only protocol and the three-model comparison are decided; the report chapter is not written. | ADR-0001, ADR-0007, ADR-0010, README §3 | `in progress` |
-| V2.7 | Proposed solution | The target C4 context/offline pipeline, promotion rule and XAI gate are documented; nothing is deployed. | `README.md` §3, `docs/architecture/workspace.dsl`, ADR-0003–0012 | `in progress` |
-| V2.8 | Work completed | The current state is recorded honestly, but there is no report chapter. | `README.md` §2 and §9 | `in progress` |
+| V2.5 | Problem statement | The operational problem is written for a technical audience. | [`README.md#1-what-this-project-is`](../../README.md#1-what-this-project-is) | `in progress` |
+| V2.6 | Methodology | CRISP-DM, the evaluation-only protocol and the three-model comparison are decided; the report chapter is not written. | ADR-0001, ADR-0007, ADR-0010, [`README.md#1-what-this-project-is`](../../README.md#1-what-this-project-is), [`docs/architecture/README.md#crisp-dm-mapping`](../architecture/README.md#crisp-dm-mapping) | `in progress` |
+| V2.7 | Proposed solution | The target C4 context/offline pipeline, promotion rule and XAI gate are documented; nothing is deployed. | [`README.md#2-architecture`](../../README.md#2-architecture), `docs/architecture/workspace.dsl`, ADR-0003–0012 | `in progress` |
+| V2.8 | Work completed | The current state is recorded honestly, but there is no report chapter. | `README.md` snapshot, [`README.md#8-validation-status`](../../README.md#8-validation-status) | `in progress` |
 | V2.9 | Business Model Canvas | No canvas exists. | none | `missing` |
 | V2.10 | Marketing Mix (4Ps) | No analysis exists. | none | `missing` |
 | V2.11 | Market penetration strategy | No strategy exists. | none | `missing` |
@@ -81,7 +81,8 @@ independent code review.
 
 ## How to update
 
-1. Change a row only when the evidence file or command exists.
+1. Change a row only when the evidence file or command exists. A spec or a
+   checked task is a plan, not evidence.
 2. Record the command output or the file path in the evidence column.
 3. Recompute the summary counts.
 4. If a requirement moves to `implemented`, add the verification command to the
