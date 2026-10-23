@@ -14,6 +14,7 @@ in the template's end-to-end section and in the official evaluation output.
 | Notebook | Role | Status | Primary `dl/` code |
 |---|---|---|---|
 | `template_road_anomaly.ipynb` | Central guided tour, ownership map, end-to-end comparison | **present**; legacy inline stubs being migrated | `dl/config.py`, `dl/data/`, `dl/models/`, `dl/training/`, `dl/evaluation/` |
+| `road-anomaly-dataset-exploration.ipynb` | Scientific EDA over the canonical audit JSON; presentation client, not a second implementation | **present** | `dl/data/audit.py`, `docs/validation/roadanomaly-eda.json` |
 | `01_dataset_eda.ipynb` | Dataset inventory, label audit, coverage, benchmark inspection | planned | `dl/data/` |
 | `02_deeplabv3plus.ipynb` | DeepLabV3+ architecture, ASPP, transfer learning and diagnostics | planned | `dl/models/deeplabv3plus.py`, `dl/training/`, `dl/evaluation/` |
 | `03_autoencoder.ipynb` | Autoencoder reconstruction, error maps and per-pixel aggregation | planned | `dl/models/autoencoder.py`, `dl/training/`, `dl/evaluation/` |
