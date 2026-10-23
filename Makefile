@@ -8,8 +8,8 @@ PY ?= python3
 VENV ?= .venv
 BIN := $(VENV)/bin
 
-.PHONY: help venv install lint fmt type test test-fast data-check architecture \
-        train eval export serve landing prototype up down clean
+.PHONY: help venv install lint fmt type test test-fast data-check data-audit \
+        data-audit-check architecture train eval export serve landing prototype up down clean
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -41,6 +41,12 @@ test-fast: ## Tests that need no GPU and no training
 
 data-check: ## Validate the RoadAnomaly checkout (frame <-> label contract)
 	$(BIN)/pytest tests/dataset -v
+
+data-audit: ## Generate the schema-validated dataset audit evidence
+	PYTHONDONTWRITEBYTECODE=1 $(BIN)/python -m dl.data.audit
+
+data-audit-check: ## Validate the committed dataset audit pair without writing
+	PYTHONDONTWRITEBYTECODE=1 $(BIN)/python -m dl.data.audit --check
 
 architecture: ## Render the C4 diagrams (Java + Chromium) and refresh the manifest
 	./docs/architecture/render.sh

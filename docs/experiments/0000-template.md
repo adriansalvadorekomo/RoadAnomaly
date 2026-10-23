@@ -1,7 +1,12 @@
 # 0000. Experiment title
 
+> Copy this file to `NNNN-short-name.md` for an official run, or to
+> `learning/NNNN-short-name.md` for a learning run. The profile and the directory
+> must agree. A learning record never supports a README or report number.
+
 - **Date:** YYYY-MM-DD
 - **Owner:** M?
+- **Profile:** `official` or `learning`
 - **CRISP-DM phase:** 4 Modeling / 5 Evaluation
 - **Hypothesis:** What would be true if this run worked?
 - **Falsification:** What result would make you reject the hypothesis?
@@ -23,8 +28,10 @@
 | RoadAnomaly benchmark | `data/` at commit `<sha>`; `data/credits.txt` unchanged |
 | Artifact / registry digest | `sha256:...` or `not exported` |
 
-A run without a dataset manifest, split hash and config hash is not a valid
-experiment, even if it produced a number.
+An official run without a dataset manifest, split hash and config hash is not a
+valid experiment, even if it produced a number. A learning run records the same
+provenance where it applies, but its `Profile: learning` mark keeps it outside
+the official evidence chain.
 
 ## Results
 
@@ -41,6 +48,10 @@ independent evidence.
 Do not put RoadAnomaly metrics in the selection column. Do not mix zero-shot and
 threshold-tuned values in one cell. Record the AUPRO FPR cap, HD95 spacing and
 empty-mask policy, and Boundary IoU band width with the value.
+
+A learning record may use a narrower table for the exercise. Mark those results
+exploratory and keep them out of the official scorecard; to cite a value, rerun
+it under an official config.
 
 ## XAI evidence
 

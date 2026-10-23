@@ -1,0 +1,2761 @@
+{
+  "categories": {
+    "classification": "object_category_not_scene",
+    "counts": {
+      "animals": 31,
+      "cones": 8,
+      "lost_tires": 3,
+      "obstacles": 15,
+      "vehicle": 3
+    },
+    "total_frames": 60
+  },
+  "claims": [
+    {
+      "claim_id": "fingerprint.match",
+      "definition": "regular files under data/ (no symlinks), sorted by POSIX relative path; for each: UTF-8 path + NUL + raw 32-byte SHA-256 of content; no trailing NUL/newline; lowercase hex",
+      "evidence_class": "computed_local",
+      "source": "data/",
+      "text": "The computed local fingerprint matches the historical baseline.",
+      "value": {
+        "computed": "7c16ab39607d68a66bc2f4ac321933f64221d62980119ea780af5abf2a99f4e2",
+        "historical": "7c16ab39607d68a66bc2f4ac321933f64221d62980119ea780af5abf2a99f4e2",
+        "status": "match"
+      }
+    },
+    {
+      "claim_id": "inventory.counts",
+      "definition": "frame_list.json order and <frame>.labels directory membership",
+      "evidence_class": "computed_local",
+      "source": "data/frame_list.json",
+      "text": "60 frames, 60 label directories, 46 instance-annotated and 14 semantic-only frames.",
+      "value": {
+        "frame_count": 60,
+        "frame_list_count": 60,
+        "instance_frame_count": 46,
+        "label_dir_count": 60,
+        "semantic_only_frame_count": 14
+      }
+    },
+    {
+      "claim_id": "inventory.annotation_integrity",
+      "definition": "All annotation_integrity flags are true only after their checks pass.",
+      "evidence_class": "computed_local",
+      "source": "data/frames/*.labels",
+      "text": "Frame decoding, semantic values, colour mapping, contiguous instance IDs and cls=2 were checked.",
+      "value": {
+        "colour_mapping": {
+          "anomaly": [
+            255,
+            69,
+            0
+          ],
+          "normal": [
+            0,
+            0,
+            0
+          ]
+        },
+        "colour_mapping_valid": true,
+        "frame_decodable": true,
+        "instance_class_id": 2,
+        "instance_ids_contiguous": true,
+        "label_files_complete": true,
+        "semantic_values": [
+          0,
+          2
+        ]
+      }
+    },
+    {
+      "claim_id": "instance_semantic.exact",
+      "definition": "union(instance values 1..N) == semantic value 2, per instance frame",
+      "evidence_class": "computed_local",
+      "source": "data/frames/*.labels",
+      "text": "All 46 instance frames satisfy the instance/semantic invariant; 14 semantic-only frames are excluded.",
+      "value": {
+        "extra_instance_pixels": 0,
+        "frames_checked": 46,
+        "frames_exact_match": 46,
+        "frames_mismatched": 0,
+        "missing_instance_pixels": 0,
+        "semantic_only_frames_excluded": 14
+      }
+    },
+    {
+      "claim_id": "coverage.pooled",
+      "definition": "total anomaly pixels / total pixels over all 60 frames",
+      "evidence_class": "computed_local",
+      "source": "data/frames/*.labels/labels_semantic.png",
+      "text": "Pooled anomaly coverage is 9.849561 percent.",
+      "value": {
+        "fraction": 0.09849561,
+        "percent": 9.849561,
+        "total_anomaly_pixels": 5446413,
+        "total_pixels": 55296000
+      }
+    },
+    {
+      "claim_id": "coverage.range",
+      "definition": "anomaly pixels / (1280 x 720)",
+      "evidence_class": "computed_local",
+      "source": "data/frames/*.labels/labels_semantic.png",
+      "text": "Per-frame anomaly coverage ranges from 0.374674 to 42.328559 percent.",
+      "value": {
+        "maximum_percent": 42.328559,
+        "median_percent": 6.622938,
+        "minimum_percent": 0.374674
+      }
+    },
+    {
+      "claim_id": "coverage.below_one_percent",
+      "definition": "per-frame percent < 1.0",
+      "evidence_class": "computed_local",
+      "source": "data/frames/*.labels/labels_semantic.png",
+      "text": "Six frames have per-frame anomaly coverage below one percent.",
+      "value": [
+        "animals02_Zagori_On_the_road_to_Papigko.webp",
+        "animals11_Cock_Pheasant_on_Romford_Road.webp",
+        "lost_tires03.webp",
+        "lost_tires08.webp",
+        "lost_tires09.webp",
+        "obstacles12_rocks2.webp"
+      ]
+    },
+    {
+      "claim_id": "categories.counts",
+      "definition": "prefix before the first digit in the frame stem",
+      "evidence_class": "computed_local",
+      "source": "data/frame_list.json",
+      "text": "Filename prefixes count five object categories; they are not scene IDs.",
+      "value": {
+        "classification": "object_category_not_scene",
+        "counts": {
+          "animals": 31,
+          "cones": 8,
+          "lost_tires": 3,
+          "obstacles": 15,
+          "vehicle": 3
+        },
+        "total_frames": 60
+      }
+    },
+    {
+      "claim_id": "object_scale.counts",
+      "definition": "(x1 - x0) x (y1 - y0), half-open extents",
+      "evidence_class": "computed_local",
+      "source": "data/frames/*.labels/index.json",
+      "text": "Object-scale counts expose all three small-object definitions.",
+      "value": {
+        "both_dimensions_below_32": 20,
+        "denominator": 201,
+        "either_dimension_below_32": 46,
+        "roi_area_below_1024": 35
+      }
+    },
+    {
+      "claim_id": "object_scale.medians",
+      "definition": "sqrt(ROI area)",
+      "evidence_class": "computed_local",
+      "source": "data/frames/*.labels",
+      "text": "ROI and mask-pixel equivalent-square medians accompany the documented 87 x 87 claim.",
+      "value": {
+        "median_mask_equivalent_square_px": 51.2,
+        "median_roi_equivalent_square_px": 86.7,
+        "median_roi_height_px": 107.0,
+        "median_roi_width_px": 85.0
+      }
+    },
+    {
+      "claim_id": "instance_mapping.agreement",
+      "definition": "mask value k equals instances[k-1].id",
+      "evidence_class": "computed_local",
+      "source": "data/frames/*.labels/index.json",
+      "text": "The k-th index-entry order mapping agrees in 35 frames and disagrees in 11.",
+      "value": {
+        "disagreeing_frames": [
+          "animals05_cows_near_Phonsavan_Laos.webp",
+          "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+          "animals10_bovine_cattle_beside_road.webp",
+          "animals13_jeune_bovin_sur_la_route.webp",
+          "animals17_E6_near_Kvaenangen.webp",
+          "animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+          "animals29_Zebra_Crossing_Abbey_Road_Style.webp",
+          "cones01_Beeston_MMB_A6_Middle_Street.webp",
+          "lost_tires09.webp",
+          "obstacles12_rocks6.webp",
+          "vehicle03_Fuhrwerke_in_China.webp"
+        ],
+        "frames_agreeing": 35,
+        "frames_checked": 46,
+        "frames_disagreeing": 11,
+        "weaker_existing_test": {
+          "name": "max(mask) == len(instances)",
+          "passes": true
+        }
+      }
+    },
+    {
+      "claim_id": "roi.bounds",
+      "definition": "x0 < 0 or y0 < 0 or x1 > 1280 or y1 > 720, half-open extents",
+      "evidence_class": "computed_local",
+      "source": "data/frames/*.labels/index.json",
+      "text": "ROI findings are reported without clipping: 11 out of bounds, 17 non-tight, 201 centroids inside.",
+      "value": {
+        "centroids_inside": 201,
+        "instances_checked": 201,
+        "non_tight": 17,
+        "out_of_bounds": 11
+      }
+    },
+    {
+      "claim_id": "duplicates.methods",
+      "definition": "9x8 grayscale dHash, 64 bits; Hamming distance <= 6",
+      "evidence_class": "computed_local",
+      "source": "data/frames/*.webp",
+      "text": "Exact, decoded-pixel and dHash duplicate checks found no baseline pairs; the methods are limited.",
+      "value": {
+        "decoded_pairs": [],
+        "dhash_method": "9x8 grayscale dHash, 64 bits; Hamming distance <= 6",
+        "dhash_pairs": [],
+        "exact_pairs": []
+      }
+    },
+    {
+      "claim_id": "credits.coverage",
+      "definition": "one credit block per frame stem in data/credits.txt",
+      "evidence_class": "computed_local",
+      "source": "data/credits.txt",
+      "text": "All 60 frames have credit entries; 24 lack an explicit per-image licence token.",
+      "value": {
+        "coverage": 60,
+        "missing_entries": [],
+        "missing_licence_tokens": [
+          "animals25_jablonna_dziki.webp",
+          "animals28.webp",
+          "animals30.webp",
+          "animals31_deer.webp",
+          "cones07.webp",
+          "cones08_can.webp",
+          "lost_tires03.webp",
+          "lost_tires08.webp",
+          "lost_tires09.webp",
+          "obstacles01_boulder.webp",
+          "obstacles02_rock.webp",
+          "obstacles03_cardboard_czech_hedgehog.webp",
+          "obstacles04_cardboard_czech_hedgehog.webp",
+          "obstacles05_cardboard_czech_hedgehog.webp",
+          "obstacles06_cardboard_czech_hedgehog.webp",
+          "obstacles07_czech_hedgehog.webp",
+          "obstacles08_boulder2.webp",
+          "obstacles09_boulder3.webp",
+          "obstacles10_boulder4.webp",
+          "obstacles11_boulder5.webp",
+          "obstacles12_rocks2.webp",
+          "obstacles12_rocks4.webp",
+          "obstacles12_rocks5.webp",
+          "obstacles12_rocks6.webp"
+        ],
+        "missing_source_urls": [
+          "obstacles12_rocks2.webp",
+          "obstacles12_rocks4.webp",
+          "obstacles12_rocks5.webp",
+          "obstacles12_rocks6.webp"
+        ]
+      }
+    },
+    {
+      "claim_id": "credits.source_groups",
+      "definition": "frames sharing the same non-licence source URL, or the same URL-less credit block",
+      "evidence_class": "computed_local",
+      "source": "data/credits.txt",
+      "text": "Four attribution-derived source groups cover 13 frames, including one group without a URL.",
+      "value": {
+        "frame_count": 13,
+        "group_count": 4,
+        "groups": [
+          {
+            "frame_count": 2,
+            "frames": [
+              "cones07.webp",
+              "cones08_can.webp"
+            ],
+            "group_id": "source-group-001",
+            "source_url": "https://www.stuff.co.nz/auckland/local-news/papakura-courier/102189952/upsurge-in-traffic-turns-road-into-difficulttonegotiate-obstacle-course"
+          },
+          {
+            "frame_count": 3,
+            "frames": [
+              "lost_tires03.webp",
+              "lost_tires08.webp",
+              "lost_tires09.webp"
+            ],
+            "group_id": "source-group-002",
+            "source_url": "https://www.youtube.com/watch?v=2ysuwejHZEg"
+          },
+          {
+            "frame_count": 4,
+            "frames": [
+              "obstacles03_cardboard_czech_hedgehog.webp",
+              "obstacles04_cardboard_czech_hedgehog.webp",
+              "obstacles05_cardboard_czech_hedgehog.webp",
+              "obstacles06_cardboard_czech_hedgehog.webp"
+            ],
+            "group_id": "source-group-003",
+            "source_url": "https://jasondeansart.com/sculpture/moveable-barriers/"
+          },
+          {
+            "frame_count": 4,
+            "frames": [
+              "obstacles12_rocks2.webp",
+              "obstacles12_rocks4.webp",
+              "obstacles12_rocks5.webp",
+              "obstacles12_rocks6.webp"
+            ],
+            "group_id": "source-group-004",
+            "source_url": null
+          }
+        ]
+      }
+    },
+    {
+      "claim_id": "credits.annotation_licence",
+      "definition": "local documented claim; not independently verified",
+      "evidence_class": "documented_local",
+      "source": "data/credits.txt",
+      "text": "The annotations are documented locally as CC BY-SA 4.0; no legal conclusion is made.",
+      "value": {
+        "claim": "CC BY-SA 4.0",
+        "legal_conclusion": "not_made",
+        "sources": [
+          "data/credits.txt",
+          "docs/dataset.md",
+          "README.md"
+        ],
+        "terms_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+      }
+    },
+    {
+      "claim_id": "credits.code_licence",
+      "definition": "local documented claim; not independently verified",
+      "evidence_class": "documented_local",
+      "source": "LICENSE",
+      "text": "The source code is documented locally as MIT; data and annotations are excluded.",
+      "value": {
+        "claim": "MIT",
+        "legal_conclusion": "not_made",
+        "scope": "source code; data and annotations excluded",
+        "source": "LICENSE"
+      }
+    },
+    {
+      "claim_id": "provenance.upstream",
+      "definition": "no local release, version or checksum identifier",
+      "evidence_class": "upstream_unverified",
+      "source": "data/readme.md",
+      "text": "Upstream release provenance is unverified and scene identity is unresolved.",
+      "value": {
+        "citation": "Lis et al., Detecting the Unexpected via Image Resynthesis, ICCV 2019",
+        "filename_prefix_is_scene_id": false,
+        "local_attribution_is_redistribution_proof": false,
+        "release_identifier": null,
+        "scene_identity": "unresolved",
+        "upstream_status": "upstream_unverified"
+      }
+    },
+    {
+      "claim_id": "provenance.p0_g10",
+      "definition": "open scientific and source-readiness items",
+      "evidence_class": "unresolved",
+      "source": "docs/validation/requirements-matrix.md",
+      "text": "P0-1 through P0-4 and G10 remain open.",
+      "value": {
+        "g10_status": "open",
+        "p0_status": {
+          "P0-1": "open",
+          "P0-2": "open",
+          "P0-3": "open",
+          "P0-4": "open"
+        }
+      }
+    },
+    {
+      "claim_id": "provenance.adr0010",
+      "definition": "unresolved item; status open",
+      "evidence_class": "unresolved",
+      "source": "docs/adr/0010-model-lineup-and-evaluation-contract.md",
+      "text": "The ADR-0010 threshold contradiction remains open and is not reworded into a decision.",
+      "value": [
+        {
+          "evidence_class": "unresolved",
+          "item_id": "adr-0010-threshold-contradiction",
+          "source": "docs/adr/0010-model-lineup-and-evaluation-contract.md",
+          "statement": "ADR-0010 leaves the threshold contradiction unresolved.",
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "claim_id": "limitations.report",
+      "definition": "limitations list",
+      "evidence_class": "computed_local",
+      "source": "dl/data/audit.py",
+      "text": "The report records method and evidence limits rather than converting them into certainty.",
+      "value": [
+        "historical-fingerprint-local-reconstruction",
+        "visual-registration-unverified",
+        "duplicates-method-limited",
+        "source-groups-attribution-derived",
+        "upstream-provenance-unverified",
+        "per-image-licence-tokens-unresolved",
+        "environment-commit-provenance"
+      ]
+    },
+    {
+      "claim_id": "documented_claims.comparisons",
+      "definition": "side-by-side documented and computed value",
+      "evidence_class": "computed_local",
+      "source": "docs/dataset.md",
+      "text": "Six documented claims are compared with computed values without rewriting the source documents.",
+      "value": [
+        "coverage-rounding",
+        "object-scale-87x87",
+        "scene-prefix-grouping",
+        "per-image-licence-completeness",
+        "benchmark-scene-folds",
+        "instance-id-equality"
+      ]
+    },
+    {
+      "claim_id": "documented.coverage-rounding",
+      "definition": "pooled anomaly pixels / total pixels, six-decimal percent",
+      "evidence_class": "documented_local",
+      "source": "docs/dataset.md",
+      "text": "Anomaly coverage is 9.8 percent of all pixels.",
+      "value": "pooled 9.849561 percent; 0.374674-42.328559 percent per frame; median 6.622938 percent"
+    },
+    {
+      "claim_id": "documented.object-scale-87x87",
+      "definition": "ROI area < 1024; both/either dimension < 32; sqrt(ROI area); median ROI bbox; sqrt(mask pixel count)",
+      "evidence_class": "documented_local",
+      "source": "docs/dataset.md",
+      "text": "Median instance is approximately 87 x 87 px; 35 of 201 are smaller than 32 x 32 px.",
+      "value": "ROI area < 1024: 35/201; both dimensions < 32: 20/201; either dimension < 32: 46/201; median ROI equivalent square 86.7 px; median ROI bbox 85.0 x 107.0 px; median mask equivalent square 51.2 px"
+    },
+    {
+      "claim_id": "documented.scene-prefix-grouping",
+      "definition": "filename prefix before the first digit",
+      "evidence_class": "documented_local",
+      "source": "docs/dataset.md",
+      "text": "Filename prefixes are the natural scene grouping.",
+      "value": "No scene IDs or source scene metadata exist locally; prefix counts are object categories only (animals 31, obstacles 15, cones 8, lost_tires 3, vehicle 3)."
+    },
+    {
+      "claim_id": "documented.per-image-licence-completeness",
+      "definition": "explicit CC0, CC BY/CC BY-SA or public-domain token per credit block",
+      "evidence_class": "unresolved",
+      "source": "data/credits.txt",
+      "text": "Per-image terms are recorded in credits.txt.",
+      "value": "24/60 frames lack an explicit licence token; 4/60 lack a source URL; missing tokens remain unresolved."
+    },
+    {
+      "claim_id": "documented.benchmark-scene-folds",
+      "definition": "benchmark scene identity and fold assignment",
+      "evidence_class": "documented_local",
+      "source": "docs/dataset.md",
+      "text": "Scene-grouped benchmark folds can support the separately reported threshold-tuned regime.",
+      "value": "No benchmark scene identities exist locally; no folds, scene assignments or split hash are created."
+    },
+    {
+      "claim_id": "documented.instance-id-equality",
+      "definition": "mask value k equals instances[k-1].id",
+      "evidence_class": "documented_local",
+      "source": "docs/dataset.md",
+      "text": "The instance-mask pixel value equals the instance id.",
+      "value": "35/46 frames agree under the k-th-entry order mapping; 11/46 disagree; 48 value/entry mismatches are listed."
+    }
+  ],
+  "coverage": {
+    "below_one_percent": [
+      "animals02_Zagori_On_the_road_to_Papigko.webp",
+      "animals11_Cock_Pheasant_on_Romford_Road.webp",
+      "lost_tires03.webp",
+      "lost_tires08.webp",
+      "lost_tires09.webp",
+      "obstacles12_rocks2.webp"
+    ],
+    "definitions": {
+      "below_one_percent": "per-frame percent < 1.0",
+      "median": "median of the 60 per-frame fractions",
+      "per_frame_fraction": "anomaly pixels / (1280 x 720)",
+      "percent": "100 x fraction",
+      "pooled_fraction": "total anomaly pixels / total pixels over all 60 frames"
+    },
+    "maximum_percent": 42.328559,
+    "median_percent": 6.622938,
+    "minimum_percent": 0.374674,
+    "per_frame": [
+      {
+        "anomaly_pixels": 61817,
+        "fraction": 0.06707574,
+        "frame_name": "animals01_Guiguinto_railway_station_Calves.webp",
+        "percent": 6.707574,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 7365,
+        "fraction": 0.00799154,
+        "frame_name": "animals02_Zagori_On_the_road_to_Papigko.webp",
+        "percent": 0.799154,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 215418,
+        "fraction": 0.23374349,
+        "frame_name": "animals03_Zebras_in_the_road.webp",
+        "percent": 23.374349,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 60845,
+        "fraction": 0.06602105,
+        "frame_name": "animals04_17_animal_casualties_so_far_in_2006.webp",
+        "percent": 6.602105,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 134647,
+        "fraction": 0.14610135,
+        "frame_name": "animals05_cows_near_Phonsavan_Laos.webp",
+        "percent": 14.610135,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 339571,
+        "fraction": 0.36845812,
+        "frame_name": "animals06_sheep_roads_lambs.webp",
+        "percent": 36.845812,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 75530,
+        "fraction": 0.0819553,
+        "frame_name": "animals07_Aihole_Pattadakal.webp",
+        "percent": 8.19553,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 16251,
+        "fraction": 0.01763346,
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "percent": 1.763346,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 390100,
+        "fraction": 0.42328559,
+        "frame_name": "animals09_working_together.webp",
+        "percent": 42.328559,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 25557,
+        "fraction": 0.02773112,
+        "frame_name": "animals10_bovine_cattle_beside_road.webp",
+        "percent": 2.773112,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 8521,
+        "fraction": 0.00924588,
+        "frame_name": "animals11_Cock_Pheasant_on_Romford_Road.webp",
+        "percent": 0.924588,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 120061,
+        "fraction": 0.13027452,
+        "frame_name": "animals12_Collared_Peccary_crossing_the_road.webp",
+        "percent": 13.027452,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 14547,
+        "fraction": 0.01578451,
+        "frame_name": "animals13_jeune_bovin_sur_la_route.webp",
+        "percent": 1.578451,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 91804,
+        "fraction": 0.09961372,
+        "frame_name": "animals14_Dekemhare_Road.webp",
+        "percent": 9.961372,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 95684,
+        "fraction": 0.10382378,
+        "frame_name": "animals15_Doebeln_Pferdebahn.webp",
+        "percent": 10.382378,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 287315,
+        "fraction": 0.31175673,
+        "frame_name": "animals16_Donkeys_of_Morocco.webp",
+        "percent": 31.175673,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 14962,
+        "fraction": 0.01623481,
+        "frame_name": "animals17_E6_near_Kvaenangen.webp",
+        "percent": 1.623481,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 11992,
+        "fraction": 0.01301215,
+        "frame_name": "animals18_Goose_on_the_road_Memphis.webp",
+        "percent": 1.301215,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 86870,
+        "fraction": 0.09425998,
+        "frame_name": "animals19_Porte_de_Roubaix.webp",
+        "percent": 9.425998,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 39840,
+        "fraction": 0.04322917,
+        "frame_name": "animals20_Marcassin_Conchiglio.webp",
+        "percent": 4.322917,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 140272,
+        "fraction": 0.15220486,
+        "frame_name": "animals21_On_The_Road_to_Gondar_Ethiopia.webp",
+        "percent": 15.220486,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 183445,
+        "fraction": 0.19905056,
+        "frame_name": "animals22_red_fox_on_road.webp",
+        "percent": 19.905056,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 269268,
+        "fraction": 0.29217448,
+        "frame_name": "animals23_rhino_crossing_road.webp",
+        "percent": 29.217448,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 338376,
+        "fraction": 0.36716146,
+        "frame_name": "animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+        "percent": 36.716146,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 124640,
+        "fraction": 0.13524306,
+        "frame_name": "animals25_jablonna_dziki.webp",
+        "percent": 13.524306,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 45283,
+        "fraction": 0.0491352,
+        "frame_name": "animals26_Unnamed_Road_Kazakhstan.webp",
+        "percent": 4.91352,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 167615,
+        "fraction": 0.18187391,
+        "frame_name": "animals27_wildlife_bear.webp",
+        "percent": 18.187391,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 73954,
+        "fraction": 0.08024523,
+        "frame_name": "animals28.webp",
+        "percent": 8.024523,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 64771,
+        "fraction": 0.07028103,
+        "frame_name": "animals29_Zebra_Crossing_Abbey_Road_Style.webp",
+        "percent": 7.028103,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 61229,
+        "fraction": 0.06643772,
+        "frame_name": "animals30.webp",
+        "percent": 6.643772,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 52627,
+        "fraction": 0.05710395,
+        "frame_name": "animals31_deer.webp",
+        "percent": 5.710395,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 39294,
+        "fraction": 0.04263672,
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "percent": 4.263672,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 60484,
+        "fraction": 0.06562934,
+        "frame_name": "cones02_Broadmoor_Manhole_Cones.webp",
+        "percent": 6.562934,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 13143,
+        "fraction": 0.01426107,
+        "frame_name": "cones03_Bang_Na_Trat_Highway.webp",
+        "percent": 1.426107,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 12095,
+        "fraction": 0.01312391,
+        "frame_name": "cones04_Federation.webp",
+        "percent": 1.312391,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 10107,
+        "fraction": 0.0109668,
+        "frame_name": "cones05_Corner_of_Kingsley_Park.webp",
+        "percent": 1.09668,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 46026,
+        "fraction": 0.04994141,
+        "frame_name": "cones06_VnA_traffic_cones.webp",
+        "percent": 4.994141,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 12623,
+        "fraction": 0.01369683,
+        "frame_name": "cones07.webp",
+        "percent": 1.369683,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 18610,
+        "fraction": 0.02019314,
+        "frame_name": "cones08_can.webp",
+        "percent": 2.019314,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 6407,
+        "fraction": 0.00695204,
+        "frame_name": "lost_tires03.webp",
+        "percent": 0.695204,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 3453,
+        "fraction": 0.00374674,
+        "frame_name": "lost_tires08.webp",
+        "percent": 0.374674,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 9148,
+        "fraction": 0.00992622,
+        "frame_name": "lost_tires09.webp",
+        "percent": 0.992622,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 151657,
+        "fraction": 0.16455838,
+        "frame_name": "obstacles01_boulder.webp",
+        "percent": 16.455838,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 151619,
+        "fraction": 0.16451714,
+        "frame_name": "obstacles02_rock.webp",
+        "percent": 16.451714,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 68215,
+        "fraction": 0.07401801,
+        "frame_name": "obstacles03_cardboard_czech_hedgehog.webp",
+        "percent": 7.401801,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 43803,
+        "fraction": 0.0475293,
+        "frame_name": "obstacles04_cardboard_czech_hedgehog.webp",
+        "percent": 4.75293,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 68258,
+        "fraction": 0.07406467,
+        "frame_name": "obstacles05_cardboard_czech_hedgehog.webp",
+        "percent": 7.406467,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 42832,
+        "fraction": 0.04647569,
+        "frame_name": "obstacles06_cardboard_czech_hedgehog.webp",
+        "percent": 4.647569,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 227478,
+        "fraction": 0.24682943,
+        "frame_name": "obstacles07_czech_hedgehog.webp",
+        "percent": 24.682943,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 12461,
+        "fraction": 0.01352105,
+        "frame_name": "obstacles08_boulder2.webp",
+        "percent": 1.352105,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 47374,
+        "fraction": 0.05140408,
+        "frame_name": "obstacles09_boulder3.webp",
+        "percent": 5.140408,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 175584,
+        "fraction": 0.19052083,
+        "frame_name": "obstacles10_boulder4.webp",
+        "percent": 19.052083,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 209403,
+        "fraction": 0.2272168,
+        "frame_name": "obstacles11_boulder5.webp",
+        "percent": 22.72168,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 5788,
+        "fraction": 0.00628038,
+        "frame_name": "obstacles12_rocks2.webp",
+        "percent": 0.628038,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 58159,
+        "fraction": 0.06310655,
+        "frame_name": "obstacles12_rocks4.webp",
+        "percent": 6.310655,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 16721,
+        "fraction": 0.01814345,
+        "frame_name": "obstacles12_rocks5.webp",
+        "percent": 1.814345,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 33442,
+        "fraction": 0.03628689,
+        "frame_name": "obstacles12_rocks6.webp",
+        "percent": 3.628689,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 119369,
+        "fraction": 0.12952365,
+        "frame_name": "vehicle01_man_carrying_dry_grass_on_bicycle.webp",
+        "percent": 12.952365,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 91892,
+        "fraction": 0.0997092,
+        "frame_name": "vehicle02_Broadmoor_Cones_Skidloader.webp",
+        "percent": 9.97092,
+        "total_pixels": 921600
+      },
+      {
+        "anomaly_pixels": 70791,
+        "fraction": 0.07681315,
+        "frame_name": "vehicle03_Fuhrwerke_in_China.webp",
+        "percent": 7.681315,
+        "total_pixels": 921600
+      }
+    ],
+    "pooled_fraction": 0.09849561,
+    "pooled_percent": 9.849561,
+    "total_anomaly_pixels": 5446413,
+    "total_pixels": 55296000
+  },
+  "credits": {
+    "annotation_licence_claim": "CC BY-SA 4.0",
+    "annotation_licence_sources": [
+      "data/credits.txt",
+      "docs/dataset.md",
+      "README.md"
+    ],
+    "annotation_licence_terms_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "code_licence": "MIT",
+    "code_licence_scope": "source code; data and annotations excluded",
+    "code_licence_source": "LICENSE",
+    "coverage": 60,
+    "entries": [
+      {
+        "attribution": "Florentino Floro, CC0 https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "credit_text": "Florentino Floro, CC0 https://creativecommons.org/publicdomain/zero/1.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:03167JfGuiguinto_railway_station_Calves_grasslands_Tabe_Tuktukan_Calves_Roadsfvf_07.jpg",
+        "frame_name": "animals01_Guiguinto_railway_station_Calves.webp",
+        "licence_tokens": [
+          "CC0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:03167JfGuiguinto_railway_station_Calves_grasslands_Tabe_Tuktukan_Calves_Roadsfvf_07.jpg"
+      },
+      {
+        "attribution": "Numenor, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "credit_text": "Numenor, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Zagori_-_On_the_road_to_Papigko_-_panoramio.jpg",
+        "frame_name": "animals02_Zagori_On_the_road_to_Papigko.webp",
+        "licence_tokens": [
+          "CC BY-SA 3.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Zagori_-_On_the_road_to_Papigko_-_panoramio.jpg"
+      },
+      {
+        "attribution": "Chris Eason, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en",
+        "credit_text": "Chris Eason, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Zebras_in_the_road_(2362228520).jpg",
+        "frame_name": "animals03_Zebras_in_the_road.webp",
+        "licence_tokens": [
+          "CC BY 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Zebras_in_the_road_(2362228520).jpg"
+      },
+      {
+        "attribution": "Nigel Freeman, CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/deed.en",
+        "credit_text": "Nigel Freeman, CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:17_animal_casualties_so_far_in_2006_-_geograph.org.uk_-_223415.jpg",
+        "frame_name": "animals04_17_animal_casualties_so_far_in_2006.webp",
+        "licence_tokens": [
+          "CC BY-SA 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:17_animal_casualties_so_far_in_2006_-_geograph.org.uk_-_223415.jpg"
+      },
+      {
+        "attribution": "Jakub Hałun, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/",
+        "credit_text": "Jakub Hałun, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/\nhttps://commons.wikimedia.org/wiki/File:20171116_Cows,_local_road_near_Phonsavan,_Laos_2938_DxO.jpg",
+        "frame_name": "animals05_cows_near_Phonsavan_Laos.webp",
+        "licence_tokens": [
+          "CC BY-SA 4.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:20171116_Cows,_local_road_near_Phonsavan,_Laos_2938_DxO.jpg"
+      },
+      {
+        "attribution": "Jon Sullivan, public domain",
+        "credit_text": "Jon Sullivan, public domain\nhttps://commons.wikimedia.org/wiki/File:Sheep_roads_lambs.jpg",
+        "frame_name": "animals06_sheep_roads_lambs.webp",
+        "licence_tokens": [
+          "public domain"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Sheep_roads_lambs.jpg"
+      },
+      {
+        "attribution": "Jonas Buchholz, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "credit_text": "Jonas Buchholz, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Aihole-Pattadakal_road.JPG",
+        "frame_name": "animals07_Aihole_Pattadakal.webp",
+        "licence_tokens": [
+          "CC BY-SA 3.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Aihole-Pattadakal_road.JPG"
+      },
+      {
+        "attribution": "S. Niebel / SuSanA, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en",
+        "credit_text": "S. Niebel / SuSanA, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Animals_on_the_main_street_of_village_Lin,_Albania_(6851578103).jpg",
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "licence_tokens": [
+          "CC BY 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Animals_on_the_main_street_of_village_Lin,_Albania_(6851578103).jpg"
+      },
+      {
+        "attribution": "Gunjan Raj Giri, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/",
+        "credit_text": "Gunjan Raj Giri, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/\nhttps://commons.wikimedia.org/wiki/File:Animals_working_together.jpg",
+        "frame_name": "animals09_working_together.webp",
+        "licence_tokens": [
+          "CC BY-SA 4.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Animals_working_together.jpg"
+      },
+      {
+        "attribution": "PIXNIO, public domain",
+        "credit_text": "PIXNIO, public domain\nhttps://pixnio.com/fauna-animals/cows-and-calves/bovine-catle-beside-road",
+        "frame_name": "animals10_bovine_cattle_beside_road.webp",
+        "licence_tokens": [
+          "public domain"
+        ],
+        "source_url": "https://pixnio.com/fauna-animals/cows-and-calves/bovine-catle-beside-road"
+      },
+      {
+        "attribution": "Oast House Archive, CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/",
+        "credit_text": "Oast House Archive, CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/\nhttps://commons.wikimedia.org/wiki/File:Cock_Pheasant_on_Romford_Road_-_geograph.org.uk_-_1816852.jpg",
+        "frame_name": "animals11_Cock_Pheasant_on_Romford_Road.webp",
+        "licence_tokens": [
+          "CC BY-SA 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Cock_Pheasant_on_Romford_Road_-_geograph.org.uk_-_1816852.jpg"
+      },
+      {
+        "attribution": "Alan Vernon, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en",
+        "credit_text": "Alan Vernon, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Collared_Peccary_crossing_the_road.jpg",
+        "frame_name": "animals12_Collared_Peccary_crossing_the_road.webp",
+        "licence_tokens": [
+          "CC BY 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Collared_Peccary_crossing_the_road.jpg"
+      },
+      {
+        "attribution": "febs https://www.flickr.com/people/febs, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en",
+        "credit_text": "febs https://www.flickr.com/people/febs, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Corse_t%C3%AAt%C3%A9e_de_jeune_bovin_sur_la_route.jpg",
+        "frame_name": "animals13_jeune_bovin_sur_la_route.webp",
+        "licence_tokens": [
+          "CC BY 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Corse_t%C3%AAt%C3%A9e_de_jeune_bovin_sur_la_route.jpg"
+      },
+      {
+        "attribution": "David Stanley, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en",
+        "credit_text": "David Stanley, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Dekemhare_Road_(8352533008).jpg",
+        "frame_name": "animals14_Dekemhare_Road.webp",
+        "licence_tokens": [
+          "CC BY 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Dekemhare_Road_(8352533008).jpg"
+      },
+      {
+        "attribution": "Oxensepp, CC BY-SA 2.0 DE https://creativecommons.org/licenses/by-sa/2.0/de/deed.en",
+        "credit_text": "Oxensepp, CC BY-SA 2.0 DE https://creativecommons.org/licenses/by-sa/2.0/de/deed.en\nhttps://commons.wikimedia.org/wiki/File:Doebeln-straba.jpg",
+        "frame_name": "animals15_Doebeln_Pferdebahn.webp",
+        "licence_tokens": [
+          "CC BY-SA 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Doebeln-straba.jpg"
+      },
+      {
+        "attribution": "Makary, CC BY 3.0 https://creativecommons.org/licenses/by/3.0/deed.en",
+        "credit_text": "Makary, CC BY 3.0 https://creativecommons.org/licenses/by/3.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Donkeys_of_Morocco.JPG",
+        "frame_name": "animals16_Donkeys_of_Morocco.webp",
+        "licence_tokens": [
+          "CC BY 3.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Donkeys_of_Morocco.JPG"
+      },
+      {
+        "attribution": "Arno van den Tillaart, CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/deed.en",
+        "credit_text": "Arno van den Tillaart, CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:E6_near_Kv%C3%A6nangen.jpg",
+        "frame_name": "animals17_E6_near_Kvaenangen.webp",
+        "licence_tokens": [
+          "CC BY-SA 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:E6_near_Kv%C3%A6nangen.jpg"
+      },
+      {
+        "attribution": "Thomas R Machnitzki (thomas@machnitzki.com), CC BY 3.0 https://creativecommons.org/licenses/by/3.0/deed.en",
+        "credit_text": "Thomas R Machnitzki (thomas@machnitzki.com), CC BY 3.0 https://creativecommons.org/licenses/by/3.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Goose_on_the_road_Memphis_TN_2013-03-17_001.jpg",
+        "frame_name": "animals18_Goose_on_the_road_Memphis.webp",
+        "licence_tokens": [
+          "CC BY 3.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Goose_on_the_road_Memphis_TN_2013-03-17_001.jpg"
+      },
+      {
+        "attribution": "Pierre André Leclercq, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/",
+        "credit_text": "Pierre André Leclercq, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/\nhttps://commons.wikimedia.org/wiki/File:Lille_Et%C3%A92016_la_Porte_de_Roubaix_(1).jpg",
+        "frame_name": "animals19_Porte_de_Roubaix.webp",
+        "licence_tokens": [
+          "CC BY-SA 4.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Lille_Et%C3%A92016_la_Porte_de_Roubaix_(1).jpg"
+      },
+      {
+        "attribution": "Gzen92, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/",
+        "credit_text": "Gzen92, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/\nhttps://commons.wikimedia.org/wiki/File:Marcassin_(animal)_%C3%A0_Conchiglio_(3).jpg",
+        "frame_name": "animals20_Marcassin_Conchiglio.webp",
+        "licence_tokens": [
+          "CC BY-SA 4.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Marcassin_(animal)_%C3%A0_Conchiglio_(3).jpg"
+      },
+      {
+        "attribution": "A. Davey, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en",
+        "credit_text": "A. Davey, CC BY 2.0 https://creativecommons.org/licenses/by/2.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:On_The_Road_to_Gondar,_Ethiopia_(2401865686).jpg",
+        "frame_name": "animals21_On_The_Road_to_Gondar_Ethiopia.webp",
+        "licence_tokens": [
+          "CC BY 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:On_The_Road_to_Gondar,_Ethiopia_(2401865686).jpg"
+      },
+      {
+        "attribution": "Laubenstein Ronald, public domain",
+        "credit_text": "Laubenstein Ronald, public domain\nhttps://commons.wikimedia.org/wiki/File:Red_fox_on_road.jpg",
+        "frame_name": "animals22_red_fox_on_road.webp",
+        "licence_tokens": [
+          "public domain"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Red_fox_on_road.jpg"
+      },
+      {
+        "attribution": "Meganbeckett27, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "credit_text": "Meganbeckett27, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Rhino_crossing_road.JPG",
+        "frame_name": "animals23_rhino_crossing_road.webp",
+        "licence_tokens": [
+          "CC BY-SA 3.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Rhino_crossing_road.JPG"
+      },
+      {
+        "attribution": "Adam Jones, CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/deed.en",
+        "credit_text": "Adam Jones, CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Sheep_Herders_Block_the_Road_-_En_route_from_Kaleybar_to_Eskanlu_-_Iranian_Azerbaijan_-_Iran_(7421427006).jpg",
+        "frame_name": "animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+        "licence_tokens": [
+          "CC BY-SA 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Sheep_Herders_Block_the_Road_-_En_route_from_Kaleybar_to_Eskanlu_-_Iranian_Azerbaijan_-_Iran_(7421427006).jpg"
+      },
+      {
+        "attribution": "Legio24.pl",
+        "credit_text": "Legio24.pl\nhttps://www.legio24.pl/jablonna-rozdaja-preparat-odstraszajacy-dziki/",
+        "frame_name": "animals25_jablonna_dziki.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.legio24.pl/jablonna-rozdaja-preparat-odstraszajacy-dziki/"
+      },
+      {
+        "attribution": "Олег Ч, CC BY 3.0 https://creativecommons.org/licenses/by/3.0/deed.en",
+        "credit_text": "Олег Ч, CC BY 3.0 https://creativecommons.org/licenses/by/3.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Unnamed_Road,_070000,_Kazakhstan_-_panoramio_(8).jpg",
+        "frame_name": "animals26_Unnamed_Road_Kazakhstan.webp",
+        "licence_tokens": [
+          "CC BY 3.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Unnamed_Road,_070000,_Kazakhstan_-_panoramio_(8).jpg"
+      },
+      {
+        "attribution": "Shreyanath, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/",
+        "credit_text": "Shreyanath, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/\nhttps://commons.wikimedia.org/wiki/File:Wildlife43.jpg",
+        "frame_name": "animals27_wildlife_bear.webp",
+        "licence_tokens": [
+          "CC BY-SA 4.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Wildlife43.jpg"
+      },
+      {
+        "attribution": "Tygodnik Nowodworski",
+        "credit_text": "Tygodnik Nowodworski\nhttp://nowodworski.info/uwaga-zwierzeta-na-drodze/",
+        "frame_name": "animals28.webp",
+        "licence_tokens": [],
+        "source_url": "http://nowodworski.info/uwaga-zwierzeta-na-drodze/"
+      },
+      {
+        "attribution": "Luca Canepa, CC BY 3.0 https://creativecommons.org/licenses/by/3.0/deed.en",
+        "credit_text": "Luca Canepa, CC BY 3.0 https://creativecommons.org/licenses/by/3.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Zebra_Crossing_Abbey_Road_Style_(63894353).jpeg",
+        "frame_name": "animals29_Zebra_Crossing_Abbey_Road_Style.webp",
+        "licence_tokens": [
+          "CC BY 3.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Zebra_Crossing_Abbey_Road_Style_(63894353).jpeg"
+      },
+      {
+        "attribution": "Wirtualna Polska",
+        "credit_text": "Wirtualna Polska\nhttps://moto.wp.pl/dzikie-zwierzeta-grozne-na-drodze-6068434518099073a",
+        "frame_name": "animals30.webp",
+        "licence_tokens": [],
+        "source_url": "https://moto.wp.pl/dzikie-zwierzeta-grozne-na-drodze-6068434518099073a"
+      },
+      {
+        "attribution": "driving-tests.org",
+        "credit_text": "driving-tests.org\nhttps://driving-tests.org/beginner-drivers/how-to-avoid-obstacles-on-the-roadway/",
+        "frame_name": "animals31_deer.webp",
+        "licence_tokens": [],
+        "source_url": "https://driving-tests.org/beginner-drivers/how-to-avoid-obstacles-on-the-roadway/"
+      },
+      {
+        "attribution": "Mattbuck, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/",
+        "credit_text": "Mattbuck, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/\nhttps://commons.wikimedia.org/wiki/File:Beeston_MMB_A6_Middle_Street.jpg",
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "licence_tokens": [
+          "CC BY-SA 4.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Beeston_MMB_A6_Middle_Street.jpg"
+      },
+      {
+        "attribution": "Infrogmation, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "credit_text": "Infrogmation, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:BroadmoorManholeConesJune2008.jpg",
+        "frame_name": "cones02_Broadmoor_Manhole_Cones.webp",
+        "licence_tokens": [
+          "CC BY-SA 3.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:BroadmoorManholeConesJune2008.jpg"
+      },
+      {
+        "attribution": "Khaosaming, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "credit_text": "Khaosaming, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Emergency_traffic_control_on_Bang_Na_Trat_Highway_near_Chanthaburi.JPG",
+        "frame_name": "cones03_Bang_Na_Trat_Highway.webp",
+        "licence_tokens": [
+          "CC BY-SA 3.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Emergency_traffic_control_on_Bang_Na_Trat_Highway_near_Chanthaburi.JPG"
+      },
+      {
+        "attribution": "Kyah117, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+        "credit_text": "Kyah117, CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Federation_chantier_aout_2006_-_5.JPG",
+        "frame_name": "cones04_Federation.webp",
+        "licence_tokens": [
+          "CC BY-SA 3.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Federation_chantier_aout_2006_-_5.JPG"
+      },
+      {
+        "attribution": "Basher Eyre, CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/deed.en",
+        "credit_text": "Basher Eyre, CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/deed.en\nhttps://commons.wikimedia.org/wiki/File:Traffic_cones_on_the_corner_of_Kingsley_Park_-_geograph.org.uk_-_604201.jpg",
+        "frame_name": "cones05_Corner_of_Kingsley_Park.webp",
+        "licence_tokens": [
+          "CC BY-SA 2.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Traffic_cones_on_the_corner_of_Kingsley_Park_-_geograph.org.uk_-_604201.jpg"
+      },
+      {
+        "attribution": "HelenOnline, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/",
+        "credit_text": "HelenOnline, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/\nhttps://commons.wikimedia.org/wiki/File:V%26A_traffic_cones.jpg",
+        "frame_name": "cones06_VnA_traffic_cones.webp",
+        "licence_tokens": [
+          "CC BY-SA 4.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:V%26A_traffic_cones.jpg"
+      },
+      {
+        "attribution": "Imogen Neale stuff.co.nz",
+        "credit_text": "Imogen Neale stuff.co.nz\nhttps://www.stuff.co.nz/auckland/local-news/papakura-courier/102189952/upsurge-in-traffic-turns-road-into-difficulttonegotiate-obstacle-course",
+        "frame_name": "cones07.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.stuff.co.nz/auckland/local-news/papakura-courier/102189952/upsurge-in-traffic-turns-road-into-difficulttonegotiate-obstacle-course"
+      },
+      {
+        "attribution": "Imogen Neale stuff.co.nz",
+        "credit_text": "Imogen Neale stuff.co.nz\nhttps://www.stuff.co.nz/auckland/local-news/papakura-courier/102189952/upsurge-in-traffic-turns-road-into-difficulttonegotiate-obstacle-course",
+        "frame_name": "cones08_can.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.stuff.co.nz/auckland/local-news/papakura-courier/102189952/upsurge-in-traffic-turns-road-into-difficulttonegotiate-obstacle-course"
+      },
+      {
+        "attribution": "Meanwhile in Russia",
+        "credit_text": "Meanwhile in Russia\nhttps://www.youtube.com/watch?v=2ysuwejHZEg",
+        "frame_name": "lost_tires03.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.youtube.com/watch?v=2ysuwejHZEg"
+      },
+      {
+        "attribution": "Meanwhile in Russia",
+        "credit_text": "Meanwhile in Russia\nhttps://www.youtube.com/watch?v=2ysuwejHZEg",
+        "frame_name": "lost_tires08.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.youtube.com/watch?v=2ysuwejHZEg"
+      },
+      {
+        "attribution": "Meanwhile in Russia",
+        "credit_text": "Meanwhile in Russia\nhttps://www.youtube.com/watch?v=2ysuwejHZEg",
+        "frame_name": "lost_tires09.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.youtube.com/watch?v=2ysuwejHZEg"
+      },
+      {
+        "attribution": "CDPEnterprises",
+        "credit_text": "CDPEnterprises\nhttp://cdpenterprises.com/lifestyle/productivity/turn-your-setbacks-into-success/",
+        "frame_name": "obstacles01_boulder.webp",
+        "licence_tokens": [],
+        "source_url": "http://cdpenterprises.com/lifestyle/productivity/turn-your-setbacks-into-success/"
+      },
+      {
+        "attribution": "Belt & Road News",
+        "credit_text": "Belt & Road News\nhttps://www.beltandroad.news/2019/01/17/chinas-belt-road-initiative-faces-obstacles-in-2019/",
+        "frame_name": "obstacles02_rock.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.beltandroad.news/2019/01/17/chinas-belt-road-initiative-faces-obstacles-in-2019/"
+      },
+      {
+        "attribution": "Jason Deans",
+        "credit_text": "Jason Deans\nhttps://jasondeansart.com/sculpture/moveable-barriers/",
+        "frame_name": "obstacles03_cardboard_czech_hedgehog.webp",
+        "licence_tokens": [],
+        "source_url": "https://jasondeansart.com/sculpture/moveable-barriers/"
+      },
+      {
+        "attribution": "Jason Deans",
+        "credit_text": "Jason Deans\nhttps://jasondeansart.com/sculpture/moveable-barriers/",
+        "frame_name": "obstacles04_cardboard_czech_hedgehog.webp",
+        "licence_tokens": [],
+        "source_url": "https://jasondeansart.com/sculpture/moveable-barriers/"
+      },
+      {
+        "attribution": "Jason Deans",
+        "credit_text": "Jason Deans\nhttps://jasondeansart.com/sculpture/moveable-barriers/",
+        "frame_name": "obstacles05_cardboard_czech_hedgehog.webp",
+        "licence_tokens": [],
+        "source_url": "https://jasondeansart.com/sculpture/moveable-barriers/"
+      },
+      {
+        "attribution": "Jason Deans",
+        "credit_text": "Jason Deans\nhttps://jasondeansart.com/sculpture/moveable-barriers/",
+        "frame_name": "obstacles06_cardboard_czech_hedgehog.webp",
+        "licence_tokens": [],
+        "source_url": "https://jasondeansart.com/sculpture/moveable-barriers/"
+      },
+      {
+        "attribution": "WalkersChopShop",
+        "credit_text": "WalkersChopShop\nhttps://www.etsy.com/listing/116401378/mini-czech-hedgehog-wwii-anti-tank",
+        "frame_name": "obstacles07_czech_hedgehog.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.etsy.com/listing/116401378/mini-czech-hedgehog-wwii-anti-tank"
+      },
+      {
+        "attribution": "No Ordinary Homestead",
+        "credit_text": "No Ordinary Homestead\nhttps://www.noordinaryhomestead.com/recover-unexpected-impediments-obstacles-failures",
+        "frame_name": "obstacles08_boulder2.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.noordinaryhomestead.com/recover-unexpected-impediments-obstacles-failures"
+      },
+      {
+        "attribution": "Mid Fork Rocks",
+        "credit_text": "Mid Fork Rocks\nhttp://www.midforkrocks.com/post/201402-rock-on-road/",
+        "frame_name": "obstacles09_boulder3.webp",
+        "licence_tokens": [],
+        "source_url": "http://www.midforkrocks.com/post/201402-rock-on-road/"
+      },
+      {
+        "attribution": "Steve Curtin",
+        "credit_text": "Steve Curtin\nhttps://www.stevecurtin.com/blog/obstacles/",
+        "frame_name": "obstacles10_boulder4.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.stevecurtin.com/blog/obstacles/"
+      },
+      {
+        "attribution": "Washington State Dept of Transportation",
+        "credit_text": "Washington State Dept of Transportation\nhttps://www.flickr.com/photos/wsdot/albums/72157623228509590/",
+        "frame_name": "obstacles11_boulder5.webp",
+        "licence_tokens": [],
+        "source_url": "https://www.flickr.com/photos/wsdot/albums/72157623228509590/"
+      },
+      {
+        "attribution": "malnit56 / tripadvisor.com",
+        "credit_text": "malnit56 / tripadvisor.com",
+        "frame_name": "obstacles12_rocks2.webp",
+        "licence_tokens": [],
+        "source_url": null
+      },
+      {
+        "attribution": "malnit56 / tripadvisor.com",
+        "credit_text": "malnit56 / tripadvisor.com",
+        "frame_name": "obstacles12_rocks4.webp",
+        "licence_tokens": [],
+        "source_url": null
+      },
+      {
+        "attribution": "malnit56 / tripadvisor.com",
+        "credit_text": "malnit56 / tripadvisor.com",
+        "frame_name": "obstacles12_rocks5.webp",
+        "licence_tokens": [],
+        "source_url": null
+      },
+      {
+        "attribution": "malnit56 / tripadvisor.com",
+        "credit_text": "malnit56 / tripadvisor.com",
+        "frame_name": "obstacles12_rocks6.webp",
+        "licence_tokens": [],
+        "source_url": null
+      },
+      {
+        "attribution": "KelvinJM, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/",
+        "credit_text": "KelvinJM, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/\nhttps://commons.wikimedia.org/wiki/File:A_man_carrying_dry_grass_on_bicycle_for_domestic_animal_like_cows.jpg",
+        "frame_name": "vehicle01_man_carrying_dry_grass_on_bicycle.webp",
+        "licence_tokens": [
+          "CC BY-SA 4.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:A_man_carrying_dry_grass_on_bicycle_for_domestic_animal_like_cows.jpg"
+      },
+      {
+        "attribution": "Infrogmation, CC BY 2.5 https://creativecommons.org/licenses/by/2.5/deed.en",
+        "credit_text": "Infrogmation, CC BY 2.5 https://creativecommons.org/licenses/by/2.5/deed.en\nhttps://commons.wikimedia.org/wiki/File:Broadmoor9JanConesSkidloader.jpg",
+        "frame_name": "vehicle02_Broadmoor_Cones_Skidloader.webp",
+        "licence_tokens": [
+          "CC BY 2.5"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Broadmoor9JanConesSkidloader.jpg"
+      },
+      {
+        "attribution": "Manfred Kopka, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/",
+        "credit_text": "Manfred Kopka, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/\nhttps://commons.wikimedia.org/wiki/File:Fuhrwerke_in_China.jpg",
+        "frame_name": "vehicle03_Fuhrwerke_in_China.webp",
+        "licence_tokens": [
+          "CC BY-SA 4.0"
+        ],
+        "source_url": "https://commons.wikimedia.org/wiki/File:Fuhrwerke_in_China.jpg"
+      }
+    ],
+    "legal_conclusion": "not_made",
+    "missing_entries": [],
+    "missing_licence_tokens": [
+      "animals25_jablonna_dziki.webp",
+      "animals28.webp",
+      "animals30.webp",
+      "animals31_deer.webp",
+      "cones07.webp",
+      "cones08_can.webp",
+      "lost_tires03.webp",
+      "lost_tires08.webp",
+      "lost_tires09.webp",
+      "obstacles01_boulder.webp",
+      "obstacles02_rock.webp",
+      "obstacles03_cardboard_czech_hedgehog.webp",
+      "obstacles04_cardboard_czech_hedgehog.webp",
+      "obstacles05_cardboard_czech_hedgehog.webp",
+      "obstacles06_cardboard_czech_hedgehog.webp",
+      "obstacles07_czech_hedgehog.webp",
+      "obstacles08_boulder2.webp",
+      "obstacles09_boulder3.webp",
+      "obstacles10_boulder4.webp",
+      "obstacles11_boulder5.webp",
+      "obstacles12_rocks2.webp",
+      "obstacles12_rocks4.webp",
+      "obstacles12_rocks5.webp",
+      "obstacles12_rocks6.webp"
+    ],
+    "missing_source_urls": [
+      "obstacles12_rocks2.webp",
+      "obstacles12_rocks4.webp",
+      "obstacles12_rocks5.webp",
+      "obstacles12_rocks6.webp"
+    ],
+    "source_groups": [
+      {
+        "frame_count": 2,
+        "frames": [
+          "cones07.webp",
+          "cones08_can.webp"
+        ],
+        "group_id": "source-group-001",
+        "source_url": "https://www.stuff.co.nz/auckland/local-news/papakura-courier/102189952/upsurge-in-traffic-turns-road-into-difficulttonegotiate-obstacle-course"
+      },
+      {
+        "frame_count": 3,
+        "frames": [
+          "lost_tires03.webp",
+          "lost_tires08.webp",
+          "lost_tires09.webp"
+        ],
+        "group_id": "source-group-002",
+        "source_url": "https://www.youtube.com/watch?v=2ysuwejHZEg"
+      },
+      {
+        "frame_count": 4,
+        "frames": [
+          "obstacles03_cardboard_czech_hedgehog.webp",
+          "obstacles04_cardboard_czech_hedgehog.webp",
+          "obstacles05_cardboard_czech_hedgehog.webp",
+          "obstacles06_cardboard_czech_hedgehog.webp"
+        ],
+        "group_id": "source-group-003",
+        "source_url": "https://jasondeansart.com/sculpture/moveable-barriers/"
+      },
+      {
+        "frame_count": 4,
+        "frames": [
+          "obstacles12_rocks2.webp",
+          "obstacles12_rocks4.webp",
+          "obstacles12_rocks5.webp",
+          "obstacles12_rocks6.webp"
+        ],
+        "group_id": "source-group-004",
+        "source_url": null
+      }
+    ]
+  },
+  "documented_claims": [
+    {
+      "claim_id": "coverage-rounding",
+      "computed_definition": "pooled anomaly pixels / total pixels, six-decimal percent",
+      "computed_value": "pooled 9.849561 percent; 0.374674-42.328559 percent per frame; median 6.622938 percent",
+      "documented_source": "docs/dataset.md",
+      "documented_text": "Anomaly coverage is 9.8 percent of all pixels.",
+      "treatment": "report_both"
+    },
+    {
+      "claim_id": "object-scale-87x87",
+      "computed_definition": "ROI area < 1024; both/either dimension < 32; sqrt(ROI area); median ROI bbox; sqrt(mask pixel count)",
+      "computed_value": "ROI area < 1024: 35/201; both dimensions < 32: 20/201; either dimension < 32: 46/201; median ROI equivalent square 86.7 px; median ROI bbox 85.0 x 107.0 px; median mask equivalent square 51.2 px",
+      "documented_source": "docs/dataset.md",
+      "documented_text": "Median instance is approximately 87 x 87 px; 35 of 201 are smaller than 32 x 32 px.",
+      "treatment": "report_both"
+    },
+    {
+      "claim_id": "scene-prefix-grouping",
+      "computed_definition": "filename prefix before the first digit",
+      "computed_value": "No scene IDs or source scene metadata exist locally; prefix counts are object categories only (animals 31, obstacles 15, cones 8, lost_tires 3, vehicle 3).",
+      "documented_source": "docs/dataset.md",
+      "documented_text": "Filename prefixes are the natural scene grouping.",
+      "treatment": "report_gap"
+    },
+    {
+      "claim_id": "per-image-licence-completeness",
+      "computed_definition": "explicit CC0, CC BY/CC BY-SA or public-domain token per credit block",
+      "computed_value": "24/60 frames lack an explicit licence token; 4/60 lack a source URL; missing tokens remain unresolved.",
+      "documented_source": "data/credits.txt",
+      "documented_text": "Per-image terms are recorded in credits.txt.",
+      "treatment": "mark_unresolved"
+    },
+    {
+      "claim_id": "benchmark-scene-folds",
+      "computed_definition": "benchmark scene identity and fold assignment",
+      "computed_value": "No benchmark scene identities exist locally; no folds, scene assignments or split hash are created.",
+      "documented_source": "docs/dataset.md",
+      "documented_text": "Scene-grouped benchmark folds can support the separately reported threshold-tuned regime.",
+      "treatment": "report_gap"
+    },
+    {
+      "claim_id": "instance-id-equality",
+      "computed_definition": "mask value k equals instances[k-1].id",
+      "computed_value": "35/46 frames agree under the k-th-entry order mapping; 11/46 disagree; 48 value/entry mismatches are listed.",
+      "documented_source": "docs/dataset.md",
+      "documented_text": "The instance-mask pixel value equals the instance id.",
+      "treatment": "report_both"
+    }
+  ],
+  "duplicates": {
+    "decoded_pairs": [],
+    "dhash_method": "9x8 grayscale dHash, 64 bits; Hamming distance <= 6",
+    "dhash_pairs": [],
+    "exact_pairs": [],
+    "limitations": [
+      "Exact file hashes detect byte-identical frames only.",
+      "Decoded-pixel hashes detect identical RGB buffers after decoding, not near duplicates.",
+      "The 9x8 grayscale dHash at Hamming distance <= 6 is method-limited; absence of reported pairs is not proof that no near-duplicate exists.",
+      "No model-based perceptual duplicate check was performed."
+    ]
+  },
+  "environment": {
+    "audit_version": "1.0",
+    "command": "make data-audit",
+    "commit": "b4d40dce5d4a1f44e4586174b41cb9ad79c6077f",
+    "jsonschema": "4.26.0",
+    "numpy": "2.5.4",
+    "pillow": "13.0.0",
+    "python": "3.12.13"
+  },
+  "fingerprint": {
+    "computed": "7c16ab39607d68a66bc2f4ac321933f64221d62980119ea780af5abf2a99f4e2",
+    "current_file_count": 677,
+    "current_total_bytes": 13135474,
+    "historical": "7c16ab39607d68a66bc2f4ac321933f64221d62980119ea780af5abf2a99f4e2",
+    "historical_file_count": 677,
+    "historical_total_bytes": 13135474,
+    "matches": true,
+    "provenance": "local_reconstruction",
+    "recipe": "regular files under data/ (no symlinks), sorted by POSIX relative path; for each: UTF-8 path + NUL + raw 32-byte SHA-256 of content; no trailing NUL/newline; lowercase hex",
+    "recipe_version": "historical-v1",
+    "status": "match"
+  },
+  "instance_mapping": {
+    "disagreeing_frames": [
+      "animals05_cows_near_Phonsavan_Laos.webp",
+      "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+      "animals10_bovine_cattle_beside_road.webp",
+      "animals13_jeune_bovin_sur_la_route.webp",
+      "animals17_E6_near_Kvaenangen.webp",
+      "animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+      "animals29_Zebra_Crossing_Abbey_Road_Style.webp",
+      "cones01_Beeston_MMB_A6_Middle_Street.webp",
+      "lost_tires09.webp",
+      "obstacles12_rocks6.webp",
+      "vehicle03_Fuhrwerke_in_China.webp"
+    ],
+    "existing_test_check": {
+      "name": "max(mask) == len(instances)",
+      "passes": true
+    },
+    "frames_agreeing": 35,
+    "frames_checked": 46,
+    "frames_disagreeing": 11,
+    "mismatches": [
+      {
+        "frame_name": "animals05_cows_near_Phonsavan_Laos.webp",
+        "index_id": 5,
+        "index_position": 4,
+        "mask_value": 4
+      },
+      {
+        "frame_name": "animals05_cows_near_Phonsavan_Laos.webp",
+        "index_id": 6,
+        "index_position": 5,
+        "mask_value": 5
+      },
+      {
+        "frame_name": "animals05_cows_near_Phonsavan_Laos.webp",
+        "index_id": 8,
+        "index_position": 6,
+        "mask_value": 6
+      },
+      {
+        "frame_name": "animals05_cows_near_Phonsavan_Laos.webp",
+        "index_id": 9,
+        "index_position": 7,
+        "mask_value": 7
+      },
+      {
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "index_id": 2,
+        "index_position": 1,
+        "mask_value": 1
+      },
+      {
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "index_id": 3,
+        "index_position": 2,
+        "mask_value": 2
+      },
+      {
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "index_id": 4,
+        "index_position": 3,
+        "mask_value": 3
+      },
+      {
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "index_id": 6,
+        "index_position": 4,
+        "mask_value": 4
+      },
+      {
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "index_id": 7,
+        "index_position": 5,
+        "mask_value": 5
+      },
+      {
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "index_id": 8,
+        "index_position": 6,
+        "mask_value": 6
+      },
+      {
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "index_id": 9,
+        "index_position": 7,
+        "mask_value": 7
+      },
+      {
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "index_id": 10,
+        "index_position": 8,
+        "mask_value": 8
+      },
+      {
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "index_id": 11,
+        "index_position": 9,
+        "mask_value": 9
+      },
+      {
+        "frame_name": "animals10_bovine_cattle_beside_road.webp",
+        "index_id": 3,
+        "index_position": 2,
+        "mask_value": 2
+      },
+      {
+        "frame_name": "animals13_jeune_bovin_sur_la_route.webp",
+        "index_id": 16,
+        "index_position": 2,
+        "mask_value": 2
+      },
+      {
+        "frame_name": "animals13_jeune_bovin_sur_la_route.webp",
+        "index_id": 17,
+        "index_position": 3,
+        "mask_value": 3
+      },
+      {
+        "frame_name": "animals17_E6_near_Kvaenangen.webp",
+        "index_id": 2,
+        "index_position": 1,
+        "mask_value": 1
+      },
+      {
+        "frame_name": "animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+        "index_id": 6,
+        "index_position": 5,
+        "mask_value": 5
+      },
+      {
+        "frame_name": "animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+        "index_id": 7,
+        "index_position": 6,
+        "mask_value": 6
+      },
+      {
+        "frame_name": "animals29_Zebra_Crossing_Abbey_Road_Style.webp",
+        "index_id": 5,
+        "index_position": 4,
+        "mask_value": 4
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 9,
+        "index_position": 8,
+        "mask_value": 8
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 10,
+        "index_position": 9,
+        "mask_value": 9
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 11,
+        "index_position": 10,
+        "mask_value": 10
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 12,
+        "index_position": 11,
+        "mask_value": 11
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 13,
+        "index_position": 12,
+        "mask_value": 12
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 14,
+        "index_position": 13,
+        "mask_value": 13
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 15,
+        "index_position": 14,
+        "mask_value": 14
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 16,
+        "index_position": 15,
+        "mask_value": 15
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 17,
+        "index_position": 16,
+        "mask_value": 16
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 18,
+        "index_position": 17,
+        "mask_value": 17
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 19,
+        "index_position": 18,
+        "mask_value": 18
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 20,
+        "index_position": 19,
+        "mask_value": 19
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 21,
+        "index_position": 20,
+        "mask_value": 20
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 22,
+        "index_position": 21,
+        "mask_value": 21
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 23,
+        "index_position": 22,
+        "mask_value": 22
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 24,
+        "index_position": 23,
+        "mask_value": 23
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 25,
+        "index_position": 24,
+        "mask_value": 24
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 27,
+        "index_position": 25,
+        "mask_value": 25
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 28,
+        "index_position": 26,
+        "mask_value": 26
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 29,
+        "index_position": 27,
+        "mask_value": 27
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 30,
+        "index_position": 28,
+        "mask_value": 28
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 31,
+        "index_position": 29,
+        "mask_value": 29
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 32,
+        "index_position": 30,
+        "mask_value": 30
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "index_id": 33,
+        "index_position": 31,
+        "mask_value": 31
+      },
+      {
+        "frame_name": "lost_tires09.webp",
+        "index_id": 2,
+        "index_position": 1,
+        "mask_value": 1
+      },
+      {
+        "frame_name": "obstacles12_rocks6.webp",
+        "index_id": 5,
+        "index_position": 4,
+        "mask_value": 4
+      },
+      {
+        "frame_name": "vehicle03_Fuhrwerke_in_China.webp",
+        "index_id": 4,
+        "index_position": 3,
+        "mask_value": 3
+      },
+      {
+        "frame_name": "vehicle03_Fuhrwerke_in_China.webp",
+        "index_id": 5,
+        "index_position": 4,
+        "mask_value": 4
+      }
+    ]
+  },
+  "instance_semantic": {
+    "definition": "union(instance values 1..N) == semantic value 2, per instance frame",
+    "extra_instance_pixels": 0,
+    "frames_checked": 46,
+    "frames_exact_match": 46,
+    "frames_mismatched": 0,
+    "mismatched_frames": [],
+    "missing_instance_pixels": 0,
+    "semantic_only_frames_excluded": 14
+  },
+  "inventory": {
+    "annotation_integrity": {
+      "colour_mapping": {
+        "anomaly": [
+          255,
+          69,
+          0
+        ],
+        "normal": [
+          0,
+          0,
+          0
+        ]
+      },
+      "colour_mapping_valid": true,
+      "frame_decodable": true,
+      "instance_class_id": 2,
+      "instance_ids_contiguous": true,
+      "label_files_complete": true,
+      "semantic_values": [
+        0,
+        2
+      ]
+    },
+    "frame_count": 60,
+    "frame_list_count": 60,
+    "frames": [
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals01_Guiguinto_railway_station_Calves.webp",
+        "frame_path": "frames/animals01_Guiguinto_railway_station_Calves.webp",
+        "frame_sha256": "7cbd648e21a5cc0c2b5806138a3307db06090e112cd6f61547bbf4e915cca857",
+        "height": 720,
+        "label_dir": "frames/animals01_Guiguinto_railway_station_Calves.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals02_Zagori_On_the_road_to_Papigko.webp",
+        "frame_path": "frames/animals02_Zagori_On_the_road_to_Papigko.webp",
+        "frame_sha256": "d09cb33f33fb55fb4f0571fe08387f2953fb58eb066c9ba004d934fd68eb6b3b",
+        "height": 720,
+        "label_dir": "frames/animals02_Zagori_On_the_road_to_Papigko.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals03_Zebras_in_the_road.webp",
+        "frame_path": "frames/animals03_Zebras_in_the_road.webp",
+        "frame_sha256": "a44205f8e9a4b0c7ecc50888832e0c63d5e23372bb13b8a9984d1163bf200801",
+        "height": 720,
+        "label_dir": "frames/animals03_Zebras_in_the_road.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals04_17_animal_casualties_so_far_in_2006.webp",
+        "frame_path": "frames/animals04_17_animal_casualties_so_far_in_2006.webp",
+        "frame_sha256": "c072e047007a050ae46abf0caa7be45b6e0229abe0846a82340ff059e4b310fe",
+        "height": 720,
+        "label_dir": "frames/animals04_17_animal_casualties_so_far_in_2006.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals05_cows_near_Phonsavan_Laos.webp",
+        "frame_path": "frames/animals05_cows_near_Phonsavan_Laos.webp",
+        "frame_sha256": "e926ffc81117cdb43d3c82c7cc68c99963d1207e2b2ebdac77fd7301e07eed9f",
+        "height": 720,
+        "label_dir": "frames/animals05_cows_near_Phonsavan_Laos.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "animals06_sheep_roads_lambs.webp",
+        "frame_path": "frames/animals06_sheep_roads_lambs.webp",
+        "frame_sha256": "07790ab94e62593ecb298a91d3d31f4e68a7c31f266b630a56169ce325ba28ef",
+        "height": 720,
+        "label_dir": "frames/animals06_sheep_roads_lambs.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals07_Aihole_Pattadakal.webp",
+        "frame_path": "frames/animals07_Aihole_Pattadakal.webp",
+        "frame_sha256": "53357667478c0075c40094311c1f5340fdbd0b6c90d12b6b96abb16110ad97d9",
+        "height": 720,
+        "label_dir": "frames/animals07_Aihole_Pattadakal.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "frame_path": "frames/animals08_on_the_main_street_of_village_Lin_Albania.webp",
+        "frame_sha256": "2569e591efc723dd9e780f6b60b80b9f8b3edb82f8d702b2b703cc4be0283e0d",
+        "height": 720,
+        "label_dir": "frames/animals08_on_the_main_street_of_village_Lin_Albania.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "animals09_working_together.webp",
+        "frame_path": "frames/animals09_working_together.webp",
+        "frame_sha256": "cd0da295fe3f07b9329e63a934f755fb79df47ef53d8eaddd86b422179780053",
+        "height": 720,
+        "label_dir": "frames/animals09_working_together.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals10_bovine_cattle_beside_road.webp",
+        "frame_path": "frames/animals10_bovine_cattle_beside_road.webp",
+        "frame_sha256": "c45f36191127fc1b83620e551367c69095f5020eb3b98a32ccdff50fb63d76a9",
+        "height": 720,
+        "label_dir": "frames/animals10_bovine_cattle_beside_road.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals11_Cock_Pheasant_on_Romford_Road.webp",
+        "frame_path": "frames/animals11_Cock_Pheasant_on_Romford_Road.webp",
+        "frame_sha256": "833824f4820dee57977ea46b3331ba81e10c8775221514e9b755fbe6c86d6f78",
+        "height": 720,
+        "label_dir": "frames/animals11_Cock_Pheasant_on_Romford_Road.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals12_Collared_Peccary_crossing_the_road.webp",
+        "frame_path": "frames/animals12_Collared_Peccary_crossing_the_road.webp",
+        "frame_sha256": "eb158544b268942ad8b5d62aea423e701b264638c2a66e58cb57619bd132c023",
+        "height": 720,
+        "label_dir": "frames/animals12_Collared_Peccary_crossing_the_road.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals13_jeune_bovin_sur_la_route.webp",
+        "frame_path": "frames/animals13_jeune_bovin_sur_la_route.webp",
+        "frame_sha256": "57a289b7647d0392d4c259218594af7683de6cb89ffbda842407165b66b5efb8",
+        "height": 720,
+        "label_dir": "frames/animals13_jeune_bovin_sur_la_route.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals14_Dekemhare_Road.webp",
+        "frame_path": "frames/animals14_Dekemhare_Road.webp",
+        "frame_sha256": "c8c97ae60ca5edbc460026b9a4ab405db23f6e30ac41dd0aaf0ff6cb01eb192d",
+        "height": 720,
+        "label_dir": "frames/animals14_Dekemhare_Road.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals15_Doebeln_Pferdebahn.webp",
+        "frame_path": "frames/animals15_Doebeln_Pferdebahn.webp",
+        "frame_sha256": "a170f8c9af21390d7940cac6f08299b865418e382fdb6d86287ec24d678b4a32",
+        "height": 720,
+        "label_dir": "frames/animals15_Doebeln_Pferdebahn.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals16_Donkeys_of_Morocco.webp",
+        "frame_path": "frames/animals16_Donkeys_of_Morocco.webp",
+        "frame_sha256": "a4bcf9739a3a4731c99ba7c4bd6def97300eb8a9f61932c7656570422c34365c",
+        "height": 720,
+        "label_dir": "frames/animals16_Donkeys_of_Morocco.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals17_E6_near_Kvaenangen.webp",
+        "frame_path": "frames/animals17_E6_near_Kvaenangen.webp",
+        "frame_sha256": "9a120e7b9dee32f14ad1c16d05e5daef56a6c617c13a88a053f4a6b1ae9963dd",
+        "height": 720,
+        "label_dir": "frames/animals17_E6_near_Kvaenangen.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals18_Goose_on_the_road_Memphis.webp",
+        "frame_path": "frames/animals18_Goose_on_the_road_Memphis.webp",
+        "frame_sha256": "db7c6bc15e41548dfb952e618a55990e52523dfe45a639214f164c5312fd95b0",
+        "height": 720,
+        "label_dir": "frames/animals18_Goose_on_the_road_Memphis.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals19_Porte_de_Roubaix.webp",
+        "frame_path": "frames/animals19_Porte_de_Roubaix.webp",
+        "frame_sha256": "f425f2431ae74020a9c67c983949151c19e5d98d7fc4c220c62fcab7cd95e535",
+        "height": 720,
+        "label_dir": "frames/animals19_Porte_de_Roubaix.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals20_Marcassin_Conchiglio.webp",
+        "frame_path": "frames/animals20_Marcassin_Conchiglio.webp",
+        "frame_sha256": "d26bb8e944c5493290e600576b5b7684f177fd6f3d94ae0ee3cbbbf49b65fd95",
+        "height": 720,
+        "label_dir": "frames/animals20_Marcassin_Conchiglio.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "animals21_On_The_Road_to_Gondar_Ethiopia.webp",
+        "frame_path": "frames/animals21_On_The_Road_to_Gondar_Ethiopia.webp",
+        "frame_sha256": "a219214c17e506abd3031acf2fbe46e25fc4d4f3a4c120bc79e0da68309c82cd",
+        "height": 720,
+        "label_dir": "frames/animals21_On_The_Road_to_Gondar_Ethiopia.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals22_red_fox_on_road.webp",
+        "frame_path": "frames/animals22_red_fox_on_road.webp",
+        "frame_sha256": "9b39a76aa4151a4588ae5cf9b31b07c1b988f645d060d651b144a82d3b80fb86",
+        "height": 720,
+        "label_dir": "frames/animals22_red_fox_on_road.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals23_rhino_crossing_road.webp",
+        "frame_path": "frames/animals23_rhino_crossing_road.webp",
+        "frame_sha256": "c5093c8ae635b883672225716ea6fe4fb2ad88704e4ab9607978dad37a81cdab",
+        "height": 720,
+        "label_dir": "frames/animals23_rhino_crossing_road.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+        "frame_path": "frames/animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+        "frame_sha256": "df5b618bfcfdc746f13f7199b604b2e8fd578c7769835485515c719a7aebefe9",
+        "height": 720,
+        "label_dir": "frames/animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "animals25_jablonna_dziki.webp",
+        "frame_path": "frames/animals25_jablonna_dziki.webp",
+        "frame_sha256": "dd5572ea5587f703120367b23dc8492ec0f962997e14c760a070576308f20f0d",
+        "height": 720,
+        "label_dir": "frames/animals25_jablonna_dziki.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals26_Unnamed_Road_Kazakhstan.webp",
+        "frame_path": "frames/animals26_Unnamed_Road_Kazakhstan.webp",
+        "frame_sha256": "77b3fd82b24e7739717fbcc5d12cb3fe6b1303b234254ef438e42baa203cbff8",
+        "height": 720,
+        "label_dir": "frames/animals26_Unnamed_Road_Kazakhstan.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals27_wildlife_bear.webp",
+        "frame_path": "frames/animals27_wildlife_bear.webp",
+        "frame_sha256": "bad60141bc09b861f8234f7074979507bca4f5179d289ef85f781a47f7353a06",
+        "height": 720,
+        "label_dir": "frames/animals27_wildlife_bear.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals28.webp",
+        "frame_path": "frames/animals28.webp",
+        "frame_sha256": "da51b37091a26f1e7d500e250220c13ebdef87faf7bf560d82aa7e5ef0e25c23",
+        "height": 720,
+        "label_dir": "frames/animals28.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals29_Zebra_Crossing_Abbey_Road_Style.webp",
+        "frame_path": "frames/animals29_Zebra_Crossing_Abbey_Road_Style.webp",
+        "frame_sha256": "5144eb8b8772d41f5fbbb39168734229aa75e25c0053cd3fdab7ec6a14e56d33",
+        "height": 720,
+        "label_dir": "frames/animals29_Zebra_Crossing_Abbey_Road_Style.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "animals30.webp",
+        "frame_path": "frames/animals30.webp",
+        "frame_sha256": "2e0e8bf8e84b8a3ffda58c4dcc309c9c85977b0356fcc69b552618f57c9d8c68",
+        "height": 720,
+        "label_dir": "frames/animals30.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "animals31_deer.webp",
+        "frame_path": "frames/animals31_deer.webp",
+        "frame_sha256": "ea381d9b87e5d2d8be17c6c7605e119a0819e0f25383370a3193c45de6027d6a",
+        "height": 720,
+        "label_dir": "frames/animals31_deer.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "frame_path": "frames/cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "frame_sha256": "c65f9a5d4eef1522525b3b29c7ba3a31e2b404f0e934b3f5cc80738d83654666",
+        "height": 720,
+        "label_dir": "frames/cones01_Beeston_MMB_A6_Middle_Street.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "cones02_Broadmoor_Manhole_Cones.webp",
+        "frame_path": "frames/cones02_Broadmoor_Manhole_Cones.webp",
+        "frame_sha256": "a992469683528e97a62c02b22f4c9ea732b0d3f118dcc0cd185e7bbb06ec3e90",
+        "height": 720,
+        "label_dir": "frames/cones02_Broadmoor_Manhole_Cones.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "cones03_Bang_Na_Trat_Highway.webp",
+        "frame_path": "frames/cones03_Bang_Na_Trat_Highway.webp",
+        "frame_sha256": "794a567fbaaf93c333e8bc7950aea07000028b564f6cea468207c8b8552b9361",
+        "height": 720,
+        "label_dir": "frames/cones03_Bang_Na_Trat_Highway.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "cones04_Federation.webp",
+        "frame_path": "frames/cones04_Federation.webp",
+        "frame_sha256": "e8873bc07583758e0c5c0cbba65ed2d889725a9112878c3c520939847a717596",
+        "height": 720,
+        "label_dir": "frames/cones04_Federation.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "cones05_Corner_of_Kingsley_Park.webp",
+        "frame_path": "frames/cones05_Corner_of_Kingsley_Park.webp",
+        "frame_sha256": "55ee13fde79daecdb4cd09f5838035ceaba8601f793ff97636b2702f41338c22",
+        "height": 720,
+        "label_dir": "frames/cones05_Corner_of_Kingsley_Park.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "cones06_VnA_traffic_cones.webp",
+        "frame_path": "frames/cones06_VnA_traffic_cones.webp",
+        "frame_sha256": "3bac3d7a7c06fde88344b9c86f33ab0f2fffb11af46c850e27983f0b52f03351",
+        "height": 720,
+        "label_dir": "frames/cones06_VnA_traffic_cones.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "cones07.webp",
+        "frame_path": "frames/cones07.webp",
+        "frame_sha256": "6314acf5105c2625982b959b6c0028bd42d0ce6fbbb97888323210916c6aab78",
+        "height": 720,
+        "label_dir": "frames/cones07.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "cones08_can.webp",
+        "frame_path": "frames/cones08_can.webp",
+        "frame_sha256": "f3a08b600ed12f3dd53510917ed0c4c635cd8c746f90e32c49e43c6788dca176",
+        "height": 720,
+        "label_dir": "frames/cones08_can.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "lost_tires03.webp",
+        "frame_path": "frames/lost_tires03.webp",
+        "frame_sha256": "911fe4730983a0a169e2c164f37067b7c0e8654bc2b59f9479fa318a722b5ae8",
+        "height": 720,
+        "label_dir": "frames/lost_tires03.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "lost_tires08.webp",
+        "frame_path": "frames/lost_tires08.webp",
+        "frame_sha256": "1e3a7887c08bd8c00af2d94a0acc37a0bd04bada13cadf9905c74a32ba0d3977",
+        "height": 720,
+        "label_dir": "frames/lost_tires08.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "lost_tires09.webp",
+        "frame_path": "frames/lost_tires09.webp",
+        "frame_sha256": "02045a0bade92e2ac7304b51e4e83dda72ad80941b8a1cb05ae1e014ee03eb48",
+        "height": 720,
+        "label_dir": "frames/lost_tires09.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "obstacles01_boulder.webp",
+        "frame_path": "frames/obstacles01_boulder.webp",
+        "frame_sha256": "081c09ae6964c105b32ba55c542a881752f106db9a4679cf93f497ca85e7e5f0",
+        "height": 720,
+        "label_dir": "frames/obstacles01_boulder.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "obstacles02_rock.webp",
+        "frame_path": "frames/obstacles02_rock.webp",
+        "frame_sha256": "1ad13eaad71b3e6bff0cea41827a14d55295aea760a13ee30d93ad2acf935047",
+        "height": 720,
+        "label_dir": "frames/obstacles02_rock.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "obstacles03_cardboard_czech_hedgehog.webp",
+        "frame_path": "frames/obstacles03_cardboard_czech_hedgehog.webp",
+        "frame_sha256": "0578198becadb6834efcf36d582eca8cbe935fd74f3add3904569859e84eaa74",
+        "height": 720,
+        "label_dir": "frames/obstacles03_cardboard_czech_hedgehog.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "obstacles04_cardboard_czech_hedgehog.webp",
+        "frame_path": "frames/obstacles04_cardboard_czech_hedgehog.webp",
+        "frame_sha256": "0d7f860776a19974a0cc5a304bd8b0566e15a3bbf1067ce51c7e3516c6289130",
+        "height": 720,
+        "label_dir": "frames/obstacles04_cardboard_czech_hedgehog.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "obstacles05_cardboard_czech_hedgehog.webp",
+        "frame_path": "frames/obstacles05_cardboard_czech_hedgehog.webp",
+        "frame_sha256": "705c9e13c6765ac0fa12e8672fc2850f33f71a1663357835f180963a817b0784",
+        "height": 720,
+        "label_dir": "frames/obstacles05_cardboard_czech_hedgehog.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "obstacles06_cardboard_czech_hedgehog.webp",
+        "frame_path": "frames/obstacles06_cardboard_czech_hedgehog.webp",
+        "frame_sha256": "57de5577bc2b71cbe52f8c11f5cc6b42d37acac3b37c38a4b4f4bf8906471c6b",
+        "height": 720,
+        "label_dir": "frames/obstacles06_cardboard_czech_hedgehog.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "obstacles07_czech_hedgehog.webp",
+        "frame_path": "frames/obstacles07_czech_hedgehog.webp",
+        "frame_sha256": "80e6263ca33a93b40c4dfbb072efb3ff48a88be8dd8242fab0ec591fa61a1619",
+        "height": 720,
+        "label_dir": "frames/obstacles07_czech_hedgehog.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "obstacles08_boulder2.webp",
+        "frame_path": "frames/obstacles08_boulder2.webp",
+        "frame_sha256": "052b2d469b2db45541f47fe942454073651afb6cfadc795bcf086a4e802db17d",
+        "height": 720,
+        "label_dir": "frames/obstacles08_boulder2.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "obstacles09_boulder3.webp",
+        "frame_path": "frames/obstacles09_boulder3.webp",
+        "frame_sha256": "9a77f167d84ca68903eeedba2c77daaf2e517a8e1417d96db9f8e56c83d63b56",
+        "height": 720,
+        "label_dir": "frames/obstacles09_boulder3.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "obstacles10_boulder4.webp",
+        "frame_path": "frames/obstacles10_boulder4.webp",
+        "frame_sha256": "e81b7c1dc00c5a0f38de34ed0f9241368a3f685c17362ef9b554d8417a129b12",
+        "height": 720,
+        "label_dir": "frames/obstacles10_boulder4.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "semantic_only",
+        "frame_name": "obstacles11_boulder5.webp",
+        "frame_path": "frames/obstacles11_boulder5.webp",
+        "frame_sha256": "5372217a1df8502d5ec579fb70ed5131342c266fabbf0be36ccfb0c40ff1a116",
+        "height": 720,
+        "label_dir": "frames/obstacles11_boulder5.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "obstacles12_rocks2.webp",
+        "frame_path": "frames/obstacles12_rocks2.webp",
+        "frame_sha256": "c4df5122c16442d7c6881b23dab4331fd2331fbb79a6182451b479b814d6c626",
+        "height": 720,
+        "label_dir": "frames/obstacles12_rocks2.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "obstacles12_rocks4.webp",
+        "frame_path": "frames/obstacles12_rocks4.webp",
+        "frame_sha256": "87f9c7a7d6f77ba382b20025d12bfcbc2f15794129539901823bcffaba6ab2c9",
+        "height": 720,
+        "label_dir": "frames/obstacles12_rocks4.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "obstacles12_rocks5.webp",
+        "frame_path": "frames/obstacles12_rocks5.webp",
+        "frame_sha256": "6c33b9076e9e357787ab08f07edbee08d60629767d9a3e9651193de65cf66d9d",
+        "height": 720,
+        "label_dir": "frames/obstacles12_rocks5.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "obstacles12_rocks6.webp",
+        "frame_path": "frames/obstacles12_rocks6.webp",
+        "frame_sha256": "e1bee81010b004085440d38f18af1d6bb8cc70c212b69c26e07d867aa6318be1",
+        "height": 720,
+        "label_dir": "frames/obstacles12_rocks6.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "vehicle01_man_carrying_dry_grass_on_bicycle.webp",
+        "frame_path": "frames/vehicle01_man_carrying_dry_grass_on_bicycle.webp",
+        "frame_sha256": "3cddd7b3d7a338553e659c08192d0b5b6b7c234b632cfb83143a4e2b2ef55805",
+        "height": 720,
+        "label_dir": "frames/vehicle01_man_carrying_dry_grass_on_bicycle.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "vehicle02_Broadmoor_Cones_Skidloader.webp",
+        "frame_path": "frames/vehicle02_Broadmoor_Cones_Skidloader.webp",
+        "frame_sha256": "1465eb68f1d43c64372ffdc02a13f49041088b213271b19d6e5ef2c8d8320eb1",
+        "height": 720,
+        "label_dir": "frames/vehicle02_Broadmoor_Cones_Skidloader.labels",
+        "mode": "RGB",
+        "width": 1280
+      },
+      {
+        "annotation_kind": "instance",
+        "frame_name": "vehicle03_Fuhrwerke_in_China.webp",
+        "frame_path": "frames/vehicle03_Fuhrwerke_in_China.webp",
+        "frame_sha256": "2062ded2b23cf19f85267f6bafb0ea91bfe881f8e5300f2cd8309e6e49f570fa",
+        "height": 720,
+        "label_dir": "frames/vehicle03_Fuhrwerke_in_China.labels",
+        "mode": "RGB",
+        "width": 1280
+      }
+    ],
+    "instance_frame_count": 46,
+    "label_dir_count": 60,
+    "semantic_only_frame_count": 14
+  },
+  "limitations": [
+    {
+      "evidence_class": "upstream_unverified",
+      "limitation_id": "historical-fingerprint-local-reconstruction",
+      "source": "specs/003-dataset-understanding/spec.md",
+      "statement": "The historical fingerprint recipe is a local reconstruction; matching it does not prove the original Stage 2 implementation byte layout."
+    },
+    {
+      "evidence_class": "unresolved",
+      "limitation_id": "visual-registration-unverified",
+      "source": null,
+      "statement": "Visual registration of frames, semantic masks and instance annotations was not assessed in the MVP."
+    },
+    {
+      "evidence_class": "computed_local",
+      "limitation_id": "duplicates-method-limited",
+      "source": "data/frames/*.webp",
+      "statement": "Exact, decoded-pixel and dHash checks are method-limited; no reported pair is not proof that no near-duplicate exists."
+    },
+    {
+      "evidence_class": "computed_local",
+      "limitation_id": "source-groups-attribution-derived",
+      "source": "data/credits.txt",
+      "statement": "Source groups are attribution-derived groups, not scene identities, split units or source rankings."
+    },
+    {
+      "evidence_class": "upstream_unverified",
+      "limitation_id": "upstream-provenance-unverified",
+      "source": "data/readme.md",
+      "statement": "No local release, version or checksum identifier verifies upstream provenance."
+    },
+    {
+      "evidence_class": "unresolved",
+      "limitation_id": "per-image-licence-tokens-unresolved",
+      "source": "data/credits.txt",
+      "statement": "Missing per-image licence tokens remain unresolved and are not evidence that an image is unlicensed."
+    },
+    {
+      "evidence_class": "computed_local",
+      "limitation_id": "environment-commit-provenance",
+      "source": "specs/003-dataset-understanding/contracts/audit-cli.md",
+      "statement": "environment.commit is recorded provenance, not a revalidated git ancestry claim."
+    }
+  ],
+  "object_scale": {
+    "both_dimensions_below_32": 20,
+    "definitions": {
+      "both_dimensions_below_32": "width < 32 and height < 32",
+      "either_dimension_below_32": "width < 32 or height < 32",
+      "mask_equivalent_square": "sqrt(count of nonzero instance-mask pixels)",
+      "roi_area": "(x1 - x0) x (y1 - y0), half-open extents",
+      "roi_bounding_box": "median ROI width and height",
+      "roi_equivalent_square": "sqrt(ROI area)"
+    },
+    "denominator": 201,
+    "either_dimension_below_32": 46,
+    "median_mask_equivalent_square_px": 51.2,
+    "median_roi_equivalent_square_px": 86.7,
+    "median_roi_height_px": 107.0,
+    "median_roi_width_px": 85.0,
+    "roi_area_below_1024": 35
+  },
+  "provenance": {
+    "citation": "Lis et al., Detecting the Unexpected via Image Resynthesis, ICCV 2019",
+    "filename_prefix_is_scene_id": false,
+    "g10_status": "open",
+    "local_attribution_is_redistribution_proof": false,
+    "normal_road_source_selected": false,
+    "p0_status": {
+      "P0-1": "open",
+      "P0-2": "open",
+      "P0-3": "open",
+      "P0-4": "open"
+    },
+    "release_identifier": null,
+    "scene_identity": "unresolved",
+    "unresolved_items": [
+      {
+        "evidence_class": "unresolved",
+        "item_id": "adr-0010-threshold-contradiction",
+        "source": "docs/adr/0010-model-lineup-and-evaluation-contract.md",
+        "statement": "ADR-0010 leaves the threshold contradiction unresolved.",
+        "status": "open"
+      }
+    ],
+    "upstream_status": "upstream_unverified"
+  },
+  "roi": {
+    "centroids_inside": 201,
+    "definitions": {
+      "centroid_containment": "0 <= (bx0 + bx1) / 2 < 1280 and 0 <= (by0 + by1) / 2 < 720",
+      "non_tight": "pixel box not strictly inside half-open ROI: bx0 < x0 or by0 < y0 or bx1 >= x1 or by1 >= y1",
+      "out_of_bounds": "x0 < 0 or y0 < 0 or x1 > 1280 or y1 > 720, half-open extents"
+    },
+    "instances_checked": 201,
+    "non_tight": 17,
+    "non_tight_instances": [
+      {
+        "frame_name": "animals01_Guiguinto_railway_station_Calves.webp",
+        "mask_value": 1
+      },
+      {
+        "frame_name": "animals01_Guiguinto_railway_station_Calves.webp",
+        "mask_value": 2
+      },
+      {
+        "frame_name": "animals07_Aihole_Pattadakal.webp",
+        "mask_value": 3
+      },
+      {
+        "frame_name": "animals07_Aihole_Pattadakal.webp",
+        "mask_value": 4
+      },
+      {
+        "frame_name": "animals10_bovine_cattle_beside_road.webp",
+        "mask_value": 1
+      },
+      {
+        "frame_name": "animals14_Dekemhare_Road.webp",
+        "mask_value": 4
+      },
+      {
+        "frame_name": "animals16_Donkeys_of_Morocco.webp",
+        "mask_value": 1
+      },
+      {
+        "frame_name": "animals23_rhino_crossing_road.webp",
+        "mask_value": 2
+      },
+      {
+        "frame_name": "animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+        "mask_value": 4
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "mask_value": 25
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "mask_value": 26
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "mask_value": 30
+      },
+      {
+        "frame_name": "cones03_Bang_Na_Trat_Highway.webp",
+        "mask_value": 7
+      },
+      {
+        "frame_name": "cones05_Corner_of_Kingsley_Park.webp",
+        "mask_value": 6
+      },
+      {
+        "frame_name": "obstacles12_rocks4.webp",
+        "mask_value": 1
+      },
+      {
+        "frame_name": "obstacles12_rocks4.webp",
+        "mask_value": 4
+      },
+      {
+        "frame_name": "obstacles12_rocks6.webp",
+        "mask_value": 4
+      }
+    ],
+    "out_of_bounds": 11,
+    "out_of_bounds_instances": [
+      {
+        "frame_name": "animals07_Aihole_Pattadakal.webp",
+        "mask_value": 2
+      },
+      {
+        "frame_name": "animals14_Dekemhare_Road.webp",
+        "mask_value": 6
+      },
+      {
+        "frame_name": "animals14_Dekemhare_Road.webp",
+        "mask_value": 8
+      },
+      {
+        "frame_name": "animals16_Donkeys_of_Morocco.webp",
+        "mask_value": 1
+      },
+      {
+        "frame_name": "animals19_Porte_de_Roubaix.webp",
+        "mask_value": 1
+      },
+      {
+        "frame_name": "animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+        "mask_value": 2
+      },
+      {
+        "frame_name": "animals24_Sheep_Herders_Block_the_Road_Kaleybar_to_Eskanlu.webp",
+        "mask_value": 6
+      },
+      {
+        "frame_name": "animals27_wildlife_bear.webp",
+        "mask_value": 1
+      },
+      {
+        "frame_name": "cones01_Beeston_MMB_A6_Middle_Street.webp",
+        "mask_value": 1
+      },
+      {
+        "frame_name": "cones03_Bang_Na_Trat_Highway.webp",
+        "mask_value": 1
+      },
+      {
+        "frame_name": "obstacles12_rocks6.webp",
+        "mask_value": 1
+      }
+    ]
+  },
+  "schema_version": "1.0"
+}

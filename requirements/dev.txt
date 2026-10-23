@@ -1,9 +1,12 @@
-# Lint, type-check, test. Deliberately excludes TensorFlow so CI stays fast.
+# Lint, type-check, test and audit validation. Deliberately excludes TensorFlow so CI stays fast.
 ruff>=0.6
 mypy>=1.11
 pytest>=8.2
 pytest-cov>=5.0
 
-# Needed by tests/dataset/ (dataset + mask inspection)
+# Needed by tests/dataset/ (dataset + mask inspection) and the audit.
 numpy>=1.26
 pillow>=10.3
+
+# Runtime schema validation for dl/data/audit.py; not test-only.
+jsonschema>=4.20
