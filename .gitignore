@@ -1,0 +1,25 @@
+# Private study material (course notes, PDFs, example labs)
+docs/personalize/
+
+# Python / environments
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Training artefacts (too large for git; share via release/drive)
+models/
+checkpoints/
+*.keras
+*.h5
+logs/
+outputs/
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
