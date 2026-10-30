@@ -15,7 +15,8 @@ Goal: identify and localise, **at the pixel level**, unexpected objects on the r
 RoadAnomaly-CRISPDM/
 ├── datasets/RoadAnomaly/        # 60 images + pixel masks (readme.md, credits.txt = licences)
 ├── notebooks/                   # one notebook per CRISP-DM step, numbered
-│   └── 01_Data_Understanding.ipynb
+│   ├── 01_Data_Understanding.ipynb
+│   └── 02_B_Autoencoder.ipynb   # Binôme B: convolutional autoencoder
 ├── src/roadanomaly/             # shared code, installed with `pip install -e .`
 │   ├── data_pipeline.py         #   frame loading, binary masks, split loading, tf.data DataLoader
 │   ├── metrics.py               #   pixel + object metrics, bootstrap intervals

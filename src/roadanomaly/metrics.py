@@ -125,3 +125,60 @@ def bootstrap_ci(per_image_values, n_boot=2000, alpha=0.05, seed=1337):
     means = rng.choice(values, size=(n_boot, len(values)), replace=True).mean(axis=1)
     low, high = np.quantile(means, [alpha / 2, 1 - alpha / 2])
     return float(values.mean()), float(low), float(high)
+
+
+def object_recall_by_size(y_true, y_pred, min_size, small_max, overlap=0.5):
+    """Object recall split into small and large objects (notebook 01, section 12, decision 7).
+
+    Objects with min_size <= area < small_max are "small", the others "large".
+    Returns detected and total counts so that several images can be summed.
+    """
+    y_true = np.asarray(y_true).astype(bool).squeeze()
+    y_pred = np.asarray(y_pred).astype(bool).squeeze()
+    labeled, n = ndimage.label(remove_small_components(y_true, min_size), structure=EIGHT_CONNECTED)
+    counts = {"small_detected": 0, "small_total": 0, "large_detected": 0, "large_total": 0}
+    for k in range(1, n + 1):
+        obj = labeled == k
+        size = "small" if obj.sum() < small_max else "large"
+        counts[f"{size}_total"] += 1
+        counts[f"{size}_detected"] += int(y_pred[obj].mean() >= overlap)
+    return counts
+
+
+def aupro(y_trues, score_maps, min_size, fpr_limit=0.3, n_thresholds=100):
+    """Area under the Per-Region-Overlap curve, up to a false positive rate of fpr_limit.
+
+    For each threshold:
+      - PRO = mean over all ground-truth objects of the fraction of the object that is
+        above the threshold (every object counts the same, whatever its size);
+      - FPR = fraction of background pixels above the threshold.
+    The PRO curve is integrated over FPR in [0, fpr_limit] and divided by fpr_limit,
+    so a perfect detector scores 1. The FPR cap must always be reported with the score.
+    """
+    y_trues = [np.asarray(y).astype(bool).squeeze() for y in y_trues]
+    score_maps = [np.asarray(s, dtype=float).squeeze() for s in score_maps]
+
+    # Ground-truth objects (speckle removed) of every image
+    objects = []
+    for y in y_trues:
+        labeled, n = ndimage.label(remove_small_components(y, min_size), structure=EIGHT_CONNECTED)
+        objects.append([labeled == k for k in range(1, n + 1)])
+
+    all_scores = np.concatenate([s.ravel() for s in score_maps])
+    thresholds = np.quantile(all_scores, np.linspace(1.0, 0.0, n_thresholds))  # high -> low
+
+    background = np.concatenate([s[~y] for s, y in zip(score_maps, y_trues)])
+    fprs, pros = [], []
+    for t in thresholds:
+        fprs.append(float((background >= t).mean()))
+        overlaps = [(s[obj] >= t).mean() for s, objs in zip(score_maps, objects) for obj in objs]
+        pros.append(float(np.mean(overlaps)))
+
+    # Keep the part of the curve with FPR <= fpr_limit (add the exact end point by interpolation)
+    fprs, pros = np.array(fprs), np.array(pros)
+    keep = fprs <= fpr_limit
+    x, y = fprs[keep], pros[keep]
+    if keep.sum() < len(fprs):
+        x = np.append(x, fpr_limit)
+        y = np.append(y, np.interp(fpr_limit, fprs, pros))
+    return float(np.trapezoid(y, x) / fpr_limit)
