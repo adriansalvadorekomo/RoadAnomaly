@@ -16,7 +16,7 @@ RoadAnomaly-CRISPDM/
 ├── datasets/RoadAnomaly/        # 60 images + pixel masks (readme.md, credits.txt = licences)
 ├── notebooks/                   # one notebook per CRISP-DM step, numbered
 │   ├── 01_Data_Understanding.ipynb
-│   └── 02_B_Autoencoder.ipynb   # Binôme B: convolutional autoencoder
+│   └── 02_B_Autoencoder.ipynb   # Binôme B: pixel autoencoder (v1) + feature-space autoencoder on frozen VGG16 (v2)
 ├── src/roadanomaly/             # shared code, installed with `pip install -e .`
 │   ├── data_pipeline.py         #   frame loading, binary masks, split loading, tf.data DataLoader
 │   ├── metrics.py               #   pixel + object metrics, bootstrap intervals
@@ -42,6 +42,7 @@ Check the GPU:
 ```bash
 python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
 ```
+Notebook 02 (v2) downloads the VGG16 ImageNet weights once (about 58 MB, into `~/.keras/models`), so its first run needs internet.
 
 ### GPU notes (RTX 4060 8 GB and RTX 2060 6 GB)
 - **TensorFlow is pinned to 2.20.0.** The 2.21.0 wheel cannot find `libcusolver` and silently runs on CPU.
