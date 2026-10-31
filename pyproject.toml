@@ -8,5 +8,8 @@ version = "0.1.0"
 description = "Shared data pipeline, metrics and GPU setup for the RoadAnomaly Deep Learning project (ESPRIT)"
 requires-python = ">=3.10"
 
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
