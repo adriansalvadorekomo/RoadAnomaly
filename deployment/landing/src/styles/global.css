@@ -1,0 +1,115 @@
+/* RoadAnomaly landing — direction "The product performs" (Frost and slate, Albert Sans).
+   Layers keep the cascade predictable: reset < tokens < base < layout < components < sections < motion. */
+@layer reset, tokens, base, layout, components, sections, motion;
+
+@import "@fontsource/albert-sans/400.css" layer(base);
+@import "@fontsource/albert-sans/500.css" layer(base);
+@import "@fontsource/albert-sans/600.css" layer(base);
+
+@layer tokens {
+  :root {
+    /* colour: one ground, one ink, one accent (the action), surfaces one tone step apart */
+    --bg: #f7f9fa;
+    --surface: #ecf0f2;
+    --surface-2: #dde5e9;
+    --ink: #1f3038;
+    --muted: #5d6b72;
+    --accent: #0d7480;
+    --accent-strong: #0a5d67;
+    --accent-ink: #ffffff;
+    --stage-dark: #1f3038;
+    --on-dark: #f7f9fa;
+    --on-dark-muted: #b7c3c9;
+    /* the product's own colours, used only inside fragments (data-ui) */
+    --ui-mask: #e5484d;
+    --ui-truth: #2fd3c4;
+    --ui-line: #c9d3d8;
+
+    --font: "Albert Sans", system-ui, sans-serif;
+    /* five size steps, no more */
+    /* six steps: small, body, lead, head, display, giant (the receipt's total) */
+    --step-small: 0.875rem;
+    --step-body: 1.0625rem;
+    --step-lead: clamp(1.25rem, 1.05rem + 0.6vw, 1.5rem);
+    --step-head: clamp(2rem, 1.55rem + 1.4vw, 2.75rem);
+    --step-display: clamp(2.5rem, 1rem + 4.6vw, 4.75rem);
+    --step-giant: clamp(10rem, 18vw, 16.25rem);
+
+    --margin: clamp(1.25rem, 2.5vw, 2.5rem);
+    --gutter: clamp(1rem, 2vw, 1.75rem);
+    --section: clamp(7.5rem, 13vw, 13rem);
+    --radius: 0px;          /* the page is square-cornered; fragments keep their own small radius */
+    --ui-radius: 8px;
+
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+    --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+    --t-press: 140ms;
+    --t-hover: 180ms;
+    --t-ui: 240ms;
+    --t-reveal: 800ms;
+    --stagger-item: 70ms;
+  }
+}
+
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { margin: 0; }
+  h1, h2, h3, p, figure, blockquote, ul, ol, dl, dd, table { margin: 0; }
+  ul[class], ol[class] { padding: 0; list-style: none; }
+  img, canvas, svg, video { display: block; max-inline-size: 100%; }
+  img { block-size: auto; }
+  button, input, select { font: inherit; color: inherit; }
+  button { background: none; border: 0; padding: 0; cursor: pointer; }
+}
+
+@layer base {
+  html { color-scheme: light; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    background: var(--bg); color: var(--ink); font-family: var(--font); font-size: var(--step-body);
+    line-height: 1.5; font-kerning: normal; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3 { font-weight: 600; letter-spacing: -0.035em; line-height: 1; text-wrap: balance; }
+  p { max-inline-size: 62ch; text-wrap: pretty; }
+  a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 0.07em; }
+  strong { font-weight: 600; color: var(--ink); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  ::selection { background: var(--accent); color: var(--accent-ink); }
+  :target { scroll-margin-top: 5rem; }
+  .nums { font-variant-numeric: tabular-nums; }
+  .muted { color: var(--muted); }
+  .small { font-size: var(--step-small); line-height: 1.45; }
+}
+
+@layer layout {
+  .wrap { padding-inline: var(--margin); }
+  .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); }
+  .section { padding-block: calc(var(--section) / 2); }
+}
+
+@layer components {
+  /* navigation: wordmark, a few plain links, one action */
+  .bar { position: absolute; inset-inline: 0; inset-block-start: 0; z-index: 5; display: flex; align-items: center;
+         justify-content: space-between; gap: 2rem; padding: 1.75rem var(--margin); font-size: var(--step-small); }
+  .wordmark { display: inline-flex; align-items: center; gap: 0.55em; font-weight: 600; text-decoration: none; font-size: var(--step-body); }
+  .wordmark svg { inline-size: 1.05em; block-size: 1.05em; }
+  .bar nav { display: flex; gap: clamp(1rem, 2.4vw, 2.25rem); }
+  .bar nav a { text-decoration-color: transparent; transition: text-decoration-color var(--t-hover) ease; }
+  @media (hover: hover) and (pointer: fine) { .bar nav a:hover { text-decoration-color: currentColor; } }
+  @media (max-width: 52em) { .bar nav { display: none; } }
+
+  .button {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.6em; min-block-size: 3rem; padding-inline: 1.4rem;
+    background: var(--accent); color: var(--accent-ink); border-radius: var(--radius); text-decoration: none; font-weight: 500;
+    white-space: nowrap; transition: transform var(--t-press) var(--ease-out), background-color var(--t-hover) ease;
+  }
+  .button:active { transform: scale(0.97); }
+  @media (hover: hover) and (pointer: fine) { .button:hover { background: var(--accent-strong); } }
+  .button--small { min-block-size: 2.75rem; padding-inline: 1.1rem; }
+  .text-link { text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+               transition: text-decoration-color var(--t-hover) ease; }
+  @media (hover: hover) and (pointer: fine) { .text-link:hover { text-decoration-color: currentColor; } }
+}

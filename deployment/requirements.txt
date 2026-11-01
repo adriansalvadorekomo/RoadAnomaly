@@ -1,0 +1,10 @@
+# Deployment layer (API, Streamlit demo, video inference), on top of ../requirements.txt:
+#   pip install -r requirements.txt && pip install -e . && pip install -r deployment/requirements.txt
+# The Docker image installs the same pins with tensorflow-cpu instead of tensorflow[and-cuda].
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+python-multipart==0.0.33
+streamlit==1.66.1
+httpx==0.28.1            # FastAPI TestClient (tests/test_api.py)
+imageio==2.38.1          # video reading / writing (scripts/infer_video.py)
+imageio-ffmpeg==0.7.0

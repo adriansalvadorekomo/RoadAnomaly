@@ -1,0 +1,8 @@
+---
+// An in-text citation [n]: links to the reference list and shows the full entry on hover or focus,
+// the way an interactive paper does. Works without JavaScript (the card is CSS-only).
+const { n, refs } = Astro.props;
+const entry = refs[n - 1];
+const id = `cite-card-${n}-${Math.random().toString(36).slice(2, 7)}`;
+---
+<span class="cite"><a class="cite__link nums" href={`#ref-${n}`} aria-describedby={id}>[{n}]</a><span class="cite__card serif" id={id} role="tooltip">{entry?.text}</span></span>

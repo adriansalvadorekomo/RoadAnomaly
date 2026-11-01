@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "roadanomaly"
 version = "0.1.0"
-description = "Shared data pipeline, metrics and GPU setup for the RoadAnomaly Deep Learning project (ESPRIT)"
+description = "Shared code of the RoadAnomaly CRISP-DM project (ESPRIT): data, protocol, models, evaluation, inference, XAI"
 requires-python = ">=3.10"
 
 [project.optional-dependencies]
@@ -13,3 +13,9 @@ test = ["pytest>=8,<10"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests", "."]
+markers = ["slow: regenerates the split from the raw data (about 20 s)"]
+filterwarnings = ["ignore::DeprecationWarning"]

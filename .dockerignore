@@ -1,0 +1,16 @@
+.venv
+.git
+**/__pycache__
+.pytest_cache
+.ipynb_checkpoints
+models
+checkpoints
+data/interim
+data/processed
+docs/personalize
+archive
+notebooks
+deployment/landing/node_modules
+deployment/landing/dist
+reports/figures
+reports/video

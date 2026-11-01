@@ -1,0 +1,23 @@
+{
+  "name": "roadanomaly-landing",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Landing page of the RoadAnomaly CRISP-DM project (static site, Astro)",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "sync": "node scripts/sync-results.mjs",
+    "dev": "npm run sync && astro dev",
+    "build": "npm run sync && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@fontsource/albert-sans": "^5.3.0",
+    "@fontsource/stix-two-math": "^5.3.0",
+    "@fontsource/stix-two-text": "^5.3.0",
+    "astro": "7.4.4",
+    "gsap": "^3.15.0"
+  }
+}

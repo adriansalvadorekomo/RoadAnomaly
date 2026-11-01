@@ -70,7 +70,7 @@ def evaluate_masks(y_trues, y_preds):
 #  - most images contain several obstacles whose sizes span orders of magnitude, so
 #    pixel scores are dominated by the largest object and say little about small ones;
 #  - the ground truth contains annotation speckle (components of a few pixels) that
-#    must not count as obstacles. MIN_OBJECT_PX is measured in notebook 01, section 6.
+#    must not count as obstacles. MIN_OBJECT_PX is measured in notebook 2, section 6.
 # ---------------------------------------------------------------------------
 
 EIGHT_CONNECTED = np.ones((3, 3), dtype=bool)
@@ -128,7 +128,7 @@ def bootstrap_ci(per_image_values, n_boot=2000, alpha=0.05, seed=1337):
 
 
 def object_recall_by_size(y_true, y_pred, min_size, small_max, overlap=0.5):
-    """Object recall split into small and large objects (notebook 01, section 12, decision 7).
+    """Object recall split into small and large objects (notebook 2, section 10, decision 7).
 
     Objects with min_size <= area < small_max are "small", the others "large".
     Returns detected and total counts so that several images can be summed.
@@ -182,3 +182,42 @@ def aupro(y_trues, score_maps, min_size, fpr_limit=0.3, n_thresholds=100):
         x = np.append(x, fpr_limit)
         y = np.append(y, np.interp(fpr_limit, fprs, pros))
     return float(np.trapezoid(y, x) / fpr_limit)
+
+
+# ---------------------------------------------------------------------------
+# Boundary metrics (FR, section 10: Boundary IoU for DeepLabV3+, HD95 for U-Net), computed for
+# every model on speckle-filtered masks, in pixels at the working resolution.
+# ---------------------------------------------------------------------------
+
+def _inner_boundary(mask, band):
+    """Pixels of `mask` within `band` px of its contour (the mask minus its erosion)."""
+    mask = np.asarray(mask).astype(bool)
+    eroded = ndimage.binary_erosion(mask, structure=EIGHT_CONNECTED, iterations=band, border_value=0)
+    return mask & ~eroded
+
+
+def boundary_iou(y_true, y_pred, band=3):
+    """Boundary IoU (Cheng et al., 2021): IoU of the contour bands of width `band` px.
+
+    Sensitive to the quality of the outline, unlike the pixel IoU which large interiors dominate.
+    Both masks empty -> 1.0; exactly one empty -> 0.0.
+    """
+    gt_band, pred_band = _inner_boundary(y_true, band), _inner_boundary(y_pred, band)
+    union = (gt_band | pred_band).sum()
+    return 1.0 if union == 0 else float((gt_band & pred_band).sum() / union)
+
+
+def hd95(y_true, y_pred):
+    """95th percentile of the symmetric contour distances, in px (lower is better).
+
+    Empty masks: both empty -> 0.0; exactly one empty -> NaN (undefined), reported apart.
+    """
+    gt, pred = np.asarray(y_true).astype(bool), np.asarray(y_pred).astype(bool)
+    if not gt.any() and not pred.any():
+        return 0.0
+    if not gt.any() or not pred.any():
+        return float("nan")
+    gt_edge, pred_edge = _inner_boundary(gt, 1), _inner_boundary(pred, 1)
+    to_pred = ndimage.distance_transform_edt(~pred_edge)[gt_edge]
+    to_gt = ndimage.distance_transform_edt(~gt_edge)[pred_edge]
+    return float(np.percentile(np.concatenate([to_pred, to_gt]), 95))

@@ -1,4 +1,4 @@
-"""Shared RoadAnomaly data pipeline (FR Phase 1 deliverable).
+"""Shared RoadAnomaly data pipeline (CRISP-DM Data Preparation, notebook 3).
 
 Every binôme loads the data through these functions so that all three approaches use
 the same frames, the same binary mask convention and the same frozen split.
@@ -13,6 +13,7 @@ Conventions
 """
 import csv
 import json
+import os
 import re
 from pathlib import Path
 
@@ -20,8 +21,14 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = REPO_ROOT / "datasets" / "RoadAnomaly"
+# Every path of the project is defined here, relative to the repository (never absolute)
+# ROADANOMALY_ROOT overrides the location, e.g. inside the Docker image
+REPO_ROOT = Path(os.environ.get("ROADANOMALY_ROOT", Path(__file__).resolve().parents[2]))
+DATA_DIR = REPO_ROOT / "data" / "raw" / "RoadAnomaly"   # tracked in git, read-only
+INTERIM_DIR = REPO_ROOT / "data" / "interim"             # caches (git-ignored)
+PROCESSED_DIR = REPO_ROOT / "data" / "processed"         # derived arrays (git-ignored)
+MODELS_DIR = REPO_ROOT / "models"                        # one folder per model: model.keras + config.json
+FIG_DIR = REPO_ROOT / "reports" / "figures"
 MANIFEST_PATH = REPO_ROOT / "splits" / "split_manifest.csv"
 
 ANOMALY_LABEL = 2  # value of anomaly pixels in labels_semantic.png (background = 0)

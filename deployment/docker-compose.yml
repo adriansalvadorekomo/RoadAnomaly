@@ -1,0 +1,35 @@
+# docker compose -f deployment/docker-compose.yml up --build
+#   API  -> http://localhost:8000/docs
+#   Demo -> http://localhost:8501
+# The trained models come from ../models (produced by the modeling notebooks), mounted read-only.
+name: roadanomaly
+
+x-common: &common
+  image: roadanomaly:latest
+  build:
+    context: ..
+    dockerfile: deployment/Dockerfile
+  volumes:
+    - ../models:/app/models:ro
+  restart: unless-stopped
+
+services:
+  api:
+    <<: *common
+    ports: ["8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+
+  demo:
+    <<: *common
+    command: ["streamlit", "run", "deployment/app/streamlit_app.py", "--server.address=0.0.0.0",
+              "--server.port=8501", "--server.headless=true", "--browser.gatherUsageStats=false"]
+    ports: ["8501:8501"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
