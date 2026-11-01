@@ -1,0 +1,2335 @@
+{
+  "split": "test",
+  "frames": [
+    "animals14_Dekemhare_Road",
+    "animals17_E6_near_Kvaenangen",
+    "animals20_Marcassin_Conchiglio",
+    "animals21_On_The_Road_to_Gondar_Ethiopia",
+    "animals29_Zebra_Crossing_Abbey_Road_Style",
+    "cones06_VnA_traffic_cones",
+    "obstacles09_boulder3",
+    "obstacles10_boulder4",
+    "vehicle02_Broadmoor_Cones_Skidloader"
+  ],
+  "environment": {
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "tensorflow": "2.20.0"
+  },
+  "models": {
+    "A_deeplabv3plus": {
+      "title": "A: DeepLabV3+ (frozen ImageNet ResNet50 encoder)",
+      "binome": "A",
+      "model_type": "segmentation",
+      "config": {
+        "format_version": 1,
+        "model_file": "model.keras",
+        "name": "A_deeplabv3plus",
+        "binome": "A",
+        "title": "DeepLabV3+ (frozen ImageNet ResNet50 encoder)",
+        "model_type": "segmentation",
+        "input": {
+          "image_size": [
+            352,
+            640
+          ],
+          "channels": "RGB",
+          "range": [
+            0,
+            1
+          ]
+        },
+        "postprocessing": {
+          "sigma": 0,
+          "per_image_z_score": false,
+          "threshold": 0.4822638440251346,
+          "min_blob_px": 4
+        },
+        "selection": {
+          "split": "val",
+          "checkpoint_rule": "minimum validation loss",
+          "threshold_rule": "best per-image mean F1 over 51 quantiles (0.01-0.99)"
+        },
+        "validation": {
+          "AuPRC": 0.7536237052834396,
+          "AuPRC chance": 0.09070194128787878,
+          "AUROC": 0.9275106347576376,
+          "AUROC chance": 0.5,
+          "FPR95": 0.437995356960762,
+          "AUPRO": 0.8258023609930221,
+          "AUPRO chance": 0.15,
+          "precision": 0.7350708006571813,
+          "recall": 0.7925607308970198,
+          "f1": 0.6950271297905091,
+          "iou": 0.5752901812401235,
+          "dice": 0.6950271297905091
+        },
+        "training": {
+          "seed": 1337,
+          "batch_size": 2,
+          "learning_rate": 0.001,
+          "loss": "binary_crossentropy",
+          "max_epochs": 20,
+          "patience": 5,
+          "epochs_ran": 16,
+          "best_epoch": 11,
+          "encoder": "ResNet50 ImageNet, frozen",
+          "decoder_channels": 128
+        },
+        "environment": {
+          "python": "3.12.13",
+          "tensorflow": "2.20.0",
+          "keras": "3.15.1",
+          "device": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        }
+      },
+      "threshold_free": {
+        "AuPRC": 0.7546011665568255,
+        "AuPRC chance": 0.0859375,
+        "AUROC": 0.9646637763917211,
+        "AUROC chance": 0.5,
+        "FPR95": 0.1438536001036001,
+        "AUPRO": 0.8996167144354749,
+        "AUPRO chance": 0.15
+      },
+      "summary": {
+        "AuPRC (main)": 0.7546011665568255,
+        "AUROC": 0.9646637763917211,
+        "AUPRO@0.3": 0.8996167144354749,
+        "FPR95 (lower is better)": 0.1438536001036001,
+        "F1 = Dice (per-image mean)": 0.7387472736010122,
+        "IoU (per-image mean)": 0.6129228326030263,
+        "precision (per-image mean)": 0.717555038761549,
+        "recall (per-image mean)": 0.8456061958047291,
+        "F1 (aggregated)": 0.745680054998674,
+        "Boundary IoU (15 px band)": 0.47589655275444254,
+        "HD95 px (lower is better)": 77.54353863651444,
+        "objects detected": "20/22",
+        "small objects detected": "0/0",
+        "false alarms / predicted blobs": "38/67"
+      },
+      "bootstrap": [
+        {
+          "metric": "pixel f1",
+          "mean": 0.7387472736010122,
+          "low": 0.6218724073768379,
+          "high": 0.842042230350632
+        },
+        {
+          "metric": "pixel iou",
+          "mean": 0.6129228326030263,
+          "low": 0.48029175584541967,
+          "high": 0.7350691075290982
+        },
+        {
+          "metric": "pixel precision",
+          "mean": 0.717555038761549,
+          "low": 0.5963998443517446,
+          "high": 0.8240855237453913
+        },
+        {
+          "metric": "pixel recall",
+          "mean": 0.8456061958047291,
+          "low": 0.683868078714736,
+          "high": 0.9516887790263664
+        },
+        {
+          "metric": "object f1",
+          "mean": 0.5971226619883366,
+          "low": 0.43169410850550377,
+          "high": 0.7545803611593085
+        }
+      ],
+      "criteria": {
+        "SC1 F1 low bound > all-anomaly": "0.622 > 0.154: pass",
+        "SC2 object precision > 0.5": "0.43: FAIL",
+        "SC3 object recall >= 0.5": "0.91: pass",
+        "SC4 latency < 100 ms": "21 ms: pass"
+      },
+      "cost": {
+        "parameters, total (M)": 12.838721,
+        "trained parameters (M)": 4.247649,
+        "model file (MB)": 51.997426,
+        "latency (ms / image, NVIDIA GeForce RTX 4060 Laptop GPU)": 21.082777888902154,
+        "training labels needed": "pixel masks"
+      },
+      "report": {
+        "pixel": {
+          "per_image": [
+            {
+              "precision": 0.7318245079196766,
+              "recall": 0.9841800356506238,
+              "f1": 0.839446577216922,
+              "iou": 0.7233157567222349,
+              "dice": 0.839446577216922
+            },
+            {
+              "precision": 0.5910875875021342,
+              "recall": 0.9461601530472806,
+              "f1": 0.7276166456494325,
+              "iou": 0.5718533201189296,
+              "dice": 0.7276166456494325
+            },
+            {
+              "precision": 0.696923076923077,
+              "recall": 0.9775973692323502,
+              "f1": 0.8137376502288183,
+              "iou": 0.6859676954139025,
+              "dice": 0.8137376502288183
+            },
+            {
+              "precision": 0.4705689527392965,
+              "recall": 0.9622020166695809,
+              "f1": 0.6320373667183522,
+              "iou": 0.46202823917941255,
+              "dice": 0.6320373667183522
+            },
+            {
+              "precision": 0.8587231352718079,
+              "recall": 0.8569896543022962,
+              "f1": 0.8578555190704723,
+              "iou": 0.7510919444905181,
+              "dice": 0.8578555190704723
+            },
+            {
+              "precision": 0.43291078689308776,
+              "recall": 0.8062360801781737,
+              "f1": 0.5633364456893869,
+              "iou": 0.3921143847487002,
+              "dice": 0.5633364456893869
+            },
+            {
+              "precision": 0.8667343274260286,
+              "recall": 0.9588047327057604,
+              "f1": 0.9104477611940298,
+              "iou": 0.8356164383561644,
+              "dice": 0.9104477611940298
+            },
+            {
+              "precision": 0.9846432985353283,
+              "recall": 0.8719089088622922,
+              "f1": 0.9248533497993208,
+              "iou": 0.8602113484952906,
+              "dice": 0.9248533497993208
+            },
+            {
+              "precision": 0.8245796756435054,
+              "recall": 0.2463768115942029,
+              "f1": 0.3793941468423755,
+              "iou": 0.23410636590208253,
+              "dice": 0.3793941468423755
+            }
+          ],
+          "per_image_mean": {
+            "precision": 0.717555038761549,
+            "recall": 0.8456061958047291,
+            "f1": 0.7387472736010122,
+            "iou": 0.6129228326030263,
+            "dice": 0.7387472736010122
+          },
+          "aggregated": {
+            "precision": 0.6762199193958894,
+            "recall": 0.8310433884297521,
+            "f1": 0.745680054998674,
+            "iou": 0.5944895143941011,
+            "dice": 0.745680054998674
+          }
+        },
+        "objects": {
+          "object_recall": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            0.6666666666666666,
+            0.75
+          ],
+          "object_precision": [
+            0.3333333333333333,
+            0.4,
+            0.0625,
+            0.2,
+            0.625,
+            0.5833333333333334,
+            1.0,
+            0.5,
+            0.8
+          ],
+          "object_f1": [
+            0.5,
+            0.5714285714285715,
+            0.11764705882352941,
+            0.33333333333333337,
+            0.7692307692307693,
+            0.7368421052631579,
+            1.0,
+            0.5714285714285715,
+            0.7741935483870969
+          ],
+          "gt_objects": [
+            2,
+            1,
+            1,
+            2,
+            2,
+            6,
+            1,
+            3,
+            4
+          ],
+          "detected": [
+            2,
+            1,
+            1,
+            2,
+            2,
+            6,
+            1,
+            2,
+            3
+          ],
+          "pred_objects": [
+            6,
+            5,
+            16,
+            5,
+            8,
+            12,
+            1,
+            4,
+            10
+          ],
+          "false_alarms": [
+            4,
+            3,
+            15,
+            4,
+            3,
+            5,
+            0,
+            2,
+            2
+          ]
+        },
+        "sizes": {
+          "small_detected": 0,
+          "small_total": 0,
+          "large_detected": 20,
+          "large_total": 22
+        },
+        "boundary": {
+          "boundary_iou": [
+            0.5254452926208651,
+            0.5568219359101421,
+            0.48111762054979723,
+            0.3255194334727838,
+            0.6966422872340425,
+            0.4049305244285074,
+            0.5671930023855504,
+            0.47728103858109344,
+            0.2481178396072013
+          ],
+          "hd95_px": [
+            53.77730579255895,
+            91.67458362880515,
+            140.06801890652918,
+            133.05129894479813,
+            10.198039027185569,
+            112.0,
+            13.892443989449804,
+            90.0,
+            53.23015743930315
+          ],
+          "hd95_undefined_images": 0
+        },
+        "confusion": {
+          "tp": 144801,
+          "fp": 69332,
+          "fn": 29439,
+          "tn": 1783948
+        }
+      },
+      "validation_threshold_free": {
+        "AuPRC": 0.7536237052834396,
+        "AuPRC chance": 0.09070194128787878,
+        "AUROC": 0.9275106347576376,
+        "AUROC chance": 0.5,
+        "FPR95": 0.437995356960762,
+        "AUPRO": 0.8258023609930221,
+        "AUPRO chance": 0.15
+      }
+    },
+    "B_feature_ae": {
+      "title": "B: Feature-space autoencoder on frozen VGG16 block5_conv3",
+      "binome": "B",
+      "model_type": "feature_autoencoder",
+      "config": {
+        "format_version": 1,
+        "model_file": "model.keras",
+        "name": "B_feature_ae",
+        "binome": "B",
+        "title": "Feature-space autoencoder on frozen VGG16 block5_conv3",
+        "model_type": "feature_autoencoder",
+        "input": {
+          "image_size": [
+            352,
+            640
+          ],
+          "channels": "RGB",
+          "range": [
+            0,
+            1
+          ]
+        },
+        "features": {
+          "backbone": "VGG16",
+          "layer": "block5_conv3",
+          "weights": "imagenet (frozen)"
+        },
+        "postprocessing": {
+          "sigma": 8,
+          "per_image_z_score": true,
+          "threshold": 0.5948146074101077,
+          "min_blob_px": 256
+        },
+        "selection": {
+          "split": "val",
+          "depth_rule": "best feature-AE AuPRC",
+          "component_rule": "AuPRC gain > 0.002",
+          "threshold_rule": "best per-image mean F1 (threshold and min blob together)"
+        },
+        "validation": {
+          "AuPRC": 0.5960098486082742,
+          "AuPRC chance": 0.09070194128787878,
+          "AUROC": 0.9128945916295763,
+          "AUROC chance": 0.5,
+          "FPR95": 0.40924594005272236,
+          "AUPRO": 0.6996992695447267,
+          "AUPRO chance": 0.15,
+          "precision": 0.5745940636206628,
+          "recall": 0.7104227288653623,
+          "f1": 0.5750391111111983,
+          "iou": 0.4214479236917945,
+          "dice": 0.5750391111111983
+        },
+        "controls_validation_auprc": {
+          "feature norm, no AE": 0.6266657068293499
+        },
+        "training": {
+          "seed": 1337,
+          "hidden": 256,
+          "code_channels": 8,
+          "learning_rate": 0.001,
+          "batch_size": 8,
+          "mask_margin": 4,
+          "normal_cells_train": 30739
+        },
+        "environment": {
+          "python": "3.12.13",
+          "tensorflow": "2.20.0",
+          "keras": "3.15.1",
+          "device": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        }
+      },
+      "threshold_free": {
+        "AuPRC": 0.6312390369627464,
+        "AuPRC chance": 0.0859375,
+        "AUROC": 0.921758363862496,
+        "AUROC chance": 0.5,
+        "FPR95": 0.4423799965466632,
+        "AUPRO": 0.8227242849622128,
+        "AUPRO chance": 0.15
+      },
+      "summary": {
+        "AuPRC (main)": 0.6312390369627464,
+        "AUROC": 0.921758363862496,
+        "AUPRO@0.3": 0.8227242849622128,
+        "FPR95 (lower is better)": 0.4423799965466632,
+        "F1 = Dice (per-image mean)": 0.623387782650508,
+        "IoU (per-image mean)": 0.47386022024203417,
+        "precision (per-image mean)": 0.5903334104362444,
+        "recall (per-image mean)": 0.7692780915212157,
+        "F1 (aggregated)": 0.6177365255920879,
+        "Boundary IoU (15 px band)": 0.23592355305156593,
+        "HD95 px (lower is better)": 55.436183088344286,
+        "objects detected": "16/22",
+        "small objects detected": "0/0",
+        "false alarms / predicted blobs": "10/22"
+      },
+      "bootstrap": [
+        {
+          "metric": "pixel f1",
+          "mean": 0.623387782650508,
+          "low": 0.5057051636981426,
+          "high": 0.7285635976826731
+        },
+        {
+          "metric": "pixel iou",
+          "mean": 0.47386022024203417,
+          "low": 0.35517778001294403,
+          "high": 0.5830962600399212
+        },
+        {
+          "metric": "pixel precision",
+          "mean": 0.5903334104362444,
+          "low": 0.4632424890637475,
+          "high": 0.6975368857293912
+        },
+        {
+          "metric": "pixel recall",
+          "mean": 0.7692780915212157,
+          "low": 0.6172675960945389,
+          "high": 0.9030063951343366
+        },
+        {
+          "metric": "object f1",
+          "mean": 0.6685660018993352,
+          "low": 0.42350427350427344,
+          "high": 0.8784425451092118
+        }
+      ],
+      "criteria": {
+        "SC1 F1 low bound > all-anomaly": "0.506 > 0.154: pass",
+        "SC2 object precision > 0.5": "0.55: pass",
+        "SC3 object recall >= 0.5": "0.73: pass",
+        "SC4 latency < 100 ms": "40 ms: pass"
+      },
+      "cost": {
+        "parameters, total (M)": 16.04692,
+        "trained parameters (M)": 1.332232,
+        "model file (MB)": 16.020657,
+        "latency (ms / image, NVIDIA GeForce RTX 4060 Laptop GPU)": 39.67271629631728,
+        "training labels needed": "normal regions only (masks used to exclude obstacles)"
+      },
+      "report": {
+        "pixel": {
+          "per_image": [
+            {
+              "precision": 0.72057310219267,
+              "recall": 0.8113190730837789,
+              "f1": 0.7632582903617994,
+              "iou": 0.6171525423728813,
+              "dice": 0.7632582903617994
+            },
+            {
+              "precision": 0.2928802588996764,
+              "recall": 0.9398742825908718,
+              "f1": 0.44659437698850724,
+              "iou": 0.28749373014546065,
+              "dice": 0.44659437698850724
+            },
+            {
+              "precision": 0.6653757354584047,
+              "recall": 0.9180968040283629,
+              "f1": 0.7715692201399085,
+              "iou": 0.6280933633295838,
+              "dice": 0.7715692201399085
+            },
+            {
+              "precision": 0.7694043496868069,
+              "recall": 0.5763245322608848,
+              "f1": 0.6590132795707883,
+              "iou": 0.49143907954573696,
+              "dice": 0.6590132795707883
+            },
+            {
+              "precision": 0.5761062311847911,
+              "recall": 0.8812768104970982,
+              "f1": 0.6967407296576146,
+              "iou": 0.5346140599288202,
+              "dice": 0.6967407296576146
+            },
+            {
+              "precision": 0.23076428823850675,
+              "recall": 0.6399109131403118,
+              "f1": 0.3392047601057801,
+              "iou": 0.20424237254400182,
+              "dice": 0.3392047601057801
+            },
+            {
+              "precision": 0.7069698650397486,
+              "recall": 0.9907591329130322,
+              "f1": 0.8251456520175502,
+              "iou": 0.7023386800538753,
+              "dice": 0.8251456520175502
+            },
+            {
+              "precision": 0.7634224880068344,
+              "recall": 0.2705024915009547,
+              "f1": 0.3994635765005244,
+              "iou": 0.24958105959695784,
+              "dice": 0.3994635765005244
+            },
+            {
+              "precision": 0.587504375218761,
+              "recall": 0.8954387836756469,
+              "f1": 0.7095001585120998,
+              "iou": 0.5497870946609892,
+              "dice": 0.7095001585120998
+            }
+          ],
+          "per_image_mean": {
+            "precision": 0.5903334104362444,
+            "recall": 0.7692780915212157,
+            "f1": 0.623387782650508,
+            "iou": 0.47386022024203417,
+            "dice": 0.623387782650508
+          },
+          "aggregated": {
+            "precision": 0.5817168757161254,
+            "recall": 0.658511248852158,
+            "f1": 0.6177365255920879,
+            "iou": 0.4469021550733613,
+            "dice": 0.6177365255920879
+          }
+        },
+        "objects": {
+          "object_recall": [
+            1.0,
+            1.0,
+            1.0,
+            0.5,
+            1.0,
+            0.6666666666666666,
+            1.0,
+            0.3333333333333333,
+            0.75
+          ],
+          "object_precision": [
+            1.0,
+            0.0,
+            1.0,
+            1.0,
+            1.0,
+            0.3333333333333333,
+            1.0,
+            0.6666666666666666,
+            0.3333333333333333
+          ],
+          "object_f1": [
+            1.0,
+            0.0,
+            1.0,
+            0.6666666666666666,
+            1.0,
+            0.4444444444444444,
+            1.0,
+            0.4444444444444444,
+            0.46153846153846156
+          ],
+          "gt_objects": [
+            2,
+            1,
+            1,
+            2,
+            2,
+            6,
+            1,
+            3,
+            4
+          ],
+          "detected": [
+            2,
+            1,
+            1,
+            1,
+            2,
+            4,
+            1,
+            1,
+            3
+          ],
+          "pred_objects": [
+            2,
+            3,
+            1,
+            2,
+            1,
+            6,
+            1,
+            3,
+            3
+          ],
+          "false_alarms": [
+            0,
+            3,
+            0,
+            0,
+            0,
+            4,
+            0,
+            1,
+            2
+          ]
+        },
+        "sizes": {
+          "small_detected": 0,
+          "small_total": 0,
+          "large_detected": 16,
+          "large_total": 22
+        },
+        "boundary": {
+          "boundary_iou": [
+            0.3596763215609166,
+            0.08651875612581306,
+            0.28551123745225193,
+            0.26374635233942095,
+            0.24382240946285344,
+            0.206971751797458,
+            0.29858361924870236,
+            0.1448645886561063,
+            0.233616940820571
+          ],
+          "hd95_px": [
+            28.089053566450623,
+            86.87632390593619,
+            26.076809620810597,
+            61.001229425601785,
+            24.730542617056145,
+            104.32230733483186,
+            21.587033144922902,
+            88.3979379757766,
+            57.84441020371192
+          ],
+          "hd95_undefined_images": 0
+        },
+        "confusion": {
+          "tp": 114739,
+          "fp": 82503,
+          "fn": 59501,
+          "tn": 1770777
+        }
+      },
+      "validation_threshold_free": {
+        "AuPRC": 0.5960098486082742,
+        "AuPRC chance": 0.09070194128787878,
+        "AUROC": 0.9128945916295763,
+        "AUROC chance": 0.5,
+        "FPR95": 0.40924594005272236,
+        "AUPRO": 0.6996992695447267,
+        "AUPRO chance": 0.15
+      }
+    },
+    "B_pixel_ae": {
+      "title": "B: Pixel autoencoder (mae_vgg19 loss), baseline",
+      "binome": "B",
+      "model_type": "pixel_autoencoder",
+      "config": {
+        "format_version": 1,
+        "model_file": "model.keras",
+        "name": "B_pixel_ae",
+        "binome": "B",
+        "title": "Pixel autoencoder (mae_vgg19 loss), baseline",
+        "model_type": "pixel_autoencoder",
+        "input": {
+          "image_size": [
+            352,
+            640
+          ],
+          "channels": "RGB",
+          "range": [
+            0,
+            1
+          ]
+        },
+        "postprocessing": {
+          "sigma": 16,
+          "per_image_z_score": true,
+          "threshold": 0.6193964413364055,
+          "min_blob_px": 4
+        },
+        "selection": {
+          "split": "val",
+          "variant_rule": "best AuPRC, then per-image mean F1",
+          "threshold_rule": "best per-image mean F1"
+        },
+        "validation": {
+          "AuPRC": 0.15730066233229237,
+          "AuPRC chance": 0.09070194128787878,
+          "AUROC": 0.6942286126172237,
+          "AUROC chance": 0.5,
+          "FPR95": 0.7024012540545231,
+          "AUPRO": 0.5275889505886774,
+          "AUPRO chance": 0.15,
+          "precision": 0.17977312985665428,
+          "recall": 0.5950621202108127,
+          "f1": 0.2487206354350841,
+          "iou": 0.1475320214474221,
+          "dice": 0.2487206354350841
+        },
+        "training": {
+          "loss": "mae_vgg19",
+          "seed": 1337,
+          "patch": 64,
+          "stride": 32,
+          "mask_margin": 4,
+          "normal_patches_train": 5325,
+          "learning_rate": 0.001,
+          "batch_size": 64,
+          "epochs_ran": 33,
+          "best_epoch": 25
+        },
+        "environment": {
+          "python": "3.12.13",
+          "tensorflow": "2.20.0",
+          "keras": "3.15.1",
+          "device": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        }
+      },
+      "threshold_free": {
+        "AuPRC": 0.1775285994559434,
+        "AuPRC chance": 0.0859375,
+        "AUROC": 0.6760642518486644,
+        "AUROC chance": 0.5,
+        "FPR95": 0.9781252697919365,
+        "AUPRO": 0.5031208886725206,
+        "AUPRO chance": 0.15
+      },
+      "summary": {
+        "AuPRC (main)": 0.1775285994559434,
+        "AUROC": 0.6760642518486644,
+        "AUPRO@0.3": 0.5031208886725206,
+        "FPR95 (lower is better)": 0.9781252697919365,
+        "F1 = Dice (per-image mean)": 0.24763338774428398,
+        "IoU (per-image mean)": 0.15945808117655094,
+        "precision (per-image mean)": 0.18095718696426338,
+        "recall (per-image mean)": 0.5030579562301067,
+        "F1 (aggregated)": 0.24435604837944064,
+        "Boundary IoU (15 px band)": 0.07314185189522898,
+        "HD95 px (lower is better)": 223.58479553566042,
+        "objects detected": "16/22",
+        "small objects detected": "0/0",
+        "false alarms / predicted blobs": "40/45"
+      },
+      "bootstrap": [
+        {
+          "metric": "pixel f1",
+          "mean": 0.24763338774428398,
+          "low": 0.11753575496525824,
+          "high": 0.392647241255376
+        },
+        {
+          "metric": "pixel iou",
+          "mean": 0.15945808117655094,
+          "low": 0.07042712063731674,
+          "high": 0.26299614513564085
+        },
+        {
+          "metric": "pixel precision",
+          "mean": 0.18095718696426338,
+          "low": 0.08305448078818398,
+          "high": 0.29219012361330643
+        },
+        {
+          "metric": "pixel recall",
+          "mean": 0.5030579562301067,
+          "low": 0.2526756997022893,
+          "high": 0.7421641227071885
+        },
+        {
+          "metric": "object f1",
+          "mean": 0.06381766381766381,
+          "low": 0.0,
+          "high": 0.1527065527065527
+        }
+      ],
+      "criteria": {
+        "SC1 F1 low bound > all-anomaly": "0.118 > 0.154: FAIL",
+        "SC2 object precision > 0.5": "0.11: FAIL",
+        "SC3 object recall >= 0.5": "0.73: pass",
+        "SC4 latency < 100 ms": "26 ms: pass"
+      },
+      "cost": {
+        "parameters, total (M)": 0.786053,
+        "trained parameters (M)": 0.786053,
+        "model file (MB)": 3.193364,
+        "latency (ms / image, NVIDIA GeForce RTX 4060 Laptop GPU)": 26.486059481478016,
+        "training labels needed": "normal regions only (masks used to exclude obstacles)"
+      },
+      "report": {
+        "pixel": {
+          "per_image": [
+            {
+              "precision": 0.07334295208114726,
+              "recall": 0.14950980392156862,
+              "f1": 0.09841018420743869,
+              "iou": 0.0517515309506548,
+              "dice": 0.09841018420743869
+            },
+            {
+              "precision": 0.0743754227040764,
+              "recall": 0.9918010385351189,
+              "f1": 0.13837413254022726,
+              "iou": 0.07432972164758413,
+              "dice": 0.13837413254022726
+            },
+            {
+              "precision": 0.007578423146669554,
+              "recall": 0.05754804233891686,
+              "f1": 0.013393124065769806,
+              "iou": 0.006741708300728345,
+              "dice": 0.013393124065769806
+            },
+            {
+              "precision": 0.37495390126969075,
+              "recall": 0.6222241650638224,
+              "f1": 0.46793122719353036,
+              "iou": 0.3054244270878036,
+              "dice": 0.46793122719353036
+            },
+            {
+              "precision": 0.4278113859781787,
+              "recall": 0.999306081251577,
+              "f1": 0.5991301059001513,
+              "iou": 0.42768433273036527,
+              "dice": 0.5991301059001513
+            },
+            {
+              "precision": 0.15624788808542273,
+              "recall": 0.8238752783964365,
+              "f1": 0.26267876670501183,
+              "iou": 0.15119758031553993,
+              "dice": 0.26267876670501183
+            },
+            {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "iou": 0.0,
+              "dice": 0.0
+            },
+            {
+              "precision": 0.11485322323721596,
+              "recall": 0.1645322032319657,
+              "f1": 0.13527587395183213,
+              "iou": 0.07254471160756452,
+              "dice": 0.13527587395183213
+            },
+            {
+              "precision": 0.39945148617596915,
+              "recall": 0.718724993331555,
+              "f1": 0.5135070751345943,
+              "iou": 0.34544871794871795,
+              "dice": 0.5135070751345943
+            }
+          ],
+          "per_image_mean": {
+            "precision": 0.18095718696426338,
+            "recall": 0.5030579562301067,
+            "f1": 0.24763338774428398,
+            "iou": 0.15945808117655094,
+            "dice": 0.24763338774428398
+          },
+          "aggregated": {
+            "precision": 0.16868298948803315,
+            "recall": 0.4431646005509642,
+            "f1": 0.24435604837944064,
+            "iou": 0.1391831459641268,
+            "dice": 0.24435604837944064
+          }
+        },
+        "objects": {
+          "object_recall": [
+            0.0,
+            1.0,
+            0.0,
+            1.0,
+            1.0,
+            1.0,
+            0.0,
+            0.3333333333333333,
+            1.0
+          ],
+          "object_precision": [
+            0.25,
+            0.0,
+            0.0,
+            0.15384615384615385,
+            0.0,
+            0.0,
+            0.0,
+            0.2857142857142857,
+            0.0
+          ],
+          "object_f1": [
+            0.0,
+            0.0,
+            0.0,
+            0.2666666666666667,
+            0.0,
+            0.0,
+            0.0,
+            0.30769230769230765,
+            0.0
+          ],
+          "gt_objects": [
+            2,
+            1,
+            1,
+            2,
+            2,
+            6,
+            1,
+            3,
+            4
+          ],
+          "detected": [
+            0,
+            1,
+            0,
+            2,
+            2,
+            6,
+            0,
+            1,
+            4
+          ],
+          "pred_objects": [
+            4,
+            1,
+            3,
+            13,
+            1,
+            4,
+            4,
+            7,
+            8
+          ],
+          "false_alarms": [
+            3,
+            1,
+            3,
+            11,
+            1,
+            4,
+            4,
+            5,
+            8
+          ]
+        },
+        "sizes": {
+          "small_detected": 0,
+          "small_total": 0,
+          "large_detected": 16,
+          "large_total": 22
+        },
+        "boundary": {
+          "boundary_iou": [
+            0.033990875795155175,
+            0.028790360642993975,
+            0.006346444199912992,
+            0.1696103167928231,
+            0.0982440465963369,
+            0.10501034408960122,
+            0.0,
+            0.09236876407157246,
+            0.12391551486866512
+          ],
+          "hd95_px": [
+            245.97845408703486,
+            328.1730038921598,
+            267.53205403911835,
+            239.45354455509738,
+            42.053536886441734,
+            137.38267721950973,
+            361.3932756803483,
+            186.61401750937947,
+            203.68259595185413
+          ],
+          "hd95_undefined_images": 0
+        },
+        "confusion": {
+          "tp": 77217,
+          "fp": 380547,
+          "fn": 97023,
+          "tn": 1472733
+        }
+      },
+      "validation_threshold_free": {
+        "AuPRC": 0.15730089497705016,
+        "AuPRC chance": 0.09070194128787878,
+        "AUROC": 0.6942284791056303,
+        "AUROC chance": 0.5,
+        "FPR95": 0.7023996268211453,
+        "AUPRO": 0.5275879642773508,
+        "AUPRO chance": 0.15
+      }
+    },
+    "C_cnn": {
+      "title": "C: CNN baseline (encoder-decoder, no skips)",
+      "binome": "C",
+      "model_type": "segmentation",
+      "config": {
+        "format_version": 1,
+        "model_file": "model.keras",
+        "name": "C_cnn",
+        "binome": "C",
+        "title": "CNN baseline (encoder-decoder, no skips)",
+        "model_type": "segmentation",
+        "input": {
+          "image_size": [
+            352,
+            640
+          ],
+          "channels": "RGB",
+          "range": [
+            0,
+            1
+          ]
+        },
+        "postprocessing": {
+          "sigma": 0,
+          "per_image_z_score": false,
+          "threshold": 0.24976674493551196,
+          "min_blob_px": 4,
+          "tta_flip": false
+        },
+        "selection": {
+          "split": "val",
+          "checkpoint_rule": "best validation IoU at threshold 0.5",
+          "threshold_rule": "best per-image mean F1 over 51 quantiles (0.01-0.99)"
+        },
+        "validation": {
+          "AuPRC": 0.41053045632780216,
+          "AuPRC chance": 0.09070194128787878,
+          "AUROC": 0.9051918684944842,
+          "AUROC chance": 0.5,
+          "FPR95": 0.2638672828457057,
+          "AUPRO": 0.6494039710626347,
+          "AUPRO chance": 0.15,
+          "precision": 0.44969528951568016,
+          "recall": 0.6483640073336074,
+          "f1": 0.502923754509923,
+          "iou": 0.38194033880242184,
+          "dice": 0.502923754509923
+        },
+        "training": {
+          "seed": 1337,
+          "author": "Hejer",
+          "loss": "BCE + Dice",
+          "optimizer": "AdamW 1e-3, wd 1e-4, cosine",
+          "epochs": 80,
+          "batch_size": 4,
+          "best_epoch": 48
+        },
+        "environment": {
+          "python": "3.12.13",
+          "tensorflow": "2.20.0",
+          "keras": "3.15.1",
+          "device": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        }
+      },
+      "threshold_free": {
+        "AuPRC": 0.35257385405021247,
+        "AuPRC chance": 0.0859375,
+        "AUROC": 0.8183761658303537,
+        "AUROC chance": 0.5,
+        "FPR95": 0.563027713027713,
+        "AUPRO": 0.4915790576153918,
+        "AUPRO chance": 0.15
+      },
+      "summary": {
+        "AuPRC (main)": 0.35257385405021247,
+        "AUROC": 0.8183761658303537,
+        "AUPRO@0.3": 0.4915790576153918,
+        "FPR95 (lower is better)": 0.563027713027713,
+        "F1 = Dice (per-image mean)": 0.33993937782421796,
+        "IoU (per-image mean)": 0.21627667665575864,
+        "precision (per-image mean)": 0.40341039807566204,
+        "recall (per-image mean)": 0.4176283114487793,
+        "F1 (aggregated)": 0.3661471438188385,
+        "Boundary IoU (15 px band)": 0.1820081553396921,
+        "HD95 px (lower is better)": 179.44382220720624,
+        "objects detected": "9/22",
+        "small objects detected": "0/0",
+        "false alarms / predicted blobs": "155/219"
+      },
+      "bootstrap": [
+        {
+          "metric": "pixel f1",
+          "mean": 0.33993937782421796,
+          "low": 0.22969909467274496,
+          "high": 0.4446680022315837
+        },
+        {
+          "metric": "pixel iou",
+          "mean": 0.21627667665575864,
+          "low": 0.1421075628828352,
+          "high": 0.2904133094578423
+        },
+        {
+          "metric": "pixel precision",
+          "mean": 0.40341039807566204,
+          "low": 0.23019957936638413,
+          "high": 0.5890571781822214
+        },
+        {
+          "metric": "pixel recall",
+          "mean": 0.4176283114487793,
+          "low": 0.24891338603155092,
+          "high": 0.6172014563436798
+        },
+        {
+          "metric": "object f1",
+          "mean": 0.15366971731919443,
+          "low": 0.037825059101654845,
+          "high": 0.2960548900866246
+        }
+      ],
+      "criteria": {
+        "SC1 F1 low bound > all-anomaly": "0.230 > 0.154: pass",
+        "SC2 object precision > 0.5": "0.29: FAIL",
+        "SC3 object recall >= 0.5": "0.41: FAIL",
+        "SC4 latency < 100 ms": "13 ms: pass"
+      },
+      "cost": {
+        "parameters, total (M)": 0.186225,
+        "trained parameters (M)": 0.185553,
+        "model file (MB)": 0.847846,
+        "latency (ms / image, NVIDIA GeForce RTX 4060 Laptop GPU)": 12.872058444406354,
+        "training labels needed": "pixel masks"
+      },
+      "report": {
+        "pixel": {
+          "per_image": [
+            {
+              "precision": 0.43497613400099566,
+              "recall": 0.6619429590017826,
+              "f1": 0.5249783526833837,
+              "iou": 0.35591230382173233,
+              "dice": 0.5249783526833837
+            },
+            {
+              "precision": 0.24412185647106932,
+              "recall": 0.32631866630226836,
+              "f1": 0.2792982456140351,
+              "iou": 0.16231647634584012,
+              "dice": 0.2792982456140351
+            },
+            {
+              "precision": 0.16167893521211013,
+              "recall": 0.9998972356386805,
+              "f1": 0.2783499256207804,
+              "iou": 0.16167624871223954,
+              "dice": 0.2783499256207804
+            },
+            {
+              "precision": 0.39956825657894735,
+              "recall": 0.5663868974762487,
+              "f1": 0.46857294404127586,
+              "iou": 0.30597144161589446,
+              "dice": 0.46857294404127586
+            },
+            {
+              "precision": 0.15868563414145462,
+              "recall": 0.09992429977289932,
+              "f1": 0.12262909344274986,
+              "iou": 0.06531958762886599,
+              "dice": 0.12262909344274986
+            },
+            {
+              "precision": 0.021076474201474203,
+              "recall": 0.0489086859688196,
+              "f1": 0.029458321036675342,
+              "iou": 0.014949351922448536,
+              "dice": 0.029458321036675342
+            },
+            {
+              "precision": 0.4700258150874845,
+              "recall": 0.42456170653769754,
+              "f1": 0.4461384880660677,
+              "iou": 0.2871159911225324,
+              "dice": 0.4461384880660677
+            },
+            {
+              "precision": 0.9425816155003096,
+              "recall": 0.24807898290876915,
+              "f1": 0.39278143375914765,
+              "iou": 0.24438582406239248,
+              "dice": 0.39278143375914765
+            },
+            {
+              "precision": 0.797978861487113,
+              "recall": 0.3826353694318485,
+              "f1": 0.5172475961538462,
+              "iou": 0.34884286466988207,
+              "dice": 0.5172475961538462
+            }
+          ],
+          "per_image_mean": {
+            "precision": 0.40341039807566204,
+            "recall": 0.4176283114487793,
+            "f1": 0.33993937782421796,
+            "iou": 0.21627667665575864,
+            "dice": 0.33993937782421796
+          },
+          "aggregated": {
+            "precision": 0.33045338409436376,
+            "recall": 0.4104855371900826,
+            "f1": 0.3661471438188385,
+            "iou": 0.22410043991026332,
+            "dice": 0.3661471438188385
+          }
+        },
+        "objects": {
+          "object_recall": [
+            1.0,
+            0.0,
+            1.0,
+            1.0,
+            0.0,
+            0.16666666666666666,
+            0.0,
+            0.0,
+            0.75
+          ],
+          "object_precision": [
+            0.27586206896551724,
+            0.26666666666666666,
+            0.0,
+            0.20512820512820512,
+            0.7857142857142857,
+            0.07317073170731707,
+            0.1,
+            0.6153846153846154,
+            0.38461538461538464
+          ],
+          "object_f1": [
+            0.4324324324324324,
+            0.0,
+            0.0,
+            0.3404255319148936,
+            0.0,
+            0.1016949152542373,
+            0.0,
+            0.0,
+            0.5084745762711865
+          ],
+          "gt_objects": [
+            2,
+            1,
+            1,
+            2,
+            2,
+            6,
+            1,
+            3,
+            4
+          ],
+          "detected": [
+            2,
+            0,
+            1,
+            2,
+            0,
+            1,
+            0,
+            0,
+            3
+          ],
+          "pred_objects": [
+            29,
+            15,
+            18,
+            39,
+            28,
+            41,
+            10,
+            13,
+            26
+          ],
+          "false_alarms": [
+            21,
+            11,
+            18,
+            31,
+            6,
+            38,
+            9,
+            5,
+            16
+          ]
+        },
+        "sizes": {
+          "small_detected": 0,
+          "small_total": 0,
+          "large_detected": 9,
+          "large_total": 22
+        },
+        "boundary": {
+          "boundary_iou": [
+            0.3048963800793475,
+            0.16231647634584012,
+            0.07857642339258769,
+            0.2350221994847527,
+            0.06813196266506086,
+            0.015064208100098783,
+            0.2593945720250522,
+            0.20911246921463103,
+            0.3055587067498582
+          ],
+          "hd95_px": [
+            192.2878013454843,
+            165.8448058011959,
+            243.01440281308464,
+            248.8714527622644,
+            94.92101980067429,
+            121.81707504943694,
+            353.4339375353438,
+            87.91471651547609,
+            106.88918824189585
+          ],
+          "hd95_undefined_images": 0
+        },
+        "confusion": {
+          "tp": 71523,
+          "fp": 144916,
+          "fn": 102717,
+          "tn": 1708364
+        }
+      },
+      "validation_threshold_free": {
+        "AuPRC": 0.4105305925132932,
+        "AuPRC chance": 0.09070194128787878,
+        "AUROC": 0.9051920876312335,
+        "AUROC chance": 0.5,
+        "FPR95": 0.2638607739121945,
+        "AUPRO": 0.6493993390229741,
+        "AUPRO chance": 0.15
+      }
+    },
+    "C_unet": {
+      "title": "C: U-Net from scratch",
+      "binome": "C",
+      "model_type": "segmentation",
+      "config": {
+        "format_version": 1,
+        "model_file": "model.keras",
+        "name": "C_unet",
+        "binome": "C",
+        "title": "U-Net from scratch",
+        "model_type": "segmentation",
+        "input": {
+          "image_size": [
+            352,
+            640
+          ],
+          "channels": "RGB",
+          "range": [
+            0,
+            1
+          ]
+        },
+        "postprocessing": {
+          "sigma": 0,
+          "per_image_z_score": false,
+          "threshold": 0.9524747611045842,
+          "min_blob_px": 4,
+          "tta_flip": false
+        },
+        "selection": {
+          "split": "val",
+          "checkpoint_rule": "best validation IoU at threshold 0.5",
+          "threshold_rule": "best per-image mean F1 over 51 quantiles (0.01-0.99)"
+        },
+        "validation": {
+          "AuPRC": 0.45256919328828454,
+          "AuPRC chance": 0.09070194128787878,
+          "AUROC": 0.9107040715679715,
+          "AUROC chance": 0.5,
+          "FPR95": 0.3608775127195409,
+          "AUPRO": 0.7075018868413201,
+          "AUPRO chance": 0.15,
+          "precision": 0.40985116776898456,
+          "recall": 0.5822131885346278,
+          "f1": 0.46148772104920155,
+          "iou": 0.36441417199848736,
+          "dice": 0.46148772104920155
+        },
+        "training": {
+          "seed": 1337,
+          "author": "Walid",
+          "loss": "BCE + Dice",
+          "optimizer": "Adam 1e-3",
+          "epochs": 50,
+          "batch_size": 4,
+          "best_epoch": 43
+        },
+        "environment": {
+          "python": "3.12.13",
+          "tensorflow": "2.20.0",
+          "keras": "3.15.1",
+          "device": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        }
+      },
+      "threshold_free": {
+        "AuPRC": 0.3784937805615352,
+        "AuPRC chance": 0.0859375,
+        "AUROC": 0.8686557022322525,
+        "AUROC chance": 0.5,
+        "FPR95": 0.44045206336873005,
+        "AUPRO": 0.6844440834632143,
+        "AUPRO chance": 0.15
+      },
+      "summary": {
+        "AuPRC (main)": 0.3784937805615352,
+        "AUROC": 0.8686557022322525,
+        "AUPRO@0.3": 0.6844440834632143,
+        "FPR95 (lower is better)": 0.44045206336873005,
+        "F1 = Dice (per-image mean)": 0.4472495192452586,
+        "IoU (per-image mean)": 0.29790513885143266,
+        "precision (per-image mean)": 0.5599980046343485,
+        "recall (per-image mean)": 0.477456181444347,
+        "F1 (aggregated)": 0.4472021673697511,
+        "Boundary IoU (15 px band)": 0.2391670746399036,
+        "HD95 px (lower is better)": 111.60702278557726,
+        "objects detected": "10/22",
+        "small objects detected": "0/0",
+        "false alarms / predicted blobs": "80/117"
+      },
+      "bootstrap": [
+        {
+          "metric": "pixel f1",
+          "mean": 0.4472495192452586,
+          "low": 0.3509483217174182,
+          "high": 0.5369165788907084
+        },
+        {
+          "metric": "pixel iou",
+          "mean": 0.29790513885143266,
+          "low": 0.22219987166974836,
+          "high": 0.37174607295392337
+        },
+        {
+          "metric": "pixel precision",
+          "mean": 0.5599980046343485,
+          "low": 0.3881613599845996,
+          "high": 0.7232173254674144
+        },
+        {
+          "metric": "pixel recall",
+          "mean": 0.477456181444347,
+          "low": 0.32158521387540834,
+          "high": 0.6556061350745227
+        },
+        {
+          "metric": "object f1",
+          "mean": 0.215519399423509,
+          "low": 0.10175010175010174,
+          "high": 0.3337382987382987
+        }
+      ],
+      "criteria": {
+        "SC1 F1 low bound > all-anomaly": "0.351 > 0.154: pass",
+        "SC2 object precision > 0.5": "0.32: FAIL",
+        "SC3 object recall >= 0.5": "0.45: FAIL",
+        "SC4 latency < 100 ms": "16 ms: pass"
+      },
+      "cost": {
+        "parameters, total (M)": 1.946993,
+        "trained parameters (M)": 1.944049,
+        "model file (MB)": 8.03855,
+        "latency (ms / image, NVIDIA GeForce RTX 4060 Laptop GPU)": 15.624219259296767,
+        "training labels needed": "pixel masks"
+      },
+      "report": {
+        "pixel": {
+          "per_image": [
+            {
+              "precision": 0.4630217442940122,
+              "recall": 0.9555704099821747,
+              "f1": 0.6237872903666856,
+              "iou": 0.4532637186099603,
+              "dice": 0.6237872903666856
+            },
+            {
+              "precision": 0.3646780862374483,
+              "recall": 0.8436731347362667,
+              "f1": 0.5092378752886836,
+              "iou": 0.3415956622773044,
+              "dice": 0.5092378752886836
+            },
+            {
+              "precision": 0.8838268792710706,
+              "recall": 0.3987257219196383,
+              "f1": 0.5495361518306069,
+              "iou": 0.3788692510497022,
+              "dice": 0.5495361518306069
+            },
+            {
+              "precision": 0.3511521694000415,
+              "recall": 0.5915369819898584,
+              "f1": 0.44069562951866087,
+              "iou": 0.2826232247284879,
+              "dice": 0.44069562951866087
+            },
+            {
+              "precision": 0.5501572167562633,
+              "recall": 0.34216502649507946,
+              "f1": 0.42192057874061684,
+              "iou": 0.26736333612658353,
+              "dice": 0.42192057874061684
+            },
+            {
+              "precision": 0.12974312165862564,
+              "recall": 0.17728285077951003,
+              "f1": 0.14983247374167075,
+              "iou": 0.08098319293533553,
+              "dice": 0.14983247374167075
+            },
+            {
+              "precision": 0.8533461415305795,
+              "recall": 0.46031608947232056,
+              "f1": 0.5980364656381487,
+              "iou": 0.42657062825130054,
+              "dice": 0.5980364656381487
+            },
+            {
+              "precision": 0.9085806799784134,
+              "recall": 0.19601359847250036,
+              "f1": 0.3224607841259505,
+              "iou": 0.19222250131299523,
+              "dice": 0.3224607841259505
+            },
+            {
+              "precision": 0.5354760025826817,
+              "recall": 0.33182181915177383,
+              "f1": 0.40973842395630333,
+              "iou": 0.25765473437122444,
+              "dice": 0.40973842395630333
+            }
+          ],
+          "per_image_mean": {
+            "precision": 0.5599980046343485,
+            "recall": 0.477456181444347,
+            "f1": 0.4472495192452586,
+            "iou": 0.29790513885143266,
+            "dice": 0.4472495192452586
+          },
+          "aggregated": {
+            "precision": 0.4506196938531731,
+            "recall": 0.44383608815426995,
+            "f1": 0.4472021673697511,
+            "iou": 0.28799767617671485,
+            "dice": 0.4472021673697511
+          }
+        },
+        "objects": {
+          "object_recall": [
+            1.0,
+            1.0,
+            0.0,
+            1.0,
+            0.5,
+            0.16666666666666666,
+            0.0,
+            0.0,
+            0.75
+          ],
+          "object_precision": [
+            0.08333333333333333,
+            0.16666666666666666,
+            0.5,
+            0.3125,
+            0.42105263157894735,
+            0.22580645161290322,
+            1.0,
+            0.6153846153846154,
+            0.25
+          ],
+          "object_f1": [
+            0.15384615384615385,
+            0.2857142857142857,
+            0.0,
+            0.47619047619047616,
+            0.45714285714285713,
+            0.1917808219178082,
+            0.0,
+            0.0,
+            0.375
+          ],
+          "gt_objects": [
+            2,
+            1,
+            1,
+            2,
+            2,
+            6,
+            1,
+            3,
+            4
+          ],
+          "detected": [
+            2,
+            1,
+            0,
+            2,
+            1,
+            1,
+            0,
+            0,
+            3
+          ],
+          "pred_objects": [
+            12,
+            6,
+            2,
+            16,
+            19,
+            31,
+            2,
+            13,
+            16
+          ],
+          "false_alarms": [
+            11,
+            5,
+            1,
+            11,
+            11,
+            24,
+            0,
+            5,
+            12
+          ]
+        },
+        "sizes": {
+          "small_detected": 0,
+          "small_total": 0,
+          "large_detected": 10,
+          "large_total": 22
+        },
+        "boundary": {
+          "boundary_iou": [
+            0.3475714957912898,
+            0.3243365330321852,
+            0.24032678996936344,
+            0.19383851021777368,
+            0.2590897786620244,
+            0.08181556551412243,
+            0.3145828673674793,
+            0.10135869565217391,
+            0.28958343555272065
+          ],
+          "hd95_px": [
+            145.52439657086492,
+            127.85460027173589,
+            68.17034412742585,
+            200.6979329330216,
+            51.095975934643036,
+            110.22862281745181,
+            38.99481019439492,
+            98.84331034521254,
+            163.0532118754448
+          ],
+          "hd95_undefined_images": 0
+        },
+        "confusion": {
+          "tp": 77334,
+          "fp": 94283,
+          "fn": 96906,
+          "tn": 1758997
+        }
+      },
+      "validation_threshold_free": {
+        "AuPRC": 0.45267510924979776,
+        "AuPRC chance": 0.09070194128787878,
+        "AUROC": 0.9107240902725723,
+        "AUROC chance": 0.5,
+        "FPR95": 0.3608975819312006,
+        "AUPRO": 0.7074968118404714,
+        "AUPRO chance": 0.15
+      }
+    },
+    "C_unet_resnet50": {
+      "title": "C: U-Net with ImageNet ResNet50 encoder",
+      "binome": "C",
+      "model_type": "segmentation",
+      "config": {
+        "format_version": 1,
+        "model_file": "model.keras",
+        "name": "C_unet_resnet50",
+        "binome": "C",
+        "title": "U-Net with ImageNet ResNet50 encoder",
+        "model_type": "segmentation",
+        "input": {
+          "image_size": [
+            352,
+            640
+          ],
+          "channels": "RGB",
+          "range": [
+            0,
+            1
+          ]
+        },
+        "postprocessing": {
+          "sigma": 0,
+          "per_image_z_score": false,
+          "threshold": 0.5634523971796033,
+          "min_blob_px": 4,
+          "tta_flip": true
+        },
+        "selection": {
+          "split": "val",
+          "checkpoint_rule": "best validation IoU at threshold 0.5",
+          "threshold_rule": "best per-image mean F1 over 51 quantiles (0.01-0.99)"
+        },
+        "validation": {
+          "AuPRC": 0.7279429327320449,
+          "AuPRC chance": 0.09070194128787878,
+          "AUROC": 0.9147451819439518,
+          "AUROC chance": 0.5,
+          "FPR95": 0.6451503021229972,
+          "AUPRO": 0.706481535851488,
+          "AUPRO chance": 0.15,
+          "precision": 0.6748837593083289,
+          "recall": 0.7165329049089315,
+          "f1": 0.6425776252320755,
+          "iou": 0.5381990117039873,
+          "dice": 0.6425776252320755
+        },
+        "training": {
+          "seed": 1337,
+          "author": "Walid (ResNet34 in the original, ResNet50 here)",
+          "loss": "focal + focal-Tversky (0.3, 0.7, 0.75)",
+          "optimizer": "AdamW 3e-4, wd 1e-4, cosine to 1e-6, clipnorm 1.0",
+          "max_epochs": 80,
+          "epochs_ran": 46,
+          "patience": 15,
+          "batch_size": 8,
+          "best_epoch": 31,
+          "encoder": "ResNet50 ImageNet, BatchNorm frozen"
+        },
+        "environment": {
+          "python": "3.12.13",
+          "tensorflow": "2.20.0",
+          "keras": "3.15.1",
+          "device": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        }
+      },
+      "threshold_free": {
+        "AuPRC": 0.6868024703013786,
+        "AuPRC chance": 0.0859375,
+        "AUROC": 0.9248257928599102,
+        "AUROC chance": 0.5,
+        "FPR95": 0.5334568980402313,
+        "AUPRO": 0.8437642043269965,
+        "AUPRO chance": 0.15
+      },
+      "summary": {
+        "AuPRC (main)": 0.6868024703013786,
+        "AUROC": 0.9248257928599102,
+        "AUPRO@0.3": 0.8437642043269965,
+        "FPR95 (lower is better)": 0.5334568980402313,
+        "F1 = Dice (per-image mean)": 0.7084489303356132,
+        "IoU (per-image mean)": 0.569841726617941,
+        "precision (per-image mean)": 0.7313776210988661,
+        "recall (per-image mean)": 0.7775346119141819,
+        "F1 (aggregated)": 0.7087709975006435,
+        "Boundary IoU (15 px band)": 0.4460145757325725,
+        "HD95 px (lower is better)": 93.10746571455839,
+        "objects detected": "16/22",
+        "small objects detected": "0/0",
+        "false alarms / predicted blobs": "64/93"
+      },
+      "bootstrap": [
+        {
+          "metric": "pixel f1",
+          "mean": 0.7084489303356132,
+          "low": 0.593870074563663,
+          "high": 0.8068588296720526
+        },
+        {
+          "metric": "pixel iou",
+          "mean": 0.569841726617941,
+          "low": 0.44513624890015735,
+          "high": 0.6864925444423865
+        },
+        {
+          "metric": "pixel precision",
+          "mean": 0.7313776210988661,
+          "low": 0.6438234152297654,
+          "high": 0.8229860873900384
+        },
+        {
+          "metric": "pixel recall",
+          "mean": 0.7775346119141819,
+          "low": 0.5939525273442541,
+          "high": 0.9421506542336673
+        },
+        {
+          "metric": "object f1",
+          "mean": 0.4885437499472587,
+          "low": 0.2876017484789415,
+          "high": 0.6905000295351171
+        }
+      ],
+      "criteria": {
+        "SC1 F1 low bound > all-anomaly": "0.594 > 0.154: pass",
+        "SC2 object precision > 0.5": "0.31: FAIL",
+        "SC3 object recall >= 0.5": "0.73: pass",
+        "SC4 latency < 100 ms": "48 ms: pass"
+      },
+      "cost": {
+        "parameters, total (M)": 30.550753,
+        "trained parameters (M)": 30.442529,
+        "model file (MB)": 122.998646,
+        "latency (ms / image, NVIDIA GeForce RTX 4060 Laptop GPU)": 48.477373481445184,
+        "training labels needed": "pixel masks"
+      },
+      "report": {
+        "pixel": {
+          "per_image": [
+            {
+              "precision": 0.6097078726781586,
+              "recall": 0.975668449197861,
+              "f1": 0.7504498791753073,
+              "iou": 0.6005760526676724,
+              "dice": 0.7504498791753073
+            },
+            {
+              "precision": 0.5943314206225004,
+              "recall": 0.934135009565455,
+              "f1": 0.7264612114771519,
+              "iou": 0.5704272363150867,
+              "dice": 0.7264612114771519
+            },
+            {
+              "precision": 0.7061194029850746,
+              "recall": 0.972356386805056,
+              "f1": 0.8181228654187022,
+              "iou": 0.692223278952374,
+              "dice": 0.8181228654187022
+            },
+            {
+              "precision": 0.5348793684282166,
+              "recall": 0.916156670746634,
+              "f1": 0.6754254039188725,
+              "iou": 0.5099187361113364,
+              "dice": 0.6754254039188725
+            },
+            {
+              "precision": 0.6910554234497897,
+              "recall": 0.9533181932879132,
+              "f1": 0.8012725344644751,
+              "iou": 0.6684359518754424,
+              "dice": 0.8012725344644751
+            },
+            {
+              "precision": 0.7121843269981776,
+              "recall": 0.48739420935412026,
+              "f1": 0.5787274554397842,
+              "iou": 0.4071896397737422,
+              "dice": 0.5787274554397842
+            },
+            {
+              "precision": 0.931883811788687,
+              "recall": 0.9475775110113136,
+              "f1": 0.9396651393825205,
+              "iou": 0.8861965915515709,
+              "dice": 0.9396651393825205
+            },
+            {
+              "precision": 0.9787943399883698,
+              "recall": 0.5879010850835934,
+              "f1": 0.7345834363771258,
+              "iou": 0.5805072080564688,
+              "dice": 0.7345834363771258
+            },
+            {
+              "precision": 0.8234426229508197,
+              "recall": 0.2233039921756913,
+              "f1": 0.3513324473665804,
+              "iou": 0.2131008442577744,
+              "dice": 0.3513324473665804
+            }
+          ],
+          "per_image_mean": {
+            "precision": 0.7313776210988661,
+            "recall": 0.7775346119141819,
+            "f1": 0.7084489303356132,
+            "iou": 0.569841726617941,
+            "dice": 0.7084489303356132
+          },
+          "aggregated": {
+            "precision": 0.6844958380779779,
+            "recall": 0.7348312672176308,
+            "f1": 0.7087709975006435,
+            "iou": 0.5489119250951744,
+            "dice": 0.7087709975006435
+          }
+        },
+        "objects": {
+          "object_recall": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            0.5,
+            1.0,
+            0.3333333333333333,
+            0.75
+          ],
+          "object_precision": [
+            0.4,
+            0.1,
+            0.05555555555555555,
+            0.058823529411764705,
+            0.6666666666666666,
+            0.5,
+            1.0,
+            0.4,
+            0.7777777777777778
+          ],
+          "object_f1": [
+            0.5714285714285715,
+            0.18181818181818182,
+            0.10526315789473684,
+            0.1111111111111111,
+            0.8,
+            0.5,
+            1.0,
+            0.3636363636363636,
+            0.7636363636363638
+          ],
+          "gt_objects": [
+            2,
+            1,
+            1,
+            2,
+            2,
+            6,
+            1,
+            3,
+            4
+          ],
+          "detected": [
+            2,
+            1,
+            1,
+            2,
+            2,
+            3,
+            1,
+            1,
+            3
+          ],
+          "pred_objects": [
+            5,
+            10,
+            18,
+            17,
+            3,
+            20,
+            1,
+            10,
+            9
+          ],
+          "false_alarms": [
+            3,
+            9,
+            17,
+            16,
+            1,
+            10,
+            0,
+            6,
+            2
+          ]
+        },
+        "sizes": {
+          "small_detected": 0,
+          "small_total": 0,
+          "large_detected": 16,
+          "large_total": 22
+        },
+        "boundary": {
+          "boundary_iou": [
+            0.4460117031105636,
+            0.5423898531375166,
+            0.5261998715242727,
+            0.3617764711552364,
+            0.5253308381232455,
+            0.4071896397737422,
+            0.687920298879203,
+            0.2698319512732076,
+            0.24748055461616503
+          ],
+          "hd95_px": [
+            82.80095429010429,
+            115.65385855697474,
+            226.18022969372248,
+            153.68799562750502,
+            15.524174696260024,
+            93.11256317971106,
+            10.0,
+            90.01722025082015,
+            50.99019513592785
+          ],
+          "hd95_undefined_images": 0
+        },
+        "confusion": {
+          "tp": 128037,
+          "fp": 59016,
+          "fn": 46203,
+          "tn": 1794264
+        }
+      },
+      "validation_threshold_free": {
+        "AuPRC": 0.727690068368474,
+        "AuPRC chance": 0.09070194128787878,
+        "AUROC": 0.9146273223358902,
+        "AUROC chance": 0.5,
+        "FPR95": 0.6454307286751065,
+        "AUPRO": 0.7064798502863959,
+        "AUPRO chance": 0.15
+      }
+    }
+  },
+  "paired_differences": [
+    {
+      "A - B": "A_deeplabv3plus - B_feature_ae",
+      "metric": "per-image f1",
+      "mean difference": 0.11535949095050421,
+      "95% low": -0.030406408336158087,
+      "95% high": 0.2561083317853527,
+      "established": "no"
+    },
+    {
+      "A - B": "A_deeplabv3plus - B_feature_ae",
+      "metric": "per-image iou",
+      "mean difference": 0.13906261236099202,
+      "95% low": -0.014521893455488849,
+      "95% high": 0.291793443995787,
+      "established": "no"
+    },
+    {
+      "A - B": "A_deeplabv3plus - B_pixel_ae",
+      "metric": "per-image f1",
+      "mean difference": 0.49111388585672827,
+      "95% low": 0.2669449285830474,
+      "95% high": 0.6994509761746942,
+      "established": "yes"
+    },
+    {
+      "A - B": "A_deeplabv3plus - B_pixel_ae",
+      "metric": "per-image iou",
+      "mean difference": 0.45346475142647524,
+      "95% low": 0.2506776253909735,
+      "95% high": 0.6377174900365891,
+      "established": "yes"
+    },
+    {
+      "A - B": "A_deeplabv3plus - C_cnn",
+      "metric": "per-image f1",
+      "mean difference": 0.39880789577679426,
+      "95% low": 0.22882245358047015,
+      "95% high": 0.5393161597734212,
+      "established": "yes"
+    },
+    {
+      "A - B": "A_deeplabv3plus - C_cnn",
+      "metric": "per-image iou",
+      "mean difference": 0.3966461559472675,
+      "95% low": 0.23592926011520501,
+      "95% high": 0.5328131350432462,
+      "established": "yes"
+    },
+    {
+      "A - B": "A_deeplabv3plus - C_unet",
+      "metric": "per-image f1",
+      "mean difference": 0.2914977543557537,
+      "95% low": 0.17982646923420784,
+      "95% high": 0.402918413119311,
+      "established": "yes"
+    },
+    {
+      "A - B": "A_deeplabv3plus - C_unet",
+      "metric": "per-image iou",
+      "mean difference": 0.3150176937515935,
+      "95% low": 0.19399312939287758,
+      "95% high": 0.43352489487169793,
+      "established": "yes"
+    },
+    {
+      "A - B": "A_deeplabv3plus - C_unet_resnet50",
+      "metric": "per-image f1",
+      "mean difference": 0.03029834326539893,
+      "95% low": -0.010146299489045971,
+      "95% high": 0.08099748654141939,
+      "established": "no"
+    },
+    {
+      "A - B": "A_deeplabv3plus - C_unet_resnet50",
+      "metric": "per-image iou",
+      "mean difference": 0.04308110598508522,
+      "95% low": -0.014564139289758091,
+      "95% high": 0.11707839609304142,
+      "established": "no"
+    },
+    {
+      "A - B": "B_feature_ae - B_pixel_ae",
+      "metric": "per-image f1",
+      "mean difference": 0.3757543949062241,
+      "95% low": 0.2064422472168007,
+      "95% high": 0.5789439281317713,
+      "established": "yes"
+    },
+    {
+      "A - B": "B_feature_ae - B_pixel_ae",
+      "metric": "per-image iou",
+      "mean difference": 0.3144021390654832,
+      "95% low": 0.17056138633767906,
+      "95% high": 0.4844698448947683,
+      "established": "yes"
+    },
+    {
+      "A - B": "B_feature_ae - C_cnn",
+      "metric": "per-image f1",
+      "mean difference": 0.2834484048262901,
+      "95% low": 0.17869813933485132,
+      "95% high": 0.3878917466428844,
+      "established": "yes"
+    },
+    {
+      "A - B": "B_feature_ae - C_cnn",
+      "metric": "per-image iou",
+      "mean difference": 0.25758354358627544,
+      "95% low": 0.15853623211614964,
+      "95% high": 0.3581834610205694,
+      "established": "yes"
+    },
+    {
+      "A - B": "B_feature_ae - C_unet",
+      "metric": "per-image f1",
+      "mean difference": 0.17613826340524946,
+      "95% low": 0.10111594782828812,
+      "95% high": 0.23598068841666994,
+      "established": "yes"
+    },
+    {
+      "A - B": "B_feature_ae - C_unet",
+      "metric": "per-image iou",
+      "mean difference": 0.17595508139060143,
+      "95% low": 0.09921202680543095,
+      "95% high": 0.24092579384463905,
+      "established": "yes"
+    },
+    {
+      "A - B": "B_feature_ae - C_unet_resnet50",
+      "metric": "per-image f1",
+      "mean difference": -0.08506114768510527,
+      "95% low": -0.19851108962936226,
+      "95% high": 0.051152056011119926,
+      "established": "no"
+    },
+    {
+      "A - B": "B_feature_ae - C_unet_resnet50",
+      "metric": "per-image iou",
+      "mean difference": -0.0959815063759068,
+      "95% low": -0.20585635299596963,
+      "95% high": 0.03476095611997573,
+      "established": "no"
+    },
+    {
+      "A - B": "B_pixel_ae - C_cnn",
+      "metric": "per-image f1",
+      "mean difference": -0.09230599007993404,
+      "95% low": -0.2727189336776389,
+      "95% high": 0.09915661158797187,
+      "established": "no"
+    },
+    {
+      "A - B": "B_pixel_ae - C_cnn",
+      "metric": "per-image iou",
+      "mean difference": -0.05681859547920772,
+      "95% low": -0.18164411649527334,
+      "95% high": 0.07892855035823644,
+      "established": "no"
+    },
+    {
+      "A - B": "B_pixel_ae - C_unet",
+      "metric": "per-image f1",
+      "mean difference": -0.1996161315009746,
+      "95% low": -0.4009062358719869,
+      "95% high": -0.009302146530212682,
+      "established": "yes"
+    },
+    {
+      "A - B": "B_pixel_ae - C_unet",
+      "metric": "per-image iou",
+      "mean difference": -0.13844705767488175,
+      "95% low": -0.2866964121650552,
+      "95% high": 0.0027937018306483704,
+      "established": "no"
+    },
+    {
+      "A - B": "B_pixel_ae - C_unet_resnet50",
+      "metric": "per-image f1",
+      "mean difference": -0.4608155425913294,
+      "95% low": -0.6688649546639156,
+      "95% high": -0.23035900824558966,
+      "established": "yes"
+    },
+    {
+      "A - B": "B_pixel_ae - C_unet_resnet50",
+      "metric": "per-image iou",
+      "mean difference": -0.41038364544139,
+      "95% low": -0.5942034669053907,
+      "95% high": -0.21413778799090355,
+      "established": "yes"
+    },
+    {
+      "A - B": "C_cnn - C_unet",
+      "metric": "per-image f1",
+      "mean difference": -0.10731014142104056,
+      "95% low": -0.1940623337569206,
+      "95% high": -0.01580028790484084,
+      "established": "yes"
+    },
+    {
+      "A - B": "C_cnn - C_unet",
+      "metric": "per-image iou",
+      "mean difference": -0.08162846219567402,
+      "95% low": -0.15058999985264415,
+      "95% high": -0.010576689430361686,
+      "established": "yes"
+    },
+    {
+      "A - B": "C_cnn - C_unet_resnet50",
+      "metric": "per-image f1",
+      "mean difference": -0.36850955251139533,
+      "95% low": -0.5081701069482307,
+      "95% high": -0.20138506386628746,
+      "established": "yes"
+    },
+    {
+      "A - B": "C_cnn - C_unet_resnet50",
+      "metric": "per-image iou",
+      "mean difference": -0.3535650499621823,
+      "95% low": -0.48387896311341516,
+      "95% high": -0.2003089764868771,
+      "established": "yes"
+    },
+    {
+      "A - B": "C_unet - C_unet_resnet50",
+      "metric": "per-image f1",
+      "mean difference": -0.2611994110903548,
+      "95% low": -0.34734527278504695,
+      "95% high": -0.1568737318485087,
+      "established": "yes"
+    },
+    {
+      "A - B": "C_unet - C_unet_resnet50",
+      "metric": "per-image iou",
+      "mean difference": -0.27193658776650825,
+      "95% low": -0.3582004246962682,
+      "95% high": -0.16981929410788604,
+      "established": "yes"
+    }
+  ]
+}

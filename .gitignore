@@ -11,13 +11,40 @@ build/
 # Jupyter
 .ipynb_checkpoints/
 
+# Data: only data/raw/ is tracked; caches and derived arrays are rebuilt by the notebooks
+data/interim/*
+data/processed/*
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+
 # Training artefacts (too large for git; share via release/drive)
-models/
-checkpoints/
+/models/
+/checkpoints/
 *.keras
 *.h5
 logs/
 outputs/
+
+# Deployment (landing page build)
+deployment/landing/node_modules/
+deployment/landing/dist/
+deployment/landing/.astro/
+deployment/landing/src/data/results.json
+deployment/landing/public/figures/
+deployment/landing/public/demo/
+
+# Design-skill working files (screenshots, direction sheet)
+.taste-skill/
+
+# Vendored agent skills (re-installed from skills-lock.json)
+.agents/
+.claude/
+
+# Video outputs (scripts/infer_video.py)
+reports/video/
+
+# Tests
+.pytest_cache/
 
 # OS / editors
 .DS_Store

@@ -1,0 +1,116 @@
+# Project tasks: `mise tasks` lists them, `mise run <task>` runs one.
+# mise only provides Python / Node and these shortcuts; Python packages are installed with pip
+# (team rule), inside .venv. Without mise, every task is a plain shell command you can copy.
+
+[tools]
+python = "3.12"
+node = "22"          # only for the Astro landing page (deployment/landing)
+
+[env]
+_.python.venv = { path = ".venv", create = false }
+TF_CPP_MIN_LOG_LEVEL = "3"
+
+# ---------------------------------------------------------------- setup
+[tasks.setup]
+description = "Create .venv, install pinned requirements + the roadanomaly package, register the Jupyter kernel"
+run = [
+  "python -m venv .venv",
+  ".venv/bin/pip install -r requirements.txt",
+  ".venv/bin/pip install -e .",
+  ".venv/bin/python -m ipykernel install --user --name roadanomaly --display-name 'Python (roadanomaly)'",
+]
+
+[tasks."setup:deploy"]
+description = "Install the API / Streamlit dependencies (deployment/requirements.txt) and the landing page"
+run = [".venv/bin/pip install -r deployment/requirements.txt", "npm --prefix deployment/landing install"]
+
+[tasks.gpu]
+description = "Show the GPU TensorFlow sees and check a model configuration fits 6 GB (e.g. mise run gpu deeplab 352 640 4)"
+run = [
+  "python -c \"import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))\"",
+  "python scripts/gpu_memory_check.py {{arg(name='model', default='deeplab')}} {{arg(name='height', default='352')}} {{arg(name='width', default='640')}} {{arg(name='batch', default='4')}}",
+]
+
+# ---------------------------------------------------------------- quality
+[tasks.test]
+description = "Run the whole test suite (includes the split regeneration, about 20 s)"
+run = "python -m pytest -q"
+
+[tasks."test:fast"]
+description = "Run the tests except the slow split regeneration"
+run = "python -m pytest -q -m 'not slow'"
+
+[tasks.check]
+description = "Repository hygiene: no absolute / Windows paths in tracked notebooks and code"
+run = "! git grep -nIE 'C:\\\\\\\\Users|/home/[a-z]+/|Downloads' -- ':!archive' ':!mise.toml'"
+
+# ---------------------------------------------------------------- CRISP-DM notebooks
+[tasks.lab]
+description = "Open JupyterLab on the notebooks folder"
+run = "jupyter lab notebooks"
+
+[tasks.notebook]
+description = "Execute one notebook in place, e.g. mise run notebook notebooks/2_Data_Understanding.ipynb"
+run = "jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=roadanomaly {{arg(name='path')}}"
+
+[tasks.pipeline]
+description = "Run the CRISP-DM pipeline end to end: data -> modeling (A, B, C) -> evaluation -> XAI"
+run = """
+set -e
+for nb in notebooks/2_Data_Understanding.ipynb notebooks/3_Data_Preparation.ipynb \
+          notebooks/4_Modeling/*.ipynb notebooks/5_Evaluation.ipynb notebooks/6_XAI.ipynb; do
+  echo "=== $nb"
+  jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 \
+    --ExecutePreprocessor.kernel_name=roadanomaly "$nb"
+done
+"""
+
+[tasks.models]
+description = "List the trained models available in models/ (shared format)"
+run = "python -c \"from roadanomaly import data_pipeline as dp; from roadanomaly.inference import available_models; print(available_models(dp.MODELS_DIR))\""
+
+[tasks.evaluate]
+description = "Evaluate one saved model on a split (val by default), e.g. mise run evaluate B_feature_ae val"
+run = "python scripts/evaluate.py --model {{arg(name='model')}} --split {{arg(name='split', default='val')}}"
+
+# ---------------------------------------------------------------- deployment
+[tasks.api]
+description = "FastAPI inference server on http://localhost:8000 (docs at /docs)"
+run = "uvicorn deployment.api.main:app --reload --port 8000"
+
+[tasks.app]
+description = "Streamlit demo on http://localhost:8501"
+run = "streamlit run deployment/app/streamlit_app.py"
+
+[tasks."landing:data"]
+description = "Export the real data the landing page shows (score maps, photos, credits) after the notebooks ran"
+run = "python deployment/landing/scripts/export_demo.py"
+
+[tasks.landing]
+description = "Astro landing page in dev mode on http://localhost:4321"
+run = "npm --prefix deployment/landing run dev"
+
+[tasks."landing:build"]
+description = "Build the static landing page into deployment/landing/dist (run landing:data first)"
+run = "npm --prefix deployment/landing run build"
+
+[tasks."landing:preview"]
+description = "Serve the built landing page on http://localhost:4329"
+run = "npm --prefix deployment/landing run preview -- --port 4329"
+
+[tasks."docker:build"]
+description = "Build the API + Streamlit images"
+run = "docker compose -f deployment/docker-compose.yml build"
+
+[tasks."docker:up"]
+description = "Start the API (8000) and the demo (8501) in Docker; models/ is mounted read-only"
+run = "docker compose -f deployment/docker-compose.yml up"
+
+# ---------------------------------------------------------------- housekeeping
+[tasks.clean]
+description = "Remove caches (data/interim, __pycache__, .pytest_cache); never touches data/raw or models/"
+run = [
+  "find data/interim -mindepth 1 ! -name .gitkeep -delete",
+  "find . -name __pycache__ -type d -not -path './.venv/*' -prune -exec rm -rf {} +",
+  "rm -rf .pytest_cache",
+]
