@@ -108,6 +108,16 @@ The modeling notebooks download ImageNet weights once into `~/.keras/models` (Re
 
 **No GPU?** Nothing breaks: `setup_gpu()` prints "No GPU found: running on CPU" and the code runs on the CPU (on Windows, TensorFlow has no GPU support: use WSL2). Training is then much slower (DeepLabV3+ and the U-Net ResNet50 are the slowest), so train one binôme at a time (`train:a`, `train:b`, `train:c`) or copy the models. Scores can differ in the last digits across hardware, and the latency figures (RTX 4060) will be higher; the demo and the API in Docker already use CPU TensorFlow.
 
+> **Tip: no graphics card, or not an NVIDIA RTX?** The code does not need one.
+> - **Only want to see the results or run the demo?** No training needed: `mise run docker:up` (CPU) with a copy of the `models/` folder from a teammate, or just open the landing page.
+> - **Need to train?** Pick the cheapest option that works for you:
+>   1. **CPU:** `mise run train:a`, `train:b` or `train:c` one at a time (slow, but it works; leave the machine plugged in).
+>   2. **A free cloud GPU** (Google Colab or Kaggle notebooks give an NVIDIA GPU): clone the repo there, `pip install -r requirements.txt && pip install -e .`, run a modeling notebook, then download the `models/<name>/` folder it produced. We have not tested this route ourselves.
+>   3. **Windows:** TensorFlow 2.20 only uses an NVIDIA GPU under WSL2; on native Windows it runs on the CPU.
+> - **AMD or Apple GPU:** the pinned TensorFlow 2.20 build here targets NVIDIA CUDA, so these cards are not used and the code falls back to the CPU. (Vendor plug-ins exist, `tensorflow-rocm` and `tensorflow-metal`, but they need other TensorFlow versions and we have not tried them.)
+> - **A smaller NVIDIA card (under 6 GB)?** If training runs out of memory, lower the batch size in the modeling notebook (`BATCH_SIZE` in notebook 4A, `PIXEL_BATCH_SIZE` in 4B, the `batch_size` argument of `train(...)` in 4C); the results then differ a little from the reported ones.
+> - Whatever you use, `mise run gpu` shows what TensorFlow can see.
+
 ### GPU notes (RTX 4060 8 GB and RTX 2060 6 GB)
 - **TensorFlow is pinned to 2.20.0.** The 2.21.0 wheel cannot find `libcusolver` and silently runs on CPU. On Windows, TensorFlow runs on CPU (use WSL2 for the GPU).
 - The **RTX 2060 (6 GB) is the reference budget.** At `IMG_SIZE = (352, 640)` a U-Net fits batch 8 and DeepLabV3+ batch ≤ 4 (`python scripts/gpu_memory_check.py deeplab 352 640 4`). The trained models used batch 2 (A), 4 (C CNN and U-Net) and 8 (C U-Net ResNet50, 4.6 GB peak).
