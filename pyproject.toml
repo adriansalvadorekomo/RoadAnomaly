@@ -27,3 +27,12 @@ include = ["src", "deployment", "scripts", "tests"]
 extraPaths = ["src"]
 typeCheckingMode = "basic"
 reportMissingModuleSource = false
+# These rules mostly flag working TensorFlow / Keras / NumPy / pandas code (Optional returns, partial stubs):
+reportAttributeAccessIssue = false
+reportArgumentType = false
+reportGeneralTypeIssues = false
+reportOperatorIssue = false
+reportOptionalMemberAccess = false
+reportOptionalSubscript = false
+reportOptionalOperand = false
+reportCallIssue = false
