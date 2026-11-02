@@ -92,7 +92,7 @@ With [mise](https://mise.jdx.dev) the same is `mise run setup`. Main tasks (`mis
 |---|---|
 | `mise run setup` / `setup:deploy` | create `.venv`, install the pinned packages, register the kernel / install the API, demo and landing dependencies |
 | `mise run test` (`test:fast`) | run the test suite (without the 20 s split regeneration) |
-| `mise run train` (`train:a` / `train:b` / `train:c`) | train the six models (notebooks 4A, 4B, 4C) and save them in `models/`; needs the data split of the repo only, much faster with a GPU (see *No GPU?* below) |
+| `mise run train` (`train:a` / `train:b` / `train:c`) | train the six models (notebooks 4A, 4B, 4C) and save them in `models/`; needs the data split of the repo only, about 20 minutes on a laptop RTX 4060 (see *Training time* below) |
 | `mise run pipeline` | execute notebooks 2 → 6 in order (trains the models, evaluates, explains) |
 | `mise run notebook <path>` | execute one notebook in place |
 | `mise run models` / `evaluate <model> [split]` | list the trained models / evaluate one from the command line |
@@ -106,7 +106,18 @@ The modeling notebooks download ImageNet weights once into `~/.keras/models` (Re
 ### Get the trained models, then explain and serve them
 `models/` is git-ignored, so a fresh clone has no trained model. Either run `mise run train`, or copy the `models/` folder from a teammate. `mise run models` lists what is there; with the models in place, `mise run notebook notebooks/5_Evaluation.ipynb`, `mise run api`, `mise run app` and `mise run docker:up` all work.
 
-**No GPU?** Nothing breaks: `setup_gpu()` prints "No GPU found: running on CPU" and the code runs on the CPU (on Windows, TensorFlow has no GPU support: use WSL2). Training is then much slower (DeepLabV3+ and the U-Net ResNet50 are the slowest), so train one binôme at a time (`train:a`, `train:b`, `train:c`) or copy the models. Scores can differ in the last digits across hardware, and the latency figures (RTX 4060) will be higher; the demo and the API in Docker already use CPU TensorFlow.
+**Training time** (measured from the notebooks' own cell timestamps, RTX 4060 Laptop GPU, TensorFlow 2.20, without the one-off ImageNet download of about 250 MB):
+
+| Task | Notebook | Time | Where it goes |
+|---|---|---|---|
+| `train:a` | 4A DeepLabV3+ | about 35 s | training, 16 epochs: 25 s |
+| `train:b` | 4B autoencoders | about 12.4 min | pixel AE, four loss variants: 7.7 min; VGG depth study: 3.5 min; ablation: 35 s |
+| `train:c` | 4C CNN and U-Nets | about 6.5 min | CNN (80 epochs): 2.0 min; U-Net (50 epochs): 1.7 min; U-Net ResNet50 (46 epochs + flip check): 2.6 min |
+| `train` | all three | **about 20 min** | |
+
+Other hardware (CPU, RTX 2060, Colab) has not been measured.
+
+**No GPU?** Nothing breaks: `setup_gpu()` prints "No GPU found: running on CPU" and the code runs on the CPU (on Windows, TensorFlow has no GPU support: use WSL2). Training is then slower (not measured here), so train one binôme at a time (`train:a`, `train:b`, `train:c`) or copy the models. Scores can differ in the last digits across hardware, and the latency figures (RTX 4060) will be higher; the demo and the API in Docker already use CPU TensorFlow.
 
 > **Tip: no graphics card, or not an NVIDIA RTX?** The code does not need one.
 > - **Only want to see the results or run the demo?** No training needed: `mise run docker:up` (CPU) with a copy of the `models/` folder from a teammate, or just open the landing page.
