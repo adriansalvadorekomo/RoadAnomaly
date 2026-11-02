@@ -1,6 +1,8 @@
 # docker compose -f deployment/docker-compose.yml up --build
-#   API  -> http://localhost:8000/docs
-#   Demo -> http://localhost:8501
+#   API  -> http://localhost:8000/docs   (another port: API_PORT=18000 docker compose ... up)
+#   Demo -> http://localhost:8501        (another port: DEMO_PORT=18501)
+#   Landing -> http://localhost:4321     (another port: LANDING_PORT=4329)
+#   The landing needs its data once:  mise run landing:data
 # The trained models come from ../models (produced by the modeling notebooks), mounted read-only.
 name: roadanomaly
 
@@ -16,7 +18,7 @@ x-common: &common
 services:
   api:
     <<: *common
-    ports: ["8000:8000"]
+    ports: ["${API_PORT:-8000}:8000"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
@@ -27,9 +29,17 @@ services:
     <<: *common
     command: ["streamlit", "run", "deployment/app/streamlit_app.py", "--server.address=0.0.0.0",
               "--server.port=8501", "--server.headless=true", "--browser.gatherUsageStats=false"]
-    ports: ["8501:8501"]
+    ports: ["${DEMO_PORT:-8501}:8501"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')"]
       interval: 30s
       timeout: 5s
       start_period: 60s
+
+  landing:
+    build:
+      context: ..
+      dockerfile: deployment/landing/Dockerfile
+    image: roadanomaly-landing:latest
+    ports: ["${LANDING_PORT:-4321}:80"]
+    restart: unless-stopped
