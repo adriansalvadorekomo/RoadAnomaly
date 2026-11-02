@@ -2,13 +2,15 @@
 
 ESPRIT · Deep Learning module · Group of 6 · **Final submission: 8 November 2026**
 
+**Authors:** Ines Trabelsi, Emna Trabelsi, Khaled Gannoun, Adrian Salvador Ekomo Mesi Obono, Hejer Mnejja, Walid Fehry
+
 Goal: identify and localise, **at the pixel level**, unexpected objects on the road (animals, rocks, cones, lost tyres, …) in the [RoadAnomaly](data/raw/RoadAnomaly/readme.md) dataset (Lis et al., ICCV 2019). Three approaches are trained on the same shared split, evaluated once on the same frozen test set, explained with XAI, and served through an API and a demo.
 
 | Binôme | Members | Approach | Notebook |
 |---|---|---|---|
-| A | Ines · Emna | DeepLabV3+ with transfer learning (frozen ImageNet ResNet50) | [`4_Modeling/A_DeepLabV3Plus.ipynb`](notebooks/4_Modeling/A_DeepLabV3Plus.ipynb) |
-| B | Khaled · Adrian | Convolutional autoencoders: pixel AE (baseline) and feature-space AE on frozen VGG16 (final) | [`4_Modeling/B_Autoencoder.ipynb`](notebooks/4_Modeling/B_Autoencoder.ipynb) |
-| C | Hejer · Walid | CNN baseline (Hejer), U-Net from scratch and U-Net with ImageNet ResNet50 encoder (Walid) | [`4_Modeling/C_CNN_UNet.ipynb`](notebooks/4_Modeling/C_CNN_UNet.ipynb) |
+| A | Ines Trabelsi · Emna Trabelsi | DeepLabV3+ with transfer learning (frozen ImageNet ResNet50) | [`4_Modeling/A_DeepLabV3Plus.ipynb`](notebooks/4_Modeling/A_DeepLabV3Plus.ipynb) |
+| B | Khaled Gannoun · Adrian Salvador Ekomo Mesi Obono | Convolutional autoencoders: pixel AE (baseline) and feature-space AE on frozen VGG16 (final) | [`4_Modeling/B_Autoencoder.ipynb`](notebooks/4_Modeling/B_Autoencoder.ipynb) |
+| C | Hejer Mnejja · Walid Fehry | CNN baseline (Hejer), U-Net from scratch and U-Net with ImageNet ResNet50 encoder (Walid) | [`4_Modeling/C_CNN_UNet.ipynb`](notebooks/4_Modeling/C_CNN_UNet.ipynb) |
 
 ## TL;DR
 **The problem.** A car's camera network knows a closed list of things: road, car, person, sign. Put a cow on the road and it still has to answer with one of its words, so it may call the cow "road". We want a network that says instead *"these pixels are something I did not expect"*: a mask that tells a driver-assistance system **where** the obstacle is and **how big**, without knowing **what** it is.
@@ -94,6 +96,7 @@ With [mise](https://mise.jdx.dev) the same is `mise run setup`. Main tasks (`mis
 | `mise run notebook <path>` | execute one notebook in place |
 | `mise run models` / `evaluate <model> [split]` | list the trained models / evaluate one from the command line |
 | `mise run api` / `app` / `landing` | FastAPI on :8000, Streamlit demo on :8501, landing page on :4321 |
+| `mise run landing:build` / `landing:preview` / `landing:deploy` | build the landing page, serve the build on :4329, deploy it to Vercel (`landing:deploy:preview` for a preview URL) |
 | `mise run docker:build` / `docker:up` | build and start the API + demo containers |
 | `mise run gpu` / `check` / `clean` | GPU check, repository hygiene, remove caches |
 

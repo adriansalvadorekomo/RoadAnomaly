@@ -17,8 +17,10 @@ const PUBLIC = path.join(process.cwd(), "public");
 const demoPath = path.join(PUBLIC, "demo", "demo.json");
 const demo = fs.existsSync(demoPath) ? JSON.parse(fs.readFileSync(demoPath, "utf8")) : { images: [], models: [], gallery: [], receipt: {} };
 
-const DEMO_URL = import.meta.env.PUBLIC_DEMO_URL ?? "http://localhost:8501";
-const API_URL = import.meta.env.PUBLIC_API_URL ?? "http://localhost:8000/docs";
+// The demo and the API need the trained models, so they are not hosted with this static page: by default the buttons
+// lead to the "run it yourself" section. Set PUBLIC_DEMO_URL / PUBLIC_API_URL at build time to link a running instance.
+const DEMO_URL = import.meta.env.PUBLIC_DEMO_URL ?? "#run-it-yourself";
+const API_URL = import.meta.env.PUBLIC_API_URL ?? "#run-it-yourself";
 const REPO_URL = "https://github.com/adriansalvadorekomo/RoadAnomaly-CRISPDM";
 
 // ---- the single test evaluation, one report per model
@@ -96,12 +98,12 @@ const [gapMantissa, gapExponent] = Number(xaiSummary.efficiency_gap_max ?? 0).to
 const contents = [
   ["abstract", "Abstract"], ["introduction", "Introduction"], ["method", "Three approaches"], ["protocol", "Protocol"],
   ["results", "Results"], ["explanations", "Explanations"], ["limitations", "Limitations"], ["conclusion", "Conclusion"],
-  ["references", "References"],
+  ["run-it-yourself", "Run it"], ["references", "References"],
 ];
 const bibtex = `@techreport{roadanomaly2026,
   title       = {Road obstacles, pixel by pixel: three deep learning
                  approaches to road anomaly segmentation},
-  author      = {Ines and Emna and Khaled and Adrian and Hejer and Walid},
+  author      = {Trabelsi, Ines and Trabelsi, Emna and Gannoun, Khaled and Salvador Ekomo Mesi Obono, Adrian and Mnejja, Hejer and Fehry, Walid},
   institution = {ESPRIT, Deep Learning module},
   year        = {2026},
   month       = nov,
@@ -155,7 +157,7 @@ const bibtex = `@techreport{roadanomaly2026,
           </h1>
           <p class="hero__lead serif" data-load style="--d:420ms">Three deep learning approaches to finding what a road camera was never trained to see, compared under one honest protocol. Move the threshold in Figure 1 and watch a real model change its mind.</p>
           <dl class="byline" data-load style="--d:460ms">
-            <div><dt>Authors</dt><dd>Ines, Emna, Khaled, Adrian, Hejer and Walid</dd></div>
+            <div><dt>Authors</dt><dd>Ines Trabelsi, Emna Trabelsi, Khaled Gannoun, Adrian Salvador Ekomo Mesi Obono, Hejer Mnejja and Walid Fehry</dd></div>
             <div><dt>Affiliation</dt><dd>ESPRIT, Deep Learning module</dd></div>
             <div><dt>Published</dt><dd><time datetime="2026-11">November 2026</time></dd></div>
             <div><dt>Material</dt><dd><a class="text-link" href={REPO_URL}>code</a>, <a class="text-link" href={API_URL}>API</a>, <a class="text-link" href="#references">data</a></dd></div>
@@ -449,7 +451,7 @@ const bibtex = `@techreport{roadanomaly2026,
           <p class="serif" data-reveal>RoadAnomaly made the worry concrete. Sixty photographs, each with something on the road that a closed list of classes would miss. Too few to train a giant model, enough to compare three ideas carefully.</p>
           <p class="serif" data-reveal>The most useful result was a humbling one. <mark>For the autoencoders, a simple Gaussian on pretrained features did about as well as our own networks</mark>: most of the work was done by ImageNet, and we say so.</p>
           <p class="serif" data-reveal>Nothing here is a safety system. It is a careful comparison, and every number on this page can be traced to a notebook you can run yourself.</p>
-          <p class="letter__sign" data-reveal>Ines, Emna, Khaled, Adrian, Hejer and Walid</p>
+          <p class="letter__sign" data-reveal>Ines Trabelsi, Emna Trabelsi, Khaled Gannoun, Adrian Salvador Ekomo Mesi Obono, Hejer Mnejja and Walid Fehry</p>
         </div>
       </section>
 
@@ -461,6 +463,18 @@ const bibtex = `@techreport{roadanomaly2026,
           <a class="button" href={DEMO_URL}>Open the demo</a>
           <a class="text-link" href={API_URL}>API documentation</a>
           <a class="text-link" href={REPO_URL}>Source code</a>
+        </div>
+      </section>
+
+      <!-- RUN IT YOURSELF -->
+      <section class="prose wrap section" id="run-it-yourself" data-section="Run it" aria-labelledby="run-title">
+        <h2 id="run-title" class="prose__title" data-reveal>Run it yourself</h2>
+        <div class="prose__body">
+          <p class="serif" data-reveal>The demo and the API run the trained models, so they live on your machine rather than on this page. With <a class="text-link" href="https://docs.docker.com/get-docker/">Docker</a>, three commands start all three services:</p>
+          <pre class="bibtex" data-reveal><code>git clone {REPO_URL}.git && cd RoadAnomaly-CRISPDM
+# train the models once (notebooks 4A, 4B, 4C), then:
+mise run landing:data && mise run docker:up</code></pre>
+          <p class="serif" data-reveal>The <strong>demo</strong> opens on port 8501 (upload a photograph, see what each model flags and why), the <strong>API</strong> on port 8000 (interactive documentation at <code>/docs</code>) and this <strong>page</strong> on port 4321. The full setup, with GPU notes, is in the <a class="text-link" href={REPO_URL + "#setup-pip-only"}>README</a>.</p>
         </div>
       </section>
 
