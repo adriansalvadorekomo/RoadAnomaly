@@ -38,20 +38,27 @@ document.querySelectorAll("[data-section]").forEach((section) => {
   });
 });
 
-// Back above the abstract: the title returns, the rail hides
+// Back above the abstract: the title returns, the rail hides. The state is applied on load and on every
+// refresh too, so a visitor who arrives mid-page (anchor link, reload) gets the rail straight away.
+let railShown = null;
+function showRail(show, animate = true) {
+  if (!rail || railShown === show) return;
+  railShown = show;
+  const duration = animate && !still.matches ? 0.3 : 0;
+  if (show) {
+    rail.classList.add("is-shown");
+    gsap.fromTo(rail, { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration, ease: "power2.out" });
+  } else {
+    gsap.to(rail, { autoAlpha: 0, x: -12, duration, ease: "power2.in", onComplete: () => rail.classList.remove("is-shown") });
+  }
+}
 ScrollTrigger.create({
-  trigger: ".hero", start: "top top", end: "bottom 40%",
+  trigger: ".hero", start: "top bottom", end: "bottom 40%",
   onToggle: ({ isActive }) => {
     if (isActive) { setHead(title); setCurrent(null); }
-    if (!rail) return;
-    const duration = still.matches ? 0 : 0.3;
-    if (isActive) {
-      gsap.to(rail, { autoAlpha: 0, x: -12, duration, ease: "power2.in", onComplete: () => rail.classList.remove("is-shown") });
-    } else {
-      rail.classList.add("is-shown");
-      gsap.fromTo(rail, { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration, ease: "power2.out" });
-    }
+    showRail(!isActive);
   },
+  onRefresh: (self) => showRail(!self.isActive, false),
 });
 
 // Reading progress: a filled bar scrubbed by the scroll

@@ -38,11 +38,24 @@ def model_names():
     return available_models(dp.MODELS_DIR)
 
 
+# The model recommended by notebook 5 for the demo: the most accurate on the test split and among the fastest
+RECOMMENDED_MODEL = "A_deeplabv3plus"
+
+
+def default_model():
+    """The recommended model when it is available, otherwise the first one (API and video defaults)."""
+    names = model_names()
+    return RECOMMENDED_MODEL if RECOMMENDED_MODEL in names else (names[0] if names else None)
+
+
 @lru_cache(maxsize=None)
 def get_predictor(name):
     if name not in model_names():
         raise KeyError(f"unknown model {name!r}; available: {model_names()}")
-    return Predictor(dp.MODELS_DIR / name)
+    predictor = Predictor(dp.MODELS_DIR / name)
+    # one warm-up call traces and compiles the graph, so the latency reported per request is the steady state
+    predictor.predict(np.zeros((1, *predictor.image_size, 3), dtype=np.float32))
+    return predictor
 
 
 def model_info(name):
@@ -83,24 +96,25 @@ def analyse(name, image_rgb):
                       "latency_ms": float(elapsed), "image_size": list(predictor.image_size)}}
 
 
-def explain(name, image_rgb):
-    """Grad-CAM heatmap (H, W) in [0, 1] of the predicted region (or the top 1 % scores if empty)."""
+def explain(name, image_rgb, method="gradcam++"):
+    """The paired explanation of one model on one image: WHERE (Grad-CAM family) and WHAT (exact factor SHAP).
+
+    Same code as notebook 6 (roadanomaly.xai.explain). Returns (analysis of analyse(), explanation dict).
+    """
     predictor = get_predictor(name)
     result = analyse(name, image_rgb)
-    region = result["mask"] if result["mask"].any() else result["scores"] >= np.quantile(result["scores"], 0.99)
-    if predictor.model_type == "segmentation":
-        layer = predictor.config.get("xai", {}).get("layer") or xai.default_segmentation_layer(predictor.model)
-        cam, _ = xai.grad_cam(predictor.model, result["image"], layer, xai.logit_target(region),
-                              output_name="anomaly_logits")
-    elif predictor.model_type == "pixel_autoencoder":
-        cam, _ = xai.grad_cam(predictor.model, result["image"], "code", xai.reconstruction_target(region))
-    else:
-        features = predictor.features(result["image"][None])[0]
-        cells = tf.image.resize(region.astype("float32")[..., None], features.shape[:2], method="area").numpy()[..., 0]
-        cells = cells >= 0.5 if (cells >= 0.5).any() else cells > 0
-        cam, _ = xai.grad_cam(predictor.model, features, "code", xai.reconstruction_target(cells),
-                              size=predictor.image_size)
-    return result, cam
+    explanation = xai.explain(predictor, result["image"], method=method)
+    explanation["sentence"] = xai.describe_what(explanation["what"], service_title(name))
+    return result, explanation
+
+
+def service_title(name):
+    """Short public name of a model, for sentences and labels."""
+    return SHORT_NAMES.get(name, name)
+
+
+SHORT_NAMES = {"A_deeplabv3plus": "DeepLabV3+", "B_feature_ae": "The feature autoencoder", "B_pixel_ae": "The pixel autoencoder",
+               "C_cnn": "The CNN baseline", "C_unet": "The U-Net", "C_unet_resnet50": "The U-Net ResNet50"}
 
 
 def overlay(image, mask, color=(255, 40, 40), alpha=0.5):

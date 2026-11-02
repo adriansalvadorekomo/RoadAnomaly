@@ -1,0 +1,255 @@
+{
+  "cases": {
+    "success": "animals04_17_animal_casualties_so_far_in_2006",
+    "failure": "obstacles08_boulder2"
+  },
+  "factors": {
+    "colour": {
+      "label": "Colour",
+      "removal": "replaced by its grey luminance"
+    },
+    "texture": {
+      "label": "Fine texture",
+      "removal": "fine detail blurred away (Gaussian, sigma 2 px)"
+    },
+    "contrast": {
+      "label": "Brightness and contrast",
+      "removal": "contrast flattened to 35 % around the image mean"
+    },
+    "object": {
+      "label": "The obstacle itself",
+      "removal": "the region (dilated 6 px) filled with a heavy blur of its surroundings"
+    },
+    "context": {
+      "label": "The surrounding scene",
+      "removal": "everything outside the region replaced by a heavy blur"
+    }
+  },
+  "shares": {
+    "A_deeplabv3plus": {
+      "colour": 0.1368,
+      "texture": 0.0503,
+      "contrast": 0.2989,
+      "object": 0.2004,
+      "context": 0.3137
+    },
+    "B_feature_ae": {
+      "colour": 0.1206,
+      "texture": 0.2356,
+      "contrast": 0.3661,
+      "object": 0.2212,
+      "context": 0.0565
+    },
+    "B_pixel_ae": {
+      "colour": 0.0721,
+      "texture": 0.1984,
+      "contrast": 0.344,
+      "object": 0.3833,
+      "context": 0.0022
+    },
+    "C_cnn": {
+      "colour": 0.181,
+      "texture": 0.0177,
+      "contrast": 0.629,
+      "object": 0.1669,
+      "context": 0.0054
+    },
+    "C_unet": {
+      "colour": 0.188,
+      "texture": 0.0526,
+      "contrast": 0.5389,
+      "object": 0.1677,
+      "context": 0.0528
+    },
+    "C_unet_resnet50": {
+      "colour": 0.1494,
+      "texture": 0.1405,
+      "contrast": 0.3868,
+      "object": 0.216,
+      "context": 0.1074
+    }
+  },
+  "positive_fraction": {
+    "A_deeplabv3plus": {
+      "colour": 1.0,
+      "texture": 0.6667,
+      "contrast": 1.0,
+      "object": 0.8889,
+      "context": 1.0
+    },
+    "B_feature_ae": {
+      "colour": 0.8889,
+      "texture": 1.0,
+      "contrast": 1.0,
+      "object": 0.8889,
+      "context": 0.6667
+    },
+    "B_pixel_ae": {
+      "colour": 1.0,
+      "texture": 1.0,
+      "contrast": 1.0,
+      "object": 1.0,
+      "context": 0.7778
+    },
+    "C_cnn": {
+      "colour": 0.8889,
+      "texture": 0.3333,
+      "contrast": 1.0,
+      "object": 1.0,
+      "context": 0.8889
+    },
+    "C_unet": {
+      "colour": 0.8889,
+      "texture": 0.3333,
+      "contrast": 1.0,
+      "object": 0.7778,
+      "context": 0.4444
+    },
+    "C_unet_resnet50": {
+      "colour": 0.6667,
+      "texture": 1.0,
+      "contrast": 1.0,
+      "object": 0.8889,
+      "context": 0.7778
+    }
+  },
+  "relies_most_on": {
+    "A_deeplabv3plus": "context",
+    "B_feature_ae": "contrast",
+    "B_pixel_ae": "object",
+    "C_cnn": "contrast",
+    "C_unet": "contrast",
+    "C_unet_resnet50": "contrast"
+  },
+  "success_case_sentences": {
+    "A_deeplabv3plus": "A_deeplabv3plus relies most on the surrounding scene, which raises its anomaly score by 2.96 (30 % of the total attribution), then on brightness and contrast (+2.70).",
+    "B_feature_ae": "B_feature_ae relies most on brightness and contrast, which raises its anomaly score by 22.7 (30 % of the total attribution), then on the obstacle itself (+19.0).",
+    "B_pixel_ae": "B_pixel_ae relies most on the obstacle itself, which raises its anomaly score by 0.00694 (39 % of the total attribution), then on brightness and contrast (+0.00616).",
+    "C_cnn": "C_cnn relies most on brightness and contrast, which raises its anomaly score by 3.43 (53 % of the total attribution), then on the obstacle itself (+1.48).",
+    "C_unet": "C_unet relies most on brightness and contrast, which raises its anomaly score by 7.09 (45 % of the total attribution), then on colour (+4.85).",
+    "C_unet_resnet50": "C_unet_resnet50 relies most on brightness and contrast, which raises its anomaly score by 4.33 (37 % of the total attribution), then on the obstacle itself (+3.26)."
+  },
+  "faithfulness": [
+    {
+      "model": "A_deeplabv3plus",
+      "map": "gradcam",
+      "deletion (map)": 4.1515,
+      "deletion (random)": 4.9459,
+      "insertion (map)": 7.0131,
+      "insertion (random)": 4.8979,
+      "beats random on deletion": true,
+      "beats random on insertion": true
+    },
+    {
+      "model": "A_deeplabv3plus",
+      "map": "gradcam++",
+      "deletion (map)": 4.711,
+      "deletion (random)": 4.9459,
+      "insertion (map)": 6.6737,
+      "insertion (random)": 4.8979,
+      "beats random on deletion": true,
+      "beats random on insertion": true
+    },
+    {
+      "model": "B_feature_ae",
+      "map": "gradcam",
+      "deletion (map)": 65.519,
+      "deletion (random)": 31.2625,
+      "insertion (map)": 12.17,
+      "insertion (random)": 30.7267,
+      "beats random on deletion": false,
+      "beats random on insertion": false
+    },
+    {
+      "model": "B_feature_ae",
+      "map": "gradcam++",
+      "deletion (map)": 29.9045,
+      "deletion (random)": 31.2625,
+      "insertion (map)": 32.1072,
+      "insertion (random)": 30.7267,
+      "beats random on deletion": true,
+      "beats random on insertion": true
+    },
+    {
+      "model": "B_pixel_ae",
+      "map": "gradcam",
+      "deletion (map)": 0.0081,
+      "deletion (random)": 0.0107,
+      "insertion (map)": 0.0122,
+      "insertion (random)": 0.0096,
+      "beats random on deletion": true,
+      "beats random on insertion": true
+    },
+    {
+      "model": "B_pixel_ae",
+      "map": "gradcam++",
+      "deletion (map)": 0.0058,
+      "deletion (random)": 0.0107,
+      "insertion (map)": 0.0144,
+      "insertion (random)": 0.0096,
+      "beats random on deletion": true,
+      "beats random on insertion": true
+    },
+    {
+      "model": "C_cnn",
+      "map": "gradcam",
+      "deletion (map)": 0.7213,
+      "deletion (random)": 1.3819,
+      "insertion (map)": 1.8828,
+      "insertion (random)": 1.2921,
+      "beats random on deletion": true,
+      "beats random on insertion": true
+    },
+    {
+      "model": "C_cnn",
+      "map": "gradcam++",
+      "deletion (map)": 0.7122,
+      "deletion (random)": 1.3819,
+      "insertion (map)": 1.8808,
+      "insertion (random)": 1.2921,
+      "beats random on deletion": true,
+      "beats random on insertion": true
+    },
+    {
+      "model": "C_unet",
+      "map": "gradcam",
+      "deletion (map)": 10.9342,
+      "deletion (random)": 10.7505,
+      "insertion (map)": 10.3361,
+      "insertion (random)": 10.5259,
+      "beats random on deletion": false,
+      "beats random on insertion": false
+    },
+    {
+      "model": "C_unet",
+      "map": "gradcam++",
+      "deletion (map)": 10.9673,
+      "deletion (random)": 10.7505,
+      "insertion (map)": 10.29,
+      "insertion (random)": 10.5259,
+      "beats random on deletion": false,
+      "beats random on insertion": false
+    },
+    {
+      "model": "C_unet_resnet50",
+      "map": "gradcam",
+      "deletion (map)": 1.0691,
+      "deletion (random)": 5.0703,
+      "insertion (map)": 9.1359,
+      "insertion (random)": 5.3278,
+      "beats random on deletion": true,
+      "beats random on insertion": true
+    },
+    {
+      "model": "C_unet_resnet50",
+      "map": "gradcam++",
+      "deletion (map)": 1.0367,
+      "deletion (random)": 5.0703,
+      "insertion (map)": 9.121,
+      "insertion (random)": 5.3278,
+      "beats random on deletion": true,
+      "beats random on insertion": true
+    }
+  ],
+  "efficiency_gap_max": 1.4210854715202004e-14
+}

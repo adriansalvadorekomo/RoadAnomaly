@@ -28,6 +28,8 @@ RUN pip install --no-deps -e . \
     && python -c "import keras; keras.applications.VGG16(include_top=False, weights='imagenet')"
 
 COPY deployment ./deployment
+# the demo's theme (palette, Albert Sans served from deployment/app/static); Streamlit reads it from the working dir
+COPY .streamlit ./.streamlit
 COPY splits ./splits
 COPY data/raw ./data/raw
 COPY reports/results ./reports/results

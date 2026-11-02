@@ -41,9 +41,18 @@ def test_predict_any_image_size(client):
     assert {"anomaly_percent", "blobs", "latency_ms"} <= set(body["stats"]) and "overlay_png" in body
 
 
-def test_explain(client):
-    response = client.post("/explain?model=seg", files={"file": ("road.png", _png(), "image/png")})
-    assert response.status_code == 200 and response.json()["heatmap_png"]
+def test_explain_returns_where_and_what(client):
+    for query, method in [("gradcampp", "gradcam++"), ("gradcam%2B%2B", "gradcam++"), ("gradcam++", "gradcam++"), ("gradcam", "gradcam")]:
+        response = client.post(f"/explain?model=seg&method={query}", files={"file": ("road.png", _png(), "image/png")})
+        assert response.status_code == 200, query
+        body = response.json()
+        assert body["where"]["method"] == method and body["where"]["heatmap_png"]
+        what = body["what"]
+        assert set(what["values"]) == {"colour", "texture", "contrast", "object", "context"}
+        assert what["evaluations"] == 32 and what["efficiency_gap"] < 1e-6
+        assert abs(sum(what["values"].values()) - (what["score_original"] - what["score_all_removed"])) < 1e-6
+        assert body["summary"]
+    assert client.post("/explain?model=seg&method=lime", files={"file": ("r.png", _png(), "image/png")}).status_code == 422
 
 
 def test_bad_inputs_are_rejected_clearly(client):

@@ -10,6 +10,23 @@ Goal: identify and localise, **at the pixel level**, unexpected objects on the r
 | B | Khaled · Adrian | Convolutional autoencoders: pixel AE (baseline) and feature-space AE on frozen VGG16 (final) | [`4_Modeling/B_Autoencoder.ipynb`](notebooks/4_Modeling/B_Autoencoder.ipynb) |
 | C | Hejer · Walid | CNN baseline (Hejer), U-Net from scratch and U-Net with ImageNet ResNet50 encoder (Walid) | [`4_Modeling/C_CNN_UNet.ipynb`](notebooks/4_Modeling/C_CNN_UNet.ipynb) |
 
+## TL;DR
+**The problem.** A car's camera network knows a closed list of things: road, car, person, sign. Put a cow on the road and it still has to answer with one of its words, so it may call the cow "road". We want a network that says instead *"these pixels are something I did not expect"*: a mask that tells a driver-assistance system **where** the obstacle is and **how big**, without knowing **what** it is.
+
+**What we did.** Six models from three ideas, trained on the same 42 photographs, chosen on the same 9 validation photographs, and judged **once** on 9 sealed test photographs (22 obstacles):
+- **A, learn the masks with borrowed eyes:** DeepLabV3+ on a frozen ResNet50 that already learned to see on ImageNet.
+- **B, learn only what a normal road looks like:** an autoencoder copies normal road; what it cannot copy is the alarm. First on pixels, then on VGG16 features.
+- **C, learn the masks from scratch, then with borrowed eyes:** a CNN, a U-Net (skip connections keep the details), and a U-Net with an ImageNet ResNet50 encoder.
+
+**What we found.**
+1. **Three-way tie at the top.** DeepLabV3+ (F1 0.739), the pretrained U-Net (0.708) and the feature autoencoder (0.623) cannot be separated on 9 photographs (their paired 95 % intervals cross zero), and each beats the other three models.
+2. **Pretrained ImageNet features are the dividing line.** The three models that see through an ImageNet network score F1 ≥ 0.62; the three that learned to see from our 42 photographs alone score ≤ 0.45. Even the autoencoder's success mostly comes from the VGG16 features: a model with no autoencoder at all, on the same features, scores about the same, and we say so.
+3. **They fail differently, and that decides the use.** The supervised models find the most obstacles (20/22 for DeepLabV3+) but sprinkle small false alarms (38 of its 67 blobs). The feature autoencoder raises fewer, surer warnings (12 of 22 right) and is the **only model that passes all four business tests**.
+4. **Every warning can be explained twice.** *Where* (Grad-CAM++, a flashlight on the image regions that raised the score; faithful for 5 of 6 models) and *what* (exact SHAP, a fair split of the score between five image factors). Brightness and contrast is the main factor for four models; DeepLabV3+ leans on the surrounding scene, the pixel autoencoder on the obstacle itself.
+5. **Fast enough for video:** 13–48 ms per photograph on a laptop RTX 4060.
+
+**Recommendation.** DeepLabV3+ by default (the API and the video script use it); the feature autoencoder where a false alarm is expensive. **Limits:** 9 test photographs (one photo moves a mean by about 11 %), no small obstacle in the test split, and RoadAnomaly is used here for both training and testing, so these are not out-of-distribution benchmark scores.
+
 ## CRISP-DM layout
 ```
 RoadAnomaly-CRISPDM/
@@ -22,7 +39,7 @@ RoadAnomaly-CRISPDM/
 │   │   ├── B_Autoencoder.ipynb
 │   │   └── C_CNN_UNet.ipynb
 │   ├── 5_Evaluation.ipynb            # the only use of the test split: all models, once
-│   └── 6_XAI.ipynb                   # Seg-Grad-CAM, error maps, deletion / insertion
+│   └── 6_XAI.ipynb                   # paired XAI: Grad-CAM++ (where) + exact SHAP (what), faithfulness
 ├── src/roadanomaly/                  # shared code (pip install -e .), imported everywhere
 │   ├── protocol.py                   #   seed, resolution, object limits, bootstrap settings
 │   ├── data_pipeline.py              #   paths, frames + masks, split manifest, tf.data loader
@@ -31,7 +48,7 @@ RoadAnomaly-CRISPDM/
 │   ├── postprocessing.py             #   score map → mask (smoothing, z-score, threshold)
 │   ├── metrics.py · evaluation.py    #   pixel / object / boundary metrics, the shared report
 │   ├── inference.py                  #   shared model format + Predictor (notebooks, API, demo)
-│   ├── xai.py                        #   Grad-CAM / Seg-Grad-CAM, deletion / insertion
+│   ├── xai.py                        #   Grad-CAM / Grad-CAM++, exact Shapley factors, deletion / insertion
 │   ├── gpu.py
 │   ├── losses.py                     #   BCE + Dice, focal, focal-Tversky
 │   └── models/                       #   deeplabv3plus · autoencoder · feature_ae · cnn · unet
@@ -84,7 +101,7 @@ The modeling notebooks download ImageNet weights once into `~/.keras/models` (Re
 
 ### GPU notes (RTX 4060 8 GB and RTX 2060 6 GB)
 - **TensorFlow is pinned to 2.20.0.** The 2.21.0 wheel cannot find `libcusolver` and silently runs on CPU. On Windows, TensorFlow runs on CPU (use WSL2 for the GPU).
-- The **RTX 2060 (6 GB) is the reference budget.** At `IMG_SIZE = (352, 640)`: U-Net trains with batch 8, DeepLabV3+ with batch ≤ 4 (`python scripts/gpu_memory_check.py deeplab 352 640 4`).
+- The **RTX 2060 (6 GB) is the reference budget.** At `IMG_SIZE = (352, 640)` a U-Net fits batch 8 and DeepLabV3+ batch ≤ 4 (`python scripts/gpu_memory_check.py deeplab 352 640 4`). The trained models used batch 2 (A), 4 (C CNN and U-Net) and 8 (C U-Net ResNet50, 4.6 GB peak).
 - Mixed precision: `setup_gpu(mixed_precision=True)` (float16, never bfloat16), and `jit_compile=False` when compiling.
 
 ## Shared protocol (notebooks 2 and 3)
@@ -94,14 +111,42 @@ The modeling notebooks download ImageNet weights once into `~/.keras/models` (Re
 - Thresholds, early stopping and model selection use the **validation split only**.
 
 ## Results (frozen test split, notebook 5)
-RESULTS_PLACEHOLDER
+Nine test photographs, 22 obstacles, evaluated once with thresholds fixed on validation (`reports/results/`, notebook 5). F1 is the per-image mean with its 95 % bootstrap interval; chance AuPRC is 0.086.
+
+| Binôme | Model | AuPRC | F1 = Dice [95 % CI] | Obstacles found | False alarms / blobs | ms / photo (RTX 4060) | Business criteria |
+|---|---|---|---|---|---|---|---|
+| A | DeepLabV3+ (frozen ResNet50) | **0.755** | **0.739** [0.62, 0.84] | 20/22 | 38/67 | 21 | 3 / 4 |
+| C | U-Net with ImageNet ResNet50 | 0.687 | 0.708 [0.59, 0.81] | 16/22 | 64/93 | 48 | 3 / 4 |
+| B | Feature-space autoencoder (VGG16) | 0.631 | 0.623 [0.51, 0.73] | 16/22 | **10/22** | 40 | **4 / 4** |
+| C | U-Net from scratch | 0.378 | 0.447 [0.35, 0.54] | 10/22 | 80/117 | 16 | 2 / 4 |
+| C | CNN baseline | 0.353 | 0.340 [0.23, 0.44] | 9/22 | 155/219 | 13 | 2 / 4 |
+| B | Pixel autoencoder (baseline) | 0.178 | 0.248 [0.12, 0.39] | 16/22 | 40/45 | 26 | 2 / 4 |
+
+The top three are not separated by the paired bootstrap (for example DeepLabV3+ − U-Net ResNet50 = +0.030 [−0.010, 0.081]); each of them is established as better than the bottom three. Only the feature autoencoder meets all four business criteria (`notebooks/1_Business_Understanding.md`, section 4). Earlier looks at the test set are disclosed in notebook 5.
+
+## Explanations (notebook 6)
+Every model is explained by two methods, always together and on the same target: its score on the region it flagged (mean anomaly logit for the segmentation models, mean reconstruction error for the autoencoders).
+
+- **Where — Grad-CAM++** (Grad-CAM available): which part of the image that score comes from. It is the default because it is the more faithful map under the deletion / insertion test: it beats random orders for 5 of the 6 models, and fixes the feature autoencoder, where plain Grad-CAM does worse than random (deletion area 65.5 vs 31.3 → 29.9). Neither method passes for the U-Net from scratch.
+- **What — exact SHAP over five image factors**: colour, fine texture, brightness and contrast, the obstacle itself, the surrounding scene. Each factor has a stated removal transform (`xai.FACTOR_REMOVAL`); the score is recomputed for all 2⁵ = 32 combinations, so the Shapley values are exact and add up to the score change (largest gap over 54 explanations below 1e-13, float rounding).
+
+| Model | Colour | Fine texture | Brightness & contrast | The obstacle | The scene |
+|---|---|---|---|---|---|
+| DeepLabV3+ | 14 % | 5 % | 30 % | 20 % | **31 %** |
+| Feature autoencoder | 12 % | 24 % | **37 %** | 22 % | 6 % |
+| Pixel autoencoder | 7 % | 20 % | 34 % | **38 %** | 0 % |
+| CNN baseline | 18 % | 2 % | **63 %** | 17 % | 1 % |
+| U-Net | 19 % | 5 % | **54 %** | 17 % | 5 % |
+| U-Net ResNet50 | 15 % | 14 % | **39 %** | 22 % | 11 % |
+
+Mean share of each model's Shapley attribution over the nine validation photographs (`reports/results/xai_summary.json`). Explanations describe the models; none of them was used to choose a model or a threshold.
 
 ## Deployment
-- **API** (`deployment/api/main.py`): `GET /health`, `GET /models`, `POST /predict` (image → mask, overlay, score map, statistics), `POST /explain` (Grad-CAM). Interactive docs at `http://localhost:8000/docs`.
-- **Demo** (`deployment/app/streamlit_app.py`): upload an image or pick a validation example, compare models side by side, Grad-CAM on demand, test results tab.
-- **Landing page** (`deployment/landing/`, Astro): static page whose numbers are read from `reports/results/test_results.json` at build time.
+- **API** (`deployment/api/main.py`, default model `A_deeplabv3plus`): `GET /health`, `GET /models`, `POST /predict` (image → mask, overlay, score map, statistics), `POST /explain?model=…&method=gradcampp|gradcam` (the paired explanation: a Grad-CAM++ / Grad-CAM heatmap as base64 PNG, and the exact Shapley value of each image factor with its efficiency check and a one-sentence summary). Interactive docs at `http://localhost:8000/docs`.
+- **Demo** (`deployment/app/streamlit_app.py`): upload an image or pick a validation example, Detect (every model side by side), Explain (where + what for one model), Compare (detections and factor shares of all models), Test results and Method tabs. Theme in `.streamlit/config.toml`.
+- **Landing page** (`deployment/landing/`, Astro): static page whose numbers are read from `reports/results/test_results.json` and `xai_summary.json` at build time.
 - **Docker:** `docker compose -f deployment/docker-compose.yml up --build` starts the API and the demo (CPU TensorFlow; `models/` mounted read-only).
-- **Video:** `python scripts/infer_video.py video.mp4 --model B_feature_ae` writes an overlay video and prints the measured latency and FPS.
+- **Video:** `python scripts/infer_video.py video.mp4` (DeepLabV3+ by default, or `--model B_feature_ae`) writes an overlay video and prints the measured latency and FPS.
 
 ## Dataset and licences
 RoadAnomaly by K. Lis, K. Nakka, P. Fua and M. Salzmann, *Detecting the Unexpected via Image Resynthesis*, ICCV 2019. The images belong to their authors and are provided for research purposes; sources and licences are in [`data/raw/RoadAnomaly/credits.txt`](data/raw/RoadAnomaly/credits.txt). The annotations are CC BY-SA 4.0.

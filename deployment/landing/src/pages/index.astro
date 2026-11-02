@@ -2,7 +2,7 @@
 // RoadAnomaly landing page: "a paper whose figures work".
 // It is set like a deep learning paper (title block, abstract, equations, figure captions, margin notes,
 // citations, references) and told like a product story (hook, stakes, three answers, proof, explanations,
-// limits, a closing invitation). Every number comes from reports/results/test_results.json (notebook 5)
+// limits, a closing invitation). Every number comes from reports/results/test_results.json (notebook 5) and xai_summary.json (notebook 6)
 // and public/demo/demo.json (scripts/export_demo.py); nothing is typed in by hand.
 import fs from "node:fs";
 import path from "node:path";
@@ -11,6 +11,7 @@ import "../styles/global.css";
 import "../styles/sections.css";
 import "../styles/paper.css";
 import results from "../data/results.json";
+import xaiSummary from "../data/xai.json";
 
 const PUBLIC = path.join(process.cwd(), "public");
 const demoPath = path.join(PUBLIC, "demo", "demo.json");
@@ -47,7 +48,6 @@ const receiptTotal = Object.values(demo.receipt).reduce((s, g) => s + Object.val
 // ---- photo credits
 const photos = [...demo.images, ...demo.gallery];
 const pretty = (frame) => { const t = frame.replace(/^[a-z_]+\d+_?/, "").replaceAll("_", " "); return t.charAt(0).toUpperCase() + t.slice(1); };
-const stripPairs = ["pair-1", "pair-2", "pair-3", "pair-4"];
 const firstImage = demo.images[0];
 
 // ---- figures copied from the notebooks (real pixel sizes, so the layout never jumps)
@@ -68,11 +68,30 @@ const refs = [
   { text: "O. Ronneberger, P. Fischer, T. Brox. U-Net: Convolutional Networks for Biomedical Image Segmentation. MICCAI 2015." },
   { text: "T. Defard et al. PaDiM: a Patch Distribution Modeling Framework for Anomaly Detection and Localization. ICPR 2021." },
   { text: "R. R. Selvaraju et al. Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization. ICCV 2017." },
+  { text: "A. Chattopadhay, A. Sarkar, P. Howlader, V. N. Balasubramanian. Grad-CAM++: Generalized Gradient-Based Visual Explanations for Deep Convolutional Networks. WACV 2018." },
+  { text: "S. M. Lundberg, S.-I. Lee. A Unified Approach to Interpreting Model Predictions (SHAP). NeurIPS 2017." },
   { text: "V. Petsiuk, A. Das, K. Saenko. RISE: Randomized Input Sampling for Explanation of Black-box Models. BMVC 2018." },
   { text: "B. Cheng et al. Boundary IoU: Improving Object-Centric Image Segmentation Evaluation. CVPR 2021." },
   { text: "R. Wirth, J. Hipp. CRISP-DM: Towards a Standard Process Model for Data Mining. 2000." },
 ];
-const [LIS, CHAN, CHEN, RONNEBERGER, DEFARD, SELVARAJU, PETSIUK, CHENG, WIRTH] = refs.map((_, i) => i + 1);
+const [LIS, CHAN, CHEN, RONNEBERGER, DEFARD, SELVARAJU, CHATTOPADHAY, LUNDBERG, PETSIUK, CHENG, WIRTH] = refs.map((_, i) => i + 1);
+
+// ---- explanations (notebook 6): what each model relies on, and how faithful the "where" maps are
+const factorOrder = ["colour", "texture", "contrast", "object", "context"];
+const factorLabel = (f) => xaiSummary.factors?.[f]?.label ?? f;
+const shareRows = order.filter((n) => xaiSummary.shares?.[n]).map((n) => ({ name: n, short: shortName[n], shares: xaiSummary.shares[n],
+  top: Object.entries(xaiSummary.shares[n]).sort((a, b) => b[1] - a[1])[0][0] }));
+const faithfulPP = (xaiSummary.faithfulness ?? []).filter((r) => r.map === "gradcam++");
+const faithfulCount = faithfulPP.filter((r) => r["beats random on deletion"] && r["beats random on insertion"]).length;
+const featureAE = (map) => (xaiSummary.faithfulness ?? []).find((r) => r.model === "B_feature_ae" && r.map === map);
+const reliesOn = (factor) => shareRows.filter((r) => r.top === factor).map((r) => r.short);
+// a light ramp (at most 55 % teal) keeps the slate text above 4.5:1 on every cell
+const heat = (v) => `background: color-mix(in srgb, #0d7480 ${Math.round(Math.min(1, v / 0.6) * 55)}%, #f7f9fa)`;
+const pct = (v) => `${Math.round(v * 100)} %`;
+// model names inside a sentence: "the feature autoencoder", "the U-Net", but "DeepLabV3+"
+const inText = (n) => n.startsWith("DeepLab") ? n : `the ${n.endsWith("autoencoder") ? n[0].toLowerCase() + n.slice(1) : n}`;
+const listOf = (xs) => xs.length > 1 ? `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}` : (xs[0] ?? "");
+const [gapMantissa, gapExponent] = Number(xaiSummary.efficiency_gap_max ?? 0).toExponential(0).split("e").map((x, i) => i ? x.replace("-", "−").replace("+", "") : x);
 
 const contents = [
   ["abstract", "Abstract"], ["introduction", "Introduction"], ["method", "Three approaches"], ["protocol", "Protocol"],
@@ -148,6 +167,23 @@ const bibtex = `@techreport{roadanomaly2026,
         </div>
 
         <figure class="stage" id="live">
+          <div class="controls" role="group" aria-label="Controls of Figure 1">
+            <label class="chip chip--model" data-ui>
+              <span class="chip__label">Model</span>
+              <select data-control="model">
+                {demo.models.map((m) => <option value={m.name}>{shortName[m.name] ?? m.title} · {m.binome}</option>)}
+              </select>
+            </label>
+            <div class="chip chip--threshold" data-ui>
+              <label class="chip__label" for="threshold">Threshold <output data-out="threshold" for="threshold">–</output></label>
+              <input id="threshold" type="range" data-control="threshold" min="0" max="1" step="0.001" value="0.5" />
+              <button type="button" class="chip__reset" data-control="reset">Validation value</button>
+            </div>
+            <button type="button" class="chip chip--truth" data-ui data-control="truth" aria-pressed="false">
+              <span class="chip__label">Annotation outline</span>
+              <span class="switch" aria-hidden="true"></span>
+            </button>
+          </div>
           {firstImage && (
             <div class="detector" data-ui aria-label="Live detector: a real model's answer on a real photograph">
               <div class="detector__view" style={`aspect-ratio: ${demo.size[1]} / ${demo.size[0]}`}>
@@ -169,21 +205,6 @@ const bibtex = `@techreport{roadanomaly2026,
               </div>
             </div>
           )}
-          <label class="chip chip--model" data-ui>
-            <span class="chip__label">Model</span>
-            <select data-control="model">
-              {demo.models.map((m) => <option value={m.name}>{shortName[m.name] ?? m.title} · {m.binome}</option>)}
-            </select>
-          </label>
-          <div class="chip chip--threshold" data-ui>
-            <label class="chip__label" for="threshold">Threshold <output data-out="threshold" for="threshold">–</output></label>
-            <input id="threshold" type="range" data-control="threshold" min="0" max="1" step="0.001" value="0.5" />
-            <button type="button" class="chip__reset" data-control="reset">Validation value</button>
-          </div>
-          <button type="button" class="chip chip--truth" data-ui data-control="truth" aria-pressed="false">
-            <span class="chip__label">Annotation outline</span>
-            <span class="switch" aria-hidden="true"></span>
-          </button>
           <figcaption class="stage__caption serif"><b>Figure 1.</b> A trained model's real score map on a validation photograph, re-thresholded in your browser. The default threshold is the one chosen on validation; F1 compares the mask with the human annotation.</figcaption>
         </figure>
       </section>
@@ -192,12 +213,12 @@ const bibtex = `@techreport{roadanomaly2026,
       <section class="abstract wrap section" id="abstract" data-section="Abstract" aria-labelledby="abstract-title">
         <div class="abstract__body">
           <h2 id="abstract-title" class="abstract__title" data-reveal>Abstract</h2>
-          <p class="serif abstract__text" data-reveal>A camera that labels every pixel of the road with a class it learned has no answer for a cow, a fallen rock or a lost tyre: it calls them road. We compare six models from three approaches (supervised segmentation, autoencoders that learn only what a normal road looks like, and U-Nets) on the RoadAnomaly benchmark<Cite n={LIS} refs={refs} />, under one frozen protocol and a test set opened once. {best?.short} finds {best?.summary?.["objects detected"]} obstacles with a mean F1 of {fmt(f1Of(best), 2)}, and {allPass.length === 1 ? `the ${allPass[0].short.toLowerCase()}, which never saw an annotated obstacle during training, is the only model that meets all four of our deployment criteria` : `${allPass.length} models meet all four of our deployment criteria`}.</p>
+          <p class="serif abstract__text" data-reveal>A camera that labels every pixel of the road with a class it learned has no answer for a cow, a fallen rock or a lost tyre: it calls them road. We compare six models from three approaches (DeepLabV3+ with a pretrained encoder, autoencoders that learn only what a normal road looks like, and a CNN with two U-Nets) on the RoadAnomaly dataset<Cite n={LIS} refs={refs} />, under one frozen protocol and a test set opened once. {best?.short} finds {best?.summary?.["objects detected"]} obstacles with a mean F1 of {fmt(f1Of(best), 2)}, and {allPass.length === 1 ? `the ${allPass[0].short.toLowerCase()}, which never saw an annotated obstacle during training, is the only model that meets all four of our deployment criteria` : `${allPass.length} models meet all four of our deployment criteria`}.</p>
         </div>
         <ul class="proofs" role="list">
           <li data-reveal style="--i:0"><span class="proofs__figure nums">{fmt(f1Of(best), 2)}</span><span class="proofs__label serif">best mean F1 on the sealed test set, {best?.short}</span></li>
           <li data-reveal style="--i:1"><span class="proofs__figure nums">{fmt(latency(fastest), 0)} ms</span><span class="proofs__label serif">per photograph for the fastest model, {fastest?.short}, on a laptop GPU</span></li>
-          <li data-reveal style="--i:2"><span class="proofs__figure nums">{models.length} to 1</span><span class="proofs__label serif">six models, three teams, judged by one frozen protocol</span></li>
+          <li data-reveal style="--i:2"><span class="proofs__figure nums">{models.length}</span><span class="proofs__label serif">models from three teams, judged by one frozen protocol and one opening of the test set</span></li>
         </ul>
       </section>
 
@@ -213,16 +234,20 @@ const bibtex = `@techreport{roadanomaly2026,
         <figure class="gallery wide">
           <ul class="tiles" role="list">
             {demo.gallery.map((g, i) => (
-              <li class={`tile ${stripPairs[i % 4]}`} data-reveal style={`--i:${i % 4}`}>
-                <img src={g.photo} width={g.width} height={g.height} alt={`${g.category} on the road (${g.split} split)`} loading="lazy" />
-                <div class="tile__strip nums">
-                  <p class="tile__row"><span>{g.anomaly_percent} %</span><span>{g.objects} {g.objects === 1 ? "object" : "objects"}</span><span>{g.split}</span><span>{g.category}</span></p>
-                  <p class="tile__row"><span>{g.author}</span><span>{g.licence}</span></p>
+              <li class="tile" tabindex="0" data-reveal style={`--i:${i % 4}`} aria-label={`${g.category}, ${g.anomaly_percent} % anomalous; details on focus`}>
+                <div class="tile__frame">
+                  <img src={g.photo} width={g.width} height={g.height} alt={`${g.category} on the road (${g.split} split)`} loading="lazy" />
+                  <div class="tile__info nums">
+                    <p><b>{g.objects} {g.objects === 1 ? "obstacle" : "obstacles"}</b>, {g.anomaly_percent} % of the pixels, {g.split} split</p>
+                    <p>Photo: {g.author}</p>
+                    <p>{g.licence_url ? <a href={g.licence_url}>{g.licence}</a> : g.licence} · <a href={g.source}>source</a></p>
+                  </div>
                 </div>
+                <p class="tile__label nums"><span>{g.category}</span><span>{g.anomaly_percent} %</span></p>
               </li>
             ))}
           </ul>
-          <figcaption class="serif caption" data-reveal><b>Figure 2.</b> Eight of the sixty photographs, with the share of anomalous pixels, the number of obstacles, the split and the photographer. Every photograph on this page is openly licensed.</figcaption>
+          <figcaption class="serif caption" data-reveal><b>Figure 2.</b> Eight of the sixty photographs and the share of their pixels that are anomalous. Point at a photograph, or focus it, for its obstacles, split, photographer and licence; every photograph on this page is openly licensed.</figcaption>
         </figure>
       </section>
 
@@ -348,16 +373,44 @@ const bibtex = `@techreport{roadanomaly2026,
 
       <!-- EXPLANATIONS -->
       <section class="prose wrap section" id="explanations" data-section="Explanations" aria-labelledby="xai-title">
-        <h2 id="xai-title" class="prose__title" data-reveal>Why the models flag what they flag</h2>
+        <h2 id="xai-title" class="prose__title" data-reveal>Where it looks, and what it relies on</h2>
         <div class="prose__body">
-          <p class="serif" data-reveal>A score map shows <em>where</em> a model reacts. To ask <em>why</em>, we used Grad-CAM<Cite n={SELVARAJU} refs={refs} /> on the decoder of each segmentation network and on the bottleneck of each autoencoder, always for the same fixed region, and on validation photographs only.</p>
-          <p class="serif" data-reveal>A heatmap can look convincing and still be wrong, so each one was tested: the regions it ranks first are blurred away, and the model's score should fall faster than when regions are removed in random order<Cite n={PETSIUK} refs={refs} />. For four of the six models it does. For the feature autoencoder it does not, because blurring a region makes it look unusual to an autoencoder.</p>
-          <aside class="note serif" data-reveal>An error map is a detection map, not a causal explanation, and a heatmap never replaces a segmentation metric.</aside>
+          <p class="serif" data-reveal>A score map shows that a model reacted, not why. Every model is therefore explained by two methods, always together and always on the same number, its score on the region it flagged: <strong>Grad-CAM++</strong><Cite n={CHATTOPADHAY} refs={refs} /> answers <em>where</em> in the image that score comes from, and <strong>exact Shapley values</strong><Cite n={LUNDBERG} refs={refs} /> answer <em>what</em> it is made of.</p>
+          <p class="serif" data-reveal>For the "what", five interpretable factors can each be removed by a stated transform: colour, fine texture, brightness and contrast, the obstacle itself, and the surrounding scene. The score is recomputed for all 2<sup>5</sup> = 32 combinations, which gives each factor its exact Shapley value:</p>
+          <div class="equation" data-reveal>
+            <math display="block" aria-label="phi i equals the sum over coalitions S not containing i of S factorial times F minus S minus one factorial over F factorial, times v of S with i minus v of S">
+              <mrow><msub><mi>φ</mi><mi>i</mi></msub><mo>=</mo>
+                <munder><mo>∑</mo><mrow><mi>S</mi><mo>⊆</mo><mi>F</mi><mo>∖</mo><mo stretchy="false">{</mo><mi>i</mi><mo stretchy="false">}</mo></mrow></munder>
+                <mfrac><mrow><mo stretchy="false">|</mo><mi>S</mi><mo stretchy="false">|</mo><mo>!</mo><mspace width="0.2em"/><mo stretchy="false">(</mo><mo stretchy="false">|</mo><mi>F</mi><mo stretchy="false">|</mo><mo>−</mo><mo stretchy="false">|</mo><mi>S</mi><mo stretchy="false">|</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>!</mo></mrow><mrow><mo stretchy="false">|</mo><mi>F</mi><mo stretchy="false">|</mo><mo>!</mo></mrow></mfrac>
+                <mrow><mo stretchy="false">[</mo><mi>v</mi><mo stretchy="false">(</mo><mi>S</mi><mo>∪</mo><mo stretchy="false">{</mo><mi>i</mi><mo stretchy="false">}</mo><mo stretchy="false">)</mo><mo>−</mo><mi>v</mi><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow>
+              </mrow>
+            </math>
+            <span class="equation__no">(3)</span>
+          </div>
+          <aside class="note serif" data-reveal>Because every combination is evaluated, the values add up exactly to the score change, Σφ = v(F) − v(∅). Over {shareRows.length * 9} explanations (every model, every validation photograph) the largest gap is {gapMantissa}&nbsp;×&nbsp;10<sup>{gapExponent}</sup>, float error only.</aside>
+          <p class="serif" data-reveal>Each half is tested. A "where" map is faithful when blurring the blocks it ranks first lowers the score faster than random orders do<Cite n={PETSIUK} refs={refs} />: Grad-CAM++ passes for {faithfulCount} of the {faithfulPP.length} models, and for the feature autoencoder it succeeds where plain Grad-CAM<Cite n={SELVARAJU} refs={refs} /> failed (deletion area {Number(featureAE("gradcam")?.["deletion (map)"] ?? 0).toFixed(1)} against {Number(featureAE("gradcam")?.["deletion (random)"] ?? 0).toFixed(1)} for random orders, then {Number(featureAE("gradcam++")?.["deletion (map)"] ?? 0).toFixed(1)}).</p>
+          <p class="serif" data-reveal>The "what" tells the models apart. Brightness and contrast is the largest factor for {listOf(reliesOn("contrast").map(inText))}: the obstacles of RoadAnomaly mostly stand out by contrast. {reliesOn("context").length ? `${listOf(reliesOn("context").map(inText))} is the only one that leans most on the surrounding scene, judging an obstacle in its context. ` : ""}{reliesOn("object").length ? `The ${reliesOn("object").join(" and ").toLowerCase()} leans most on the obstacle itself, one patch at a time.` : ""}</p>
+          <aside class="note serif" data-reveal>Explanations describe a model; none of them chose a model or a threshold, and a heatmap never replaces a segmentation metric.</aside>
         </div>
         <figure class="wide" data-reveal>
-          <img src={xaiBoard.src} width={xaiBoard.width} height={xaiBoard.height} alt="Explanation board: photograph, annotation, predicted mask, detection map and Grad-CAM for each model" loading="lazy" />
-          <figcaption class="serif caption"><b>Figure 4.</b> One validation photograph seen by each model: the annotation, the predicted mask, the score map and the Grad-CAM of the predicted region.</figcaption>
+          <img src={xaiBoard.src} width={xaiBoard.width} height={xaiBoard.height} alt="For each model: the annotation, the predicted region, the Grad-CAM++ map (where) and the exact Shapley values of five image factors (what)" loading="lazy" />
+          <figcaption class="serif caption"><b>Figure 4.</b> One validation photograph explained by each model: the annotation, the region the model flagged, <em>where</em> its score comes from (Grad-CAM++) and <em>what</em> it is made of (exact Shapley values; teal raises the score).</figcaption>
         </figure>
+        {shareRows.length > 0 && (
+          <figure class="wide shares" data-reveal>
+            <div class="shares__scroll">
+              <table class="shares__table nums">
+                <thead><tr><th scope="col">Model</th>{factorOrder.map((f) => <th scope="col">{factorLabel(f)}</th>)}</tr></thead>
+                <tbody>
+                  {shareRows.map((r) => (
+                    <tr><th scope="row">{r.short}</th>{factorOrder.map((f) => <td style={heat(r.shares[f])} class={r.top === f ? "is-top" : ""}>{pct(r.shares[f])}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <figcaption class="serif caption"><b>Table 3.</b> What each model relies on: the mean share of each factor in the model's Shapley attribution over the nine validation photographs. The largest factor of each model is outlined.</figcaption>
+          </figure>
+        )}
       </section>
 
       <!-- LIMITATIONS -->
@@ -371,6 +424,7 @@ const bibtex = `@techreport{roadanomaly2026,
               <li data-reveal><span class="dot dot--1"></span><span>Trained and tested on RoadAnomaly: not an out-of-distribution benchmark score</span><span class="limits__value">60 photos</span></li>
               <li data-reveal><span class="dot dot--1"></span><span>For the autoencoders, ImageNet pretraining does most of the work</span><span class="limits__value">AE ≈ Gaussian</span></li>
               <li data-reveal><span class="dot dot--1"></span><span>No small obstacle in the test split; small ones are judged on validation only</span><span class="limits__value">0 small</span></li>
+              <li data-reveal><span class="dot dot--1"></span><span>Explanations depend on how each image factor is removed; they describe a model, they do not prove a cause</span><span class="limits__value">5 factors</span></li>
               <li data-reveal><span class="dot dot--1"></span><span>A research prototype measured on a laptop GPU, not a safety system</span><span class="limits__value">RTX 4060</span></li>
             </ul>
           </div>

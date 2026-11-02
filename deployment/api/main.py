@@ -4,7 +4,8 @@ Endpoints (FR, section 6):
 - GET  /health   liveness + the models that are loaded
 - GET  /models   description of every model (binôme, type, validation scores, post-processing)
 - POST /predict  image file -> anomaly mask (+ optional overlay and score map as base64 PNG) and statistics
-- POST /explain  image file -> Grad-CAM heatmap of the predicted region (base64 PNG)
+- POST /explain  image file -> the paired explanation of the predicted region: WHERE (Grad-CAM / Grad-CAM++
+                  heatmap, base64 PNG) and WHAT (exact Shapley values over five image factors)
 
 Run: `mise run api` (or `uvicorn deployment.api.main:app --port 8000`); interactive docs at /docs.
 """
@@ -26,7 +27,7 @@ def _model_or_404(model):
     names = service.model_names()
     if not names:
         raise HTTPException(503, "no trained model in models/: run the modeling notebooks first")
-    model = model or names[-1]
+    model = model or service.default_model()
     if model not in names:
         raise HTTPException(404, f"unknown model {model!r}; available: {names}")
     return model
@@ -51,7 +52,7 @@ def models():
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(..., description="RGB image (JPEG, PNG or WebP)"),
-                  model: str | None = Query(None, description="model name from /models (default: last)"),
+                  model: str | None = Query(None, description="model name from /models (default: A_deeplabv3plus, the recommended model)"),
                   include_images: bool = Query(True, description="return overlay and score map as base64 PNG")):
     model = _model_or_404(model)
     result = service.analyse(model, await _read_image(file))
@@ -63,9 +64,28 @@ async def predict(file: UploadFile = File(..., description="RGB image (JPEG, PNG
 
 
 @app.post("/explain")
-async def explain(file: UploadFile = File(...), model: str | None = Query(None)):
+async def explain(file: UploadFile = File(...),
+                  model: str | None = Query(None, description="model name from /models (default: A_deeplabv3plus)"),
+                  method: str = Query("gradcampp", description="gradcam, or gradcampp / gradcam++ for Grad-CAM++")):
     model = _model_or_404(model)
-    result, cam = service.explain(model, await _read_image(file))
-    return {"stats": result["stats"], "target": "Grad-CAM of the predicted region",
-            "note": "descriptive explanation, not a causal proof; an error map is a detection map",
-            "heatmap_png": _b64_png(service.blend(result["image"], service.heatmap_rgb(cam, "jet")))}
+    # an unencoded "+" in a query string arrives as a space, so "gradcam++" may reach us as "gradcam  "
+    key = method.lower().replace(" ", "+")
+    methods = {"gradcam": "gradcam", "gradcam++": "gradcam++", "gradcampp": "gradcam++", "gradcam_pp": "gradcam++"}
+    if key not in methods:
+        raise HTTPException(422, f"unknown method {method!r}; use gradcam or gradcampp (Grad-CAM++)")
+    method = methods[key]
+    result, e = service.explain(model, await _read_image(file), method=method)
+    what = e["what"]
+    return {
+        "stats": result["stats"],
+        "target": "mean anomaly logit (segmentation) or mean reconstruction error (autoencoders) on the predicted region",
+        "where": {"method": e["where_method"],
+                  "heatmap_png": _b64_png(service.blend(result["image"], service.heatmap_rgb(e["where"], "jet")))},
+        "what": {"method": "exact Shapley values over interpretable image factors",
+                 "values": what["phi"], "score_original": what["full"], "score_all_removed": what["base"],
+                 "efficiency_gap": what["efficiency_gap"], "evaluations": what["evaluations"],
+                 "factors": {f: {"label": service.xai.FACTOR_LABELS[f], "removal": service.xai.FACTOR_REMOVAL[f]}
+                             for f in service.xai.FACTORS}},
+        "summary": e["sentence"],
+        "note": "descriptive explanations, not causal proof; they never replace the segmentation metrics",
+    }

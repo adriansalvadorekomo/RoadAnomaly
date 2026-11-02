@@ -19,7 +19,7 @@
 
 @layer base {
   .serif { font-family: var(--font-serif); font-size: 1.1875rem; line-height: 1.55; }
-  math { font-family: var(--font-math); font-size: 1.25em; }
+  math { font-family: var(--font-math); font-size: var(--step-lead); }
 }
 
 @layer components {
@@ -52,7 +52,7 @@
                              rotate: 45deg; translate: 0 -0.15rem; transition: rotate var(--t-ui) var(--ease-out); }
   .toc-menu[open] summary::after { rotate: 225deg; translate: 0 0.15rem; }
   @media (hover: hover) and (pointer: fine) { .toc-menu summary:hover { background: var(--surface-2); } }
-  .toc-menu__list { position: absolute; inset-inline-end: 0; inset-block-start: calc(100% + 0.5rem); min-inline-size: 15rem; padding: 0.5rem;
+  .toc-menu__list { list-style: none; margin: 0; position: absolute; inset-inline-end: 0; inset-block-start: calc(100% + 0.5rem); min-inline-size: 15rem; padding: 0.5rem;
                     background: var(--bg); border-radius: 6px; box-shadow: 0 16px 40px -18px rgb(31 48 56 / 0.45), 0 0 0 1px var(--surface-2); } /* taste-skill-ignore: an open menu floats */
   .toc-menu__list a { display: block; padding: 0.6rem 0.75rem; text-decoration: none; font-size: var(--step-body); }
   .toc-menu__list a:hover, .toc-menu__list a:focus-visible { background: var(--surface); }
@@ -68,7 +68,7 @@
     }
     .js .rail:not(.is-shown) { display: none; }   /* shown by ScrollTrigger once the title block has been read (paper.js) */
     .rail__title { font-weight: 600; margin-block-end: 0.75rem; }
-    .rail ol { display: grid; gap: 0.1rem; }
+    .rail ol { display: grid; gap: 0.1rem; list-style: none; padding: 0; margin: 0; }
     .rail a { display: block; padding: 0.35rem 0 0.35rem 0.85rem; text-decoration: none; color: var(--muted); position: relative;
               transition: color var(--t-hover) ease; }
     .rail a::before { content: ""; position: absolute; inset-inline-start: 0; inset-block: 0.45rem; inline-size: 3px; background: var(--accent);
@@ -82,10 +82,10 @@
 
   /* ---------------------------------------------------------------- citations: [n] with a hover card */
   .cite { position: relative; white-space: nowrap; }
-  .cite__link { font-family: var(--font); font-size: 0.8em; text-decoration: none; color: var(--accent); padding-inline: 0.12em;
+  .cite__link { font-family: var(--font); font-size: var(--step-small); text-decoration: none; color: var(--accent); padding-inline: 0.12em;
                 vertical-align: 0.15em; transition: color var(--t-hover) ease; }
   .cite__card { position: absolute; z-index: 30; inset-inline-start: 50%; inset-block-end: calc(100% + 0.6rem); inline-size: min(22rem, 80vw);
-                translate: -50% 0.25rem; padding: 0.85rem 1rem; background: var(--ink); color: var(--bg); font-size: 1rem; line-height: 1.4;
+                translate: -50% 0.25rem; padding: 0.85rem 1rem; background: var(--ink); color: var(--bg); font-size: var(--step-body); line-height: 1.4;
                 white-space: normal; border-radius: 6px; opacity: 0; visibility: hidden; pointer-events: none;
                 box-shadow: 0 18px 40px -20px rgb(31 48 56 / 0.6); /* taste-skill-ignore: a tooltip floats */
                 transition: opacity var(--t-hover) ease, translate var(--t-ui) var(--ease-out), visibility 0s linear var(--t-hover); }
@@ -105,13 +105,19 @@
   .byline dt { font-size: var(--step-small); color: var(--muted); }
   .byline dd { margin: 0.15rem 0 0; font-family: var(--font-serif); font-size: 1.1875rem; line-height: 1.35; }
   .stage { margin-block: 0; }
-  .stage__caption { position: absolute; inset-inline: clamp(1.5rem, 4vw, 4.5rem); inset-block-end: clamp(0.75rem, 2.5vh, 1.5rem);
-                    font-size: 1rem; line-height: 1.4; color: var(--ink); max-inline-size: 46ch; margin-inline: auto; text-align: start; }
-  .chip--threshold { inset-block-end: clamp(4.5rem, 12vh, 7rem); }
-  .chip--truth { inset-block-end: clamp(5.5rem, 15vh, 8.5rem); }
+  /* Figure 1 on one axis: the control bar, the fragment and the caption share the same width and left edge */
+  .stage { display: grid; justify-items: center; align-content: center; row-gap: 1rem; }
+  .controls { inline-size: min(100%, 640px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
+  .controls .chip { position: static; inset: auto; rotate: 0deg; min-inline-size: 0; align-content: space-between; gap: 0.6rem; }
+  .controls .chip--truth { grid-auto-flow: row; justify-items: stretch; text-align: start; }
+  .controls .chip--truth .switch { justify-self: start; }
+  .controls .chip__reset { min-block-size: 0; }
+  .stage__caption { inline-size: min(100%, 640px); font-size: var(--step-body); line-height: 1.4; color: var(--ink); text-align: start; }
+  @media (max-width: 36em) { .controls { grid-template-columns: 1fr; } }
   @media (max-width: 64em) {
     .hero { min-block-size: 0; padding-block-start: 2rem; }
-    .stage__caption { position: static; order: 5; margin: 0.5rem 0 0; max-inline-size: none; }
+    .stage { display: grid; }
+    .stage > * { order: 0; }   /* the order of the markup: controls, fragment, caption */
   }
 
   /* ---------------------------------------------------------------- abstract and its three proofs */
@@ -135,15 +141,30 @@
   .prose__body > .note { grid-column: 2; }
   .prose__sub { font-size: var(--step-lead); letter-spacing: -0.015em; line-height: 1.2; margin-block-start: 1.75rem; }
   .lede { font-size: var(--step-lead); line-height: 1.45; }
-  .note { font-size: 1rem; line-height: 1.45; color: var(--muted); padding-block-start: 0.2rem; max-inline-size: none; }
+  .note { font-size: var(--step-body); line-height: 1.45; color: var(--muted); padding-block-start: 0.2rem; max-inline-size: none; }
   .note b { color: var(--ink); font-weight: 600; }
   .equation { display: grid; grid-template-columns: 1fr auto; align-items: center; padding-block: 0.75rem; }
   .equation math { justify-self: center; }
   .equation__no { font-family: var(--font-serif); font-size: 1.1875rem; color: var(--muted); }
   .wide { grid-column: 1 / -1; margin: clamp(3rem, 6vw, 4.5rem) 0 0; }
   .wide > img { inline-size: 100%; background: var(--bg); }
-  .caption { margin-block-start: 1rem; font-size: 1rem; line-height: 1.45; max-inline-size: 70ch; }
+  .caption { margin-block-start: 1rem; font-size: var(--step-body); line-height: 1.45; max-inline-size: 70ch; }
   .gallery .tiles { margin: 0; }
+  /* gallery tiles: the photograph with a one-line label; details slide up on hover, keyboard focus or a tap */
+  .tile { position: relative; outline-offset: 4px; cursor: default; }
+  .tile__frame { position: relative; overflow: clip; aspect-ratio: 4 / 5; background: var(--surface); }
+  .tile__frame img { inline-size: 100%; block-size: 100%; object-fit: cover; aspect-ratio: auto; }
+  .tile__info { position: absolute; inset-inline: 0; inset-block-end: 0; display: grid; gap: 0.3rem; padding: 0.9rem 0.95rem 1rem;
+                background: rgb(31 48 56 / 0.92); color: var(--bg); font-size: var(--step-small); line-height: 1.4;
+                translate: 0 101%; transition: translate var(--t-ui) var(--ease-out); }
+  .tile__info p { max-inline-size: none; overflow-wrap: anywhere; }
+  .tile__info b { color: var(--bg); font-weight: 600; }
+  .tile__info a { color: inherit; text-underline-offset: 0.2em; }
+  .tile:hover .tile__info, .tile:focus-within .tile__info { translate: 0 0; }
+  .tile__label { display: flex; justify-content: space-between; gap: 1rem; padding-block-start: 0.65rem; font-size: var(--step-small);
+                 font-weight: 500; max-inline-size: none; }
+  .tile__label span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: reduce) { .tile__info { transition: none; } }
   @media (max-width: 64em) {
     .prose { grid-template-columns: minmax(0, 1fr); }
     .prose__body { grid-template-columns: minmax(0, 1fr); }
@@ -175,12 +196,46 @@
   .refs__list li { display: grid; grid-template-columns: 2.5rem 1fr; padding: 0.35rem 0.5rem; border-radius: 4px; transition: background-color 600ms ease; }
   .refs__no { font-family: var(--font); color: var(--muted); }
   .refs__sub { font-size: var(--step-lead); letter-spacing: -0.015em; margin-block: 3rem 1rem; }
-  .bibtex { margin: 0; padding: 1.25rem 1.5rem; background: var(--surface); overflow-x: auto; font-size: var(--step-small); line-height: 1.55; }
-  .refs__note { color: var(--muted); font-size: 1rem; margin-block-end: 0.75rem; }
+  .bibtex { margin: 0; padding: 1.25rem 1.5rem; background: var(--surface); overflow-x: auto; line-height: 1.55; }
+  .bibtex code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: var(--step-small); }
+  .refs__note { color: var(--muted); font-size: var(--step-body); margin-block-end: 0.75rem; }
   .refs__credits li { display: grid; grid-template-columns: 1fr auto; gap: 1rem; padding-block: 0.3rem; font-size: 1.0625rem; }
   @media (max-width: 36em) { .refs__credits li { grid-template-columns: 1fr; gap: 0; } }
 }
 
 @layer sections {
   @media (max-width: 48em) { .hero__lead, .byline { max-inline-size: none; } }
+}
+
+@layer components {
+  /* phones: a citation card opens as a sheet inside the screen, never past its edge */
+  @media (max-width: 48em) {
+    .cite__card { position: fixed; inset-inline: 1rem; inset-block: auto 1rem; inline-size: auto; translate: 0 0.5rem; }
+    .cite:hover .cite__card, .cite:focus-within .cite__card { translate: 0 0; }
+  }
+}
+@layer base {
+  html, body { overflow-x: clip; }   /* nothing may widen the page sideways (hidden cards, wide figures) */
+}
+
+@layer sections {
+  /* The headline is sized from its own column, not from the window: each authored line (about 6.8 em wide
+     for "Road obstacles,") always fits, whatever the screen width or zoom. */
+  .hero__copy { container-type: inline-size; min-inline-size: 0; }
+  .hero__title { font-size: min(var(--step-display), 14cqi); }
+
+  /* every control fills its card and never spills into the next one */
+  .controls .chip { min-inline-size: 0; overflow: clip; }
+  .controls .chip select { inline-size: 100%; min-inline-size: 0; max-inline-size: 100%; text-overflow: ellipsis; }
+  .controls .chip input[type="range"] { min-inline-size: 0; }
+}
+
+@layer sections {
+  /* Table 3: the share of each factor, as a heat table (a real table, so it keeps its cells) */
+  .shares__scroll { overflow-x: auto; }
+  .shares__table { inline-size: 100%; min-inline-size: 40rem; border-collapse: separate; border-spacing: 4px; font-size: var(--step-small); }
+  .shares__table th { text-align: start; font-weight: 500; color: var(--muted); padding: 0.4rem 0.6rem; }
+  .shares__table tbody th { color: var(--ink); white-space: nowrap; }
+  .shares__table td { text-align: center; padding: 0.75rem 0.5rem; border-radius: 4px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .shares__table td.is-top { outline: 2px solid var(--ink); outline-offset: -2px; }
 }

@@ -16,6 +16,10 @@ if (existsSync(results)) {
   writeFileSync(target, JSON.stringify({ models: {}, paired_differences: [] }));
   console.warn("results: reports/results/test_results.json not found (run notebook 5); the page shows no numbers");
 }
+const xai = join(repo, "reports", "results", "xai_summary.json");
+const xaiTarget = join(here, "..", "src", "data", "xai.json");
+if (existsSync(xai)) { copyFileSync(xai, xaiTarget); console.log("xai: copied", xai); }
+else { writeFileSync(xaiTarget, JSON.stringify({ shares: {}, factors: {}, faithfulness: [] })); console.warn("xai: run notebook 6"); }
 const figures = ["A_01_learning_curves.png", "5_01_test_predictions.png", "6_01_xai_board_success.png"];
 mkdirSync(join(here, "..", "public", "figures"), { recursive: true });
 for (const name of figures) {

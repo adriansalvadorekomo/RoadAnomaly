@@ -31,14 +31,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("video", nargs="?", help="input video file")
     parser.add_argument("--frames", help="folder of images to use as frames instead of a video")
-    parser.add_argument("--model", default=None, help=f"one of {service.model_names()}")
+    parser.add_argument("--model", default=None, help=f"one of {service.model_names()} (default: {service.default_model()})")
     parser.add_argument("--output", default="reports/video/anomaly_overlay.mp4")
     parser.add_argument("--fps", type=float, default=10, help="frame rate of the output video")
     parser.add_argument("--max-frames", type=int, default=None)
     args = parser.parse_args()
     if not args.video and not args.frames:
         parser.error("give a video file or --frames")
-    model = args.model or service.model_names()[-1]
+    model = args.model or service.default_model()
 
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
