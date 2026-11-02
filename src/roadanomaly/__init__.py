@@ -8,7 +8,9 @@
 - metrics        : pixel and object metrics, AUPRO, bootstrap intervals
 - evaluation     : the shared evaluation report used for every model
 - inference      : the shared model format (models/<name>/) and the Predictor
-- xai            : Grad-CAM / Seg-Grad-CAM and the deletion / insertion check
+- xai            : the paired explanation: Grad-CAM++ / Grad-CAM on the predicted region (where) and exact
+                   Shapley values over five image factors (what), plus the deletion / insertion check
+- losses         : BCE + Dice, focal and focal-Tversky losses (Binôme C)
 - gpu            : GPU setup that works on both RTX 4060 (8 GB) and RTX 2060 (6 GB)
 - models         : one builder module per approach
 """

@@ -5,6 +5,13 @@
 ESPRIT · Deep Learning module · Group of 6 · Final submission **8 November 2026**.
 Operative plan: the group's framing and allocation document (FR, *Fiche officielle de cadrage et de répartition*).
 
+> **TL;DR.** A car's camera network knows a closed list of things (road, car, person…). Put a cow on the road and it still has to pick one of its words, so it may call the cow "road". We want a network that instead says *"these pixels are something I did not expect"*: a mask, so a driver-assistance system knows **where** the obstacle is and **how big**, without knowing **what** it is.
+>
+> - **Four business goals:** find the obstacles (BO1), without crying wolf (BO2), explain every warning (BO3), and show it running fast enough for video (BO4).
+> - **Four pass / fail tests, fixed before the test set was opened** (section 4): beat a trivial detector (SC1), more right warnings than wrong ones (SC2), find at least half the obstacles (SC3), under 100 ms per photo (SC4).
+> - **Three approaches, one per pair of students:** learn the masks with a pretrained DeepLabV3+ (A), learn only what a normal road looks like and flag what cannot be rebuilt (B, autoencoders), and learn the masks with a CNN and two U-Nets (C).
+> - **Outcome** (notebooks 5 and 6): DeepLabV3+, the pretrained U-Net and the feature autoencoder are statistically tied at the top (test F1 0.74, 0.71, 0.62 on 9 photographs). Only the feature autoencoder passes all four tests: the others find more obstacles but raise too many false alarms (SC2). BO3 is met with a paired explanation, *where* (Grad-CAM++) and *what* (exact SHAP), for every model.
+
 ---
 
 ## 1. The problem
@@ -47,7 +54,7 @@ Three complementary approaches, one per binôme (FR):
 |---|---|---|---|
 | A | Ines · Emna | **DeepLabV3+** with transfer learning (ImageNet ResNet50 encoder, ASPP, decoder) | annotated masks (supervised) |
 | B | Khaled · Adrian | **Convolutional autoencoder**: reconstruction error as anomaly score (pixel AE baseline, feature-space AE final) | normal regions only (unsupervised idea) |
-| C | Hejer · Walid | **CNN baseline + U-Net** | annotated masks (supervised) |
+| C | Hejer · Walid | **CNN baseline + U-Nets** (from scratch, and with an ImageNet ResNet50 encoder) | annotated masks (supervised) |
 
 All three produce a **score map** (probability or reconstruction error). A threshold chosen on validation turns it into a **binary mask**, so the three are compared on the same footing.
 
@@ -72,9 +79,9 @@ Fixed on 2026-11-01, before the shared test evaluation of notebook 5 (the earlie
 | SC3 | Most obstacles are found | object recall over all annotated obstacles ≥ 0.5 | BO1 |
 | SC4 | Demonstrable on video | inference < 100 ms per image on a laptop GPU (≥ 10 images/s) | BO4 |
 
-BO3 has no numeric threshold. It is judged qualitatively in notebook 6:
-- do the heatmaps sit on the obstacle?
-- does the deletion / insertion check beat random orders?
+BO3 has no numeric threshold. It is judged in notebook 6, where every model gets a paired explanation of the same number (its score on the region it flagged): **where** the score comes from (Grad-CAM++) and **what** it is made of (exact Shapley values over five image factors). Each half is checked:
+- the map is faithful when deleting / inserting the blocks it ranks first moves the score faster than random orders;
+- the Shapley values are exact when they add up to the score change (the efficiency identity).
 
 The BU report's ideal of finding "100 % of obstacles" is not a realistic success criterion on 60 images. It stays the direction of improvement.
 
@@ -110,7 +117,7 @@ YOLO-style detectors are out of scope: they give boxes, not pixel masks.
 | Near-duplicate scenes | frames from the same video or article (notebook 2, §8) | Group-aware split, regenerated and checked in notebook 3 |
 | Licences | images belong to their authors; annotations are CC BY-SA 4.0 | Research use only; sources in `data/raw/RoadAnomaly/credits.txt`; the dataset is cited |
 | Compute | RTX 4060 8 GB and RTX 2060 6 GB (reference budget) | 352×640 working resolution; DeepLabV3+ batch ≤ 4; mixed precision float16 only |
-| Pretrained weights | ImageNet weights are used by A (ResNet50) and B (VGG16) | External knowledge, stated in the report; to be confirmed as allowed for Binôme B |
+| Pretrained weights | ImageNet weights are used by A (ResNet50 encoder), B (VGG16 features; VGG19 inside the pixel AE's loss) and C (ResNet50 encoder of the pretrained U-Net) | External knowledge, stated in the report; to be confirmed as allowed for Binôme B |
 | Test contamination | some test images were scored during development (disclosed in notebook 5) | No change made on test evidence; disclosure instead of a hidden re-split |
 | Framing | RoadAnomaly is an out-of-distribution benchmark in the literature (models trained elsewhere, tested here) | Here it is used for training and testing on 60 images; results are not comparable to OoD leaderboards, and generalisation to unseen anomaly types is not shown |
 
@@ -139,5 +146,7 @@ The FR schedule, with milestones.
 - T. Defard et al. *PaDiM: a Patch Distribution Modeling Framework for Anomaly Detection and Localization.* ICPR 2021 (Gaussian control of Binôme B).
 - B. Cheng et al. *Boundary IoU: Improving Object-Centric Image Segmentation Evaluation.* CVPR 2021.
 - R. R. Selvaraju et al. *Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization.* ICCV 2017.
+- A. Chattopadhay, A. Sarkar, P. Howlader, V. N. Balasubramanian. *Grad-CAM++: Generalized Gradient-Based Visual Explanations for Deep Convolutional Networks.* WACV 2018.
+- S. M. Lundberg, S.-I. Lee. *A Unified Approach to Interpreting Model Predictions.* NeurIPS 2017 (SHAP); L. S. Shapley. *A Value for n-Person Games.* 1953.
 - V. Petsiuk, A. Das, K. Saenko. *RISE: Randomized Input Sampling for Explanation of Black-box Models.* BMVC 2018 (deletion / insertion).
 - For Seg-Grad-CAM (Vinogradova et al., 2020), FR asks the team to verify the reference before academic citation.
