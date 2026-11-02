@@ -65,6 +65,30 @@ for nb in notebooks/2_Data_Understanding.ipynb notebooks/3_Data_Preparation.ipyn
 done
 """
 
+[tasks.train]
+description = "Train all six models (notebooks 4A, 4B, 4C) and save them in models/; needs a GPU for reasonable times"
+run = """
+set -e
+for nb in notebooks/4_Modeling/A_DeepLabV3Plus.ipynb notebooks/4_Modeling/B_Autoencoder.ipynb notebooks/4_Modeling/C_CNN_UNet.ipynb; do
+  echo "=== training: $nb"
+  jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 \
+    --ExecutePreprocessor.kernel_name=roadanomaly "$nb"
+done
+python -c "from roadanomaly import data_pipeline as dp; from roadanomaly.inference import available_models; print('trained models:', available_models(dp.MODELS_DIR))"
+"""
+
+[tasks."train:a"]
+description = "Train Binôme A: DeepLabV3+ (models/A_deeplabv3plus)"
+run = "jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=roadanomaly notebooks/4_Modeling/A_DeepLabV3Plus.ipynb"
+
+[tasks."train:b"]
+description = "Train Binôme B: pixel and feature autoencoders (models/B_pixel_ae, B_feature_ae)"
+run = "jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=roadanomaly notebooks/4_Modeling/B_Autoencoder.ipynb"
+
+[tasks."train:c"]
+description = "Train Binôme C: CNN, U-Net and U-Net ResNet50 (models/C_cnn, C_unet, C_unet_resnet50)"
+run = "jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=roadanomaly notebooks/4_Modeling/C_CNN_UNet.ipynb"
+
 [tasks.models]
 description = "List the trained models available in models/ (shared format)"
 run = "python -c \"from roadanomaly import data_pipeline as dp; from roadanomaly.inference import available_models; print(available_models(dp.MODELS_DIR))\""

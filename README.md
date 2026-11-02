@@ -92,6 +92,7 @@ With [mise](https://mise.jdx.dev) the same is `mise run setup`. Main tasks (`mis
 |---|---|
 | `mise run setup` / `setup:deploy` | create `.venv`, install the pinned packages, register the kernel / install the API, demo and landing dependencies |
 | `mise run test` (`test:fast`) | run the test suite (without the 20 s split regeneration) |
+| `mise run train` (`train:a` / `train:b` / `train:c`) | train the six models (notebooks 4A, 4B, 4C) and save them in `models/`; needs the data split of the repo only, much faster with a GPU (see *No GPU?* below) |
 | `mise run pipeline` | execute notebooks 2 → 6 in order (trains the models, evaluates, explains) |
 | `mise run notebook <path>` | execute one notebook in place |
 | `mise run models` / `evaluate <model> [split]` | list the trained models / evaluate one from the command line |
@@ -101,6 +102,11 @@ With [mise](https://mise.jdx.dev) the same is `mise run setup`. Main tasks (`mis
 | `mise run gpu` / `check` / `clean` | GPU check, repository hygiene, remove caches |
 
 The modeling notebooks download ImageNet weights once into `~/.keras/models` (ResNet50 for A and C, VGG16 / VGG19 for B; about 250 MB); their first run needs internet.
+
+### Get the trained models, then explain and serve them
+`models/` is git-ignored, so a fresh clone has no trained model. Either run `mise run train`, or copy the `models/` folder from a teammate. `mise run models` lists what is there; with the models in place, `mise run notebook notebooks/5_Evaluation.ipynb`, `mise run api`, `mise run app` and `mise run docker:up` all work.
+
+**No GPU?** Nothing breaks: `setup_gpu()` prints "No GPU found: running on CPU" and the code runs on the CPU (on Windows, TensorFlow has no GPU support: use WSL2). Training is then much slower (DeepLabV3+ and the U-Net ResNet50 are the slowest), so train one binôme at a time (`train:a`, `train:b`, `train:c`) or copy the models. Scores can differ in the last digits across hardware, and the latency figures (RTX 4060) will be higher; the demo and the API in Docker already use CPU TensorFlow.
 
 ### GPU notes (RTX 4060 8 GB and RTX 2060 6 GB)
 - **TensorFlow is pinned to 2.20.0.** The 2.21.0 wheel cannot find `libcusolver` and silently runs on CPU. On Windows, TensorFlow runs on CPU (use WSL2 for the GPU).
