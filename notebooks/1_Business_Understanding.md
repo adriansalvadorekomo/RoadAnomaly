@@ -52,9 +52,9 @@ Three complementary approaches, one per binôme (FR):
 
 | Binôme | Members | Approach | Learns from |
 |---|---|---|---|
-| A | Ines · Emna | **DeepLabV3+** with transfer learning (ImageNet ResNet50 encoder, ASPP, decoder) | annotated masks (supervised) |
-| B | Khaled · Adrian | **Convolutional autoencoder**: reconstruction error as anomaly score (pixel AE baseline, feature-space AE final) | normal regions only (unsupervised idea) |
-| C | Hejer · Walid | **CNN baseline + U-Nets** (from scratch, and with an ImageNet ResNet50 encoder) | annotated masks (supervised) |
+| A | Ines Trabelsi · Emna Trabelsi | **DeepLabV3+** with transfer learning (ImageNet ResNet50 encoder, ASPP, decoder) | annotated masks (supervised) |
+| B | Khaled Gannoun · Adrian Salvador Ekomo Mesi Obono | **Convolutional autoencoder**: reconstruction error as anomaly score (pixel AE baseline, feature-space AE final) | normal regions only (unsupervised idea) |
+| C | Hejer Mnejja · Walid Fehry | **CNN baseline + U-Nets** (from scratch, and with an ImageNet ResNet50 encoder) | annotated masks (supervised) |
 
 All three produce a **score map** (probability or reconstruction error). A threshold chosen on validation turns it into a **binary mask**, so the three are compared on the same footing.
 
