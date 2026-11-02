@@ -102,17 +102,19 @@ run = "npm --prefix deployment/landing run preview -- --port 4329"
 description = "Build the landing page and deploy it to Vercel production (needs the vercel CLI, logged in)"
 depends = ["landing:build"]
 # the build recreates dist/, which drops its link to the Vercel project: link it again, or Vercel would create a new project
+dir = "{{config_root}}/deployment/landing/dist"
 run = [
-  "vercel link --yes --project roadanomaly-landing --cwd deployment/landing/dist",
-  "vercel deploy --prod --yes --cwd deployment/landing/dist",
+  "vercel link --yes --project roadanomaly-landing",
+  "vercel deploy --prod --yes",
 ]
 
 [tasks."landing:deploy:preview"]
 description = "Same as landing:deploy, but a preview deployment (not the production alias)"
 depends = ["landing:build"]
+dir = "{{config_root}}/deployment/landing/dist"
 run = [
-  "vercel link --yes --project roadanomaly-landing --cwd deployment/landing/dist",
-  "vercel deploy --yes --cwd deployment/landing/dist",
+  "vercel link --yes --project roadanomaly-landing",
+  "vercel deploy --yes",
 ]
 
 [tasks."docker:build"]
