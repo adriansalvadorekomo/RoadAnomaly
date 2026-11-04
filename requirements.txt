@@ -36,3 +36,6 @@ nbconvert==7.16.6; python_version < "3.11"
 nbformat==5.11.1; python_version >= "3.11"
 nbformat==5.10.4; python_version < "3.11"
 pytest>=8,<10
+
+# Code quality (mise run lint): ruff checks the code and the notebooks against the rules in pyproject.toml
+ruff==0.17.3

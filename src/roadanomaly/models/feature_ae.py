@@ -18,11 +18,11 @@ from keras import layers
 
 BACKBONE = "VGG16"
 FEATURE_LAYER = "block5_conv3"
-HIDDEN = 256
-CODE_CHANNELS = 8
-LEARNING_RATE = 1e-3
+HIDDEN = 256           # width of the encoder and decoder convolutions
+CODE_CHANNELS = 8      # linear code: 512 -> 8 channels per cell, 64 times narrower, so only normal road comes back well
+LEARNING_RATE = 1e-3   # Adam's default step size
 EPOCHS = 300           # upper bound; early stopping decides
-PATIENCE = 15
+PATIENCE = 15          # epochs without a lower validation loss before stopping
 BATCH_SIZE = 8         # whole feature maps per step
 
 # keras.applications constructor and its preprocessing, by name (preprocessing expects 0-255 RGB)
@@ -80,8 +80,11 @@ def train_feature_ae(train, normal_train, val, normal_val, seed, epochs=EPOCHS, 
     """
     keras.utils.set_random_seed(seed)
     model = build_feature_ae(train.shape[-1])
+    # MSE on standardised features; sample_weight below gives weight 0 to cells that touch an obstacle (masked MSE)
     model.compile(optimizer=keras.optimizers.Adam(learning_rate), loss="mse")
+    # Early stopping on the validation normal cells (never the test set), keeping the best epoch's weights
     early_stopping = keras.callbacks.EarlyStopping(monitor="val_loss", patience=patience, restore_best_weights=True)
+    # input = target = the feature maps: the autoencoder learns to reproduce the features of normal road only
     history = model.fit(train, train, sample_weight=normal_train.astype("float32"),
                         validation_data=(val, val, normal_val.astype("float32")),
                         epochs=epochs, batch_size=batch_size, callbacks=[early_stopping], verbose=0)

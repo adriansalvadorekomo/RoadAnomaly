@@ -11,7 +11,8 @@ import json
 import numpy as np
 import pandas as pd
 
-from roadanomaly import data_pipeline as dp, evaluation
+from roadanomaly import data_pipeline as dp
+from roadanomaly import evaluation
 from roadanomaly.inference import Predictor, available_models
 from roadanomaly.protocol import IMG_SIZE
 

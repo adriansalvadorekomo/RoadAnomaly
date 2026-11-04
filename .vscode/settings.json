@@ -1,0 +1,48 @@
+{
+  // ---------------------------------------------------------------- Python environment
+  // The project's virtual environment, created with pip by `mise run setup` (see README, "Setup").
+  // Windows: run "Python: Select Interpreter" once and pick .venv\Scripts\python.exe.
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  // pip only: never let the Python Environments extension create or sync .venv with uv
+  // (a uv sync from the repository root uninstalls TensorFlow and every other dependency)
+  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "python-envs.defaultPackageManager": "ms-python.python:pip",
+  "python-envs.alwaysUseUv": false,
+
+  // ---------------------------------------------------------------- Pylance
+  // Type-checking rules live in pyproject.toml ([tool.pyright]), shared with every editor.
+  "python.analysis.diagnosticMode": "openFilesOnly",
+  "python.analysis.autoImportCompletions": false,
+
+  // ---------------------------------------------------------------- Notebooks
+  // Run each notebook from its own folder (the notebooks find the repository from there).
+  // Kernel: pick "Python (roadanomaly)" (registered by `mise run setup`), which keeps the notebooks' metadata unchanged.
+  "jupyter.notebookFileRoot": "${fileDirname}",
+  "notebook.output.scrolling": true,
+
+  // ---------------------------------------------------------------- Tests (mise run test)
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["tests"],
+
+  // ---------------------------------------------------------------- Editor and files
+  "[python]": { "editor.rulers": [120] },
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  },
+  "search.exclude": {
+    ".venv": true,
+    "**/node_modules": true,
+    "deployment/landing/dist": true,
+    "checkpoints": true,
+    "models": true
+  },
+  "files.watcherExclude": {
+    "**/.venv/**": true,
+    "**/node_modules/**": true,
+    "**/checkpoints/**": true,
+    "**/models/**": true
+  }
+}

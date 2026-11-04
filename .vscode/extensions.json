@@ -1,0 +1,12 @@
+{
+  // Extensions this project is set up for: Python + Pylance + Jupyter for the code and notebooks, Ruff for the lint,
+  // Astro for the landing page, a TOML editor for pyproject.toml and mise.toml
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-toolsai.jupyter",
+    "charliermarsh.ruff",
+    "astro-build.astro-vscode",
+    "tamasfe.even-better-toml"
+  ]
+}

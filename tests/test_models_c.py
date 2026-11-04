@@ -17,7 +17,7 @@ SHAPE = (64, 128, 3)
 def test_builders_follow_the_shared_format(builder):
     model = builder(SHAPE)
     out = model(np.random.default_rng(0).random((2, *SHAPE), dtype=np.float32), training=False).numpy()
-    assert out.shape == (2, *SHAPE[:2], 1) and 0 <= out.min() and out.max() <= 1
+    assert out.shape == (2, *SHAPE[:2], 1) and out.min() >= 0 and out.max() <= 1
     names = [layer.name for layer in model.layers]
     assert "anomaly_logits" in names and names[-1] == "anomaly_probability"
     xai.default_segmentation_layer(model)   # Seg-Grad-CAM finds a decoder layer
@@ -32,23 +32,27 @@ def test_normalisation_is_inside_the_models():
 def test_unet_resnet50_keeps_encoder_batchnorm_frozen():
     model = build_unet_resnet50(SHAPE, weights=None)
     encoder = model.get_layer("resnet50_encoder")
-    batchnorms = [l for l in encoder.layers if l.__class__.__name__ == "BatchNormalization"]
-    assert batchnorms and not any(l.trainable for l in batchnorms)
+    batchnorms = [layer for layer in encoder.layers if layer.__class__.__name__ == "BatchNormalization"]
+    assert batchnorms and not any(layer.trainable for layer in batchnorms)
     assert any(w.trainable for w in encoder.weights)   # convolutions are fine-tuned
 
 
 @pytest.mark.parametrize("loss", [losses.dice_loss, losses.bce_dice_loss, losses.focal_loss,
                                   losses.focal_tversky_loss, losses.focal_plus_tversky_loss])
 def test_losses_reward_the_right_mask(loss):
-    truth = np.zeros((2, 16, 16, 1), np.float32); truth[:, 4:10, 4:10] = 1
+    truth = np.zeros((2, 16, 16, 1), np.float32)
+    truth[:, 4:10, 4:10] = 1
     good, bad = float(loss(truth, truth)), float(loss(truth, 1 - truth))
     assert good < 0.05 and bad > good + 0.5
 
 
 def test_tversky_penalises_misses_more_than_false_alarms():
-    truth = np.zeros((1, 10, 10, 1), np.float32); truth[0, :5] = 1
-    missed = truth.copy(); missed[0, :2] = 0                      # 20 anomaly pixels missed
-    extra = truth.copy(); extra[0, 5:7] = 1                       # 20 background pixels flagged
+    truth = np.zeros((1, 10, 10, 1), np.float32)
+    truth[0, :5] = 1
+    missed = truth.copy()
+    missed[0, :2] = 0  # 20 anomaly pixels missed
+    extra = truth.copy()
+    extra[0, 5:7] = 1  # 20 background pixels flagged
     assert float(losses.focal_tversky_loss(truth, missed)) > float(losses.focal_tversky_loss(truth, extra))
 
 

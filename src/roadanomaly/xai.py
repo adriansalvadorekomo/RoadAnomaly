@@ -88,7 +88,10 @@ def block_order(heatmap, block):
     return np.argsort(-means.ravel(), kind="stable"), (rows, cols)
 
 
-def deletion_insertion(score_fn, image, heatmap, block=32, fractions=np.linspace(0, 1, 6),
+DELETION_FRACTIONS = np.linspace(0, 1, 6)   # share of the blocks deleted / inserted at each step
+
+
+def deletion_insertion(score_fn, image, heatmap, block=32, fractions=DELETION_FRACTIONS,
                        blur_sigma=8, random_seeds=(1337, 1338, 1339)):
     """Deletion and insertion curves of score_fn for the attribution order and random orders.
 
@@ -199,7 +202,7 @@ def factor_shapley(score_fn, image, region, factors=FACTORS):
     k = len(factors)
     coalitions = [frozenset(c) for r in range(k + 1) for c in combinations(factors, r)]
     batch = np.stack([remove_factors(image, region, set(factors) - set(c)) for c in coalitions])
-    value = dict(zip(coalitions, np.asarray(score_fn(batch), dtype=np.float64)))
+    value = dict(zip(coalitions, np.asarray(score_fn(batch), dtype=np.float64), strict=True))
     phi = {}
     for f in factors:
         total = 0.0
@@ -253,7 +256,9 @@ def where_map(predictor, image, region, method="gradcam++"):
     image = np.asarray(image, np.float32)
     if predictor.model_type == "segmentation":
         layer = predictor.config.get("xai", {}).get("layer") or default_segmentation_layer(predictor.model)
-        return grad_cam(predictor.model, image, layer, logit_target(region), output_name="anomaly_logits", method=method)
+        return grad_cam(
+            predictor.model, image, layer, logit_target(region), output_name="anomaly_logits", method=method
+        )
     if predictor.model_type == "pixel_autoencoder":
         return grad_cam(predictor.model, image, "code", reconstruction_target(region), method=method)
     features = predictor.features(image[None])[0]
