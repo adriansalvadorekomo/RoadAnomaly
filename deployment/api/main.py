@@ -51,9 +51,13 @@ def models():
 
 
 @app.post("/predict")
-async def predict(file: UploadFile = File(..., description="RGB image (JPEG, PNG or WebP)"),
-                  model: str | None = Query(None, description="model name from /models (default: A_deeplabv3plus, the recommended model)"),
-                  include_images: bool = Query(True, description="return overlay and score map as base64 PNG")):
+async def predict(
+    file: UploadFile = File(..., description="RGB image (JPEG, PNG or WebP)"),
+    model: str | None = Query(
+        None, description="model name from /models (default: A_deeplabv3plus, the recommended model)"
+    ),
+    include_images: bool = Query(True, description="return overlay and score map as base64 PNG"),
+):
     model = _model_or_404(model)
     result = service.analyse(model, await _read_image(file))
     response = {"stats": result["stats"], "mask_png": _b64_png(result["mask"].astype("uint8") * 255)}
@@ -78,14 +82,25 @@ async def explain(file: UploadFile = File(...),
     what = e["what"]
     return {
         "stats": result["stats"],
-        "target": "mean anomaly logit (segmentation) or mean reconstruction error (autoencoders) on the predicted region",
-        "where": {"method": e["where_method"],
-                  "heatmap_png": _b64_png(service.blend(result["image"], service.heatmap_rgb(e["where"], "jet")))},
-        "what": {"method": "exact Shapley values over interpretable image factors",
-                 "values": what["phi"], "score_original": what["full"], "score_all_removed": what["base"],
-                 "efficiency_gap": what["efficiency_gap"], "evaluations": what["evaluations"],
-                 "factors": {f: {"label": service.xai.FACTOR_LABELS[f], "removal": service.xai.FACTOR_REMOVAL[f]}
-                             for f in service.xai.FACTORS}},
+        "target": (
+            "mean anomaly logit (segmentation) or mean reconstruction error (autoencoders) on the predicted region"
+        ),
+        "where": {
+            "method": e["where_method"],
+            "heatmap_png": _b64_png(service.blend(result["image"], service.heatmap_rgb(e["where"], "jet"))),
+        },
+        "what": {
+            "method": "exact Shapley values over interpretable image factors",
+            "values": what["phi"],
+            "score_original": what["full"],
+            "score_all_removed": what["base"],
+            "efficiency_gap": what["efficiency_gap"],
+            "evaluations": what["evaluations"],
+            "factors": {
+                f: {"label": service.xai.FACTOR_LABELS[f], "removal": service.xai.FACTOR_REMOVAL[f]}
+                for f in service.xai.FACTORS
+            },
+        },
         "summary": e["sentence"],
         "note": "descriptive explanations, not causal proof; they never replace the segmentation metrics",
     }

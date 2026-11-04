@@ -27,6 +27,8 @@ include = ["src", "deployment", "scripts", "tests"]
 extraPaths = ["src"]
 typeCheckingMode = "basic"
 reportMissingModuleSource = false
+# Notebooks may define a helper again in a later phase (the master notebook joins the phases): allowed there only
+executionEnvironments = [{ root = "notebooks", reportRedeclaration = false }]
 # These rules mostly flag working TensorFlow / Keras / NumPy / pandas code (Optional returns, partial stubs):
 reportAttributeAccessIssue = false
 reportArgumentType = false
@@ -36,3 +38,26 @@ reportOptionalMemberAccess = false
 reportOptionalSubscript = false
 reportOptionalOperand = false
 reportCallIssue = false
+
+# Code quality: `mise run lint` (ruff, pinned in requirements.txt). Same rules in VS Code with the Ruff extension.
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "."]
+extend-exclude = ["archive", "deployment/landing/node_modules"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, bugbear, simplify, pyupgrade, import order, naming, comprehensions, misc, returns
+select = ["E", "W", "F", "B", "SIM", "UP", "I", "N", "C4", "PIE", "RET"]
+
+[tool.ruff.lint.per-file-ignores]
+# Notebooks import in their setup cell, after setting TensorFlow's log level in os.environ
+"*.ipynb" = ["E402"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI declares request parameters with calls in default arguments; that is its documented style
+extend-immutable-calls = ["fastapi.File", "fastapi.Query"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["roadanomaly", "deployment", "scripts"]
+

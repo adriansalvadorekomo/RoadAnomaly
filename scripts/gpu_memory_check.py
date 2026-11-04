@@ -12,9 +12,9 @@ some graphs ("Seen floating point types of different precisions ... ReluGrad").
 """
 import argparse
 
+import keras
 import numpy as np
 import tensorflow as tf
-import keras
 from keras import layers
 
 parser = argparse.ArgumentParser()
@@ -41,7 +41,7 @@ def get_unet(shape):
         x = layers.MaxPooling2D()(x)
     x = layers.Conv2D(512, 3, padding="same", activation="relu")(x)
     x = layers.Conv2D(512, 3, padding="same", activation="relu")(x)
-    for filters, skip in zip([256, 128, 64, 32], reversed(skips)):
+    for filters, skip in zip([256, 128, 64, 32], reversed(skips), strict=True):
         x = layers.Conv2DTranspose(filters, 2, strides=2)(x)
         x = layers.Concatenate()([x, skip])
         x = layers.Conv2D(filters, 3, padding="same", activation="relu")(x)

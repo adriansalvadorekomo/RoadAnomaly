@@ -7,15 +7,15 @@ on demand and timing. Models are loaded once and cached.
 import io
 import os
 import time
-from functools import lru_cache
+from functools import cache
 
 import matplotlib
 import numpy as np
-import tensorflow as tf
 from PIL import Image, UnidentifiedImageError
 from scipy import ndimage
 
-from roadanomaly import data_pipeline as dp, xai
+from roadanomaly import data_pipeline as dp
+from roadanomaly import xai
 from roadanomaly.gpu import setup_gpu
 from roadanomaly.inference import Predictor, available_models, prepare_image
 from roadanomaly.metrics import EIGHT_CONNECTED
@@ -48,7 +48,7 @@ def default_model():
     return RECOMMENDED_MODEL if RECOMMENDED_MODEL in names else (names[0] if names else None)
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_predictor(name):
     if name not in model_names():
         raise KeyError(f"unknown model {name!r}; available: {model_names()}")
@@ -113,8 +113,14 @@ def service_title(name):
     return SHORT_NAMES.get(name, name)
 
 
-SHORT_NAMES = {"A_deeplabv3plus": "DeepLabV3+", "B_feature_ae": "The feature autoencoder", "B_pixel_ae": "The pixel autoencoder",
-               "C_cnn": "The CNN baseline", "C_unet": "The U-Net", "C_unet_resnet50": "The U-Net ResNet50"}
+SHORT_NAMES = {
+    "A_deeplabv3plus": "DeepLabV3+",
+    "B_feature_ae": "The feature autoencoder",
+    "B_pixel_ae": "The pixel autoencoder",
+    "C_cnn": "The CNN baseline",
+    "C_unet": "The U-Net",
+    "C_unet_resnet50": "The U-Net ResNet50",
+}
 
 
 def overlay(image, mask, color=(255, 40, 40), alpha=0.5):

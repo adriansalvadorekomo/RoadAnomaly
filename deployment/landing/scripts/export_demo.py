@@ -17,7 +17,8 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 
-from roadanomaly import data_pipeline as dp, splitting
+from roadanomaly import data_pipeline as dp
+from roadanomaly import splitting
 from roadanomaly.inference import Predictor, available_models
 from roadanomaly.protocol import IMG_SIZE, MIN_OBJECT_PX_FULL
 
@@ -33,7 +34,13 @@ TITLES = {"animals10_bovine_cattle_beside_road": "Cow beside an alpine road",
           "cones01_Beeston_MMB_A6_Middle_Street": "Roadworks cones in Beeston",
           "animals27_wildlife_bear": "Bear crossing a forest road",
           "vehicle03_Fuhrwerke_in_China": "Carts on a road in China"}
-CATEGORY = {"animals": "animal", "cones": "cones", "lost_tires": "lost tyres", "obstacles": "obstacle", "vehicle": "vehicle"}
+CATEGORY = {
+    "animals": "animal",
+    "cones": "cones",
+    "lost_tires": "lost tyres",
+    "obstacles": "obstacle",
+    "vehicle": "vehicle",
+}
 
 
 def credits():
@@ -43,7 +50,10 @@ def credits():
         if not sources:
             continue
         line, source = sources[0], (sources[1] if len(sources) > 1 else "")
-        match = re.match(r"(?P<author>.*?),?\s*(?P<lic>CC BY(?:-SA)? [\d.]+(?: DE)?|CC0|public domain)\s*(?P<url>https?://\S+)?", line)
+        match = re.match(
+            r"(?P<author>.*?),?\s*(?P<lic>CC BY(?:-SA)? [\d.]+(?: DE)?|CC0|public domain)\s*(?P<url>https?://\S+)?",
+            line,
+        )
         if not match:
             continue
         for name in names:
@@ -62,7 +72,10 @@ def half_area(array):
 def frame_stats(mask):
     labeled, n = ndimage.label(mask, structure=np.ones((3, 3)))
     areas = ndimage.sum(mask, labeled, range(1, n + 1)) if n else np.array([])
-    return {"anomaly_percent": round(100 * float(mask.mean()), 1), "objects": int((np.asarray(areas) >= MIN_OBJECT_PX_FULL).sum())}
+    return {
+        "anomaly_percent": round(100 * float(mask.mean()), 1),
+        "objects": int((np.asarray(areas) >= MIN_OBJECT_PX_FULL).sum()),
+    }
 
 
 def main():
@@ -89,7 +102,7 @@ def main():
         predictor = Predictor(dp.MODELS_DIR / name)
         scores = predictor.score_maps(x)
         maps, ranges = {}, {}
-        for frame, score in zip(LIVE_FRAMES, scores):
+        for frame, score in zip(LIVE_FRAMES, scores, strict=True):
             small = half_area(score)
             lo, hi = float(small.min()), float(small.max())
             q = np.round((small - lo) / max(hi - lo, 1e-9) * 65535).astype("<u2")

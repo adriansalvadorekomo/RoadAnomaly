@@ -105,7 +105,7 @@ class PerceptualAutoencoder(keras.Model):
             target_features = tf.nest.flatten(self.feature_model(preprocess(targets * 255.0), training=False))
             recon_features = tf.nest.flatten(self.feature_model(preprocess(reconstruction * 255.0), training=False))
             per_layer = [tf.reduce_mean(tf.abs(t - r)) / (tf.reduce_mean(tf.abs(t)) + keras.backend.epsilon())
-                         for t, r in zip(target_features, recon_features)]
+                         for t, r in zip(target_features, recon_features, strict=True)]
             perceptual_loss = tf.reduce_mean(tf.stack(per_layer))
         return pixel_loss + self.perceptual_weight * perceptual_loss, pixel_loss, perceptual_loss
 
@@ -120,7 +120,7 @@ class PerceptualAutoencoder(keras.Model):
         with tf.GradientTape() as tape:
             total, pixel, perceptual = self._loss_terms(inputs, targets, training=True)
         variables = self.reconstruction_model.trainable_variables
-        self.optimizer.apply_gradients(zip(tape.gradient(total, variables), variables))
+        self.optimizer.apply_gradients(zip(tape.gradient(total, variables), variables, strict=True))
         return self._update_trackers(total, pixel, perceptual)
 
     def test_step(self, data):

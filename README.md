@@ -46,6 +46,7 @@ How to read it, left to right (the ribbon on top is the CRISP-DM phases; every b
 ```
 RoadAnomaly-CRISPDM/
 ├── notebooks/
+│   ├── 0_RoadAnomaly_Master.ipynb    # all phases in one notebook (generated: mise run master)
 │   ├── 1_Business_Understanding.md   # problem, objectives, success criteria, plan
 │   ├── 2_Data_Understanding.ipynb    # EDA → evaluation protocol derived from the data
 │   ├── 3_Data_Preparation.ipynb      # frozen split (rebuilt + checked), loader, conventions
@@ -87,8 +88,10 @@ RoadAnomaly-CRISPDM/
 4. **Normal-region extraction** for the autoencoders lives in `src/roadanomaly/normal_regions.py`, not in the shared notebooks.
 5. **`archive/`** holds earlier explorations; nothing in the pipeline imports from it.
 6. **Paths** come from `data_pipeline.py` (repository-relative); no absolute or OS-specific path in code or saved outputs (`mise run check`).
-7. **Reproducibility.** Every notebook sets the seed (`protocol.SEED`) and enables deterministic ops, and runs top to bottom (`mise run pipeline`).
+7. **Reproducibility.** Every notebook seeds its random generators (`protocol.SEED` wherever a model is trained, evaluated or explained); the training and evaluation notebooks (4A, 4B, 4C, 5) also enable deterministic GPU ops; every notebook runs top to bottom (`mise run pipeline`).
 8. **Dependencies.** Python packages with pip only (pinned in `requirements.txt`); Node is used only for the landing page.
+9. **One master notebook, generated.** `notebooks/0_RoadAnomaly_Master.ipynb` puts phases 1 to 6 in one notebook, for reading and submission: each modeling part names its binôme, and the training code explains its hyper-parameters. It is built from the phase notebooks by `scripts/build_master_notebook.py` (`mise run master`, also run at the end of `mise run pipeline`) and never edited by hand; `mise run check` fails when it is out of date.
+10. **Clean code.** `mise run lint` (ruff, rules in `pyproject.toml`) passes on the code and the notebooks: sorted imports, no unused names, lines of at most 120 characters, `zip(..., strict=...)` stated. The training cells explain their hyper-parameters in comments. `mise run check` runs it with the other gates.
 
 ## Setup (pip only)
 Python 3.10–3.12 and, for the GPU, an NVIDIA driver for CUDA 12 (the CUDA libraries come from pip on Linux).
@@ -106,13 +109,15 @@ With [mise](https://mise.jdx.dev) the same is `mise run setup`. Main tasks (`mis
 | `mise run setup` / `setup:deploy` | create `.venv`, install the pinned packages, register the kernel / install the API, demo and landing dependencies |
 | `mise run test` (`test:fast`) | run the test suite (without the 20 s split regeneration) |
 | `mise run train` (`train:a` / `train:b` / `train:c`) | train the six models (notebooks 4A, 4B, 4C) and save them in `models/`; needs the data split of the repo only, about 20 minutes on a laptop RTX 4060 (see *Training time* below) |
-| `mise run pipeline` | execute notebooks 2 → 6 in order (trains the models, evaluates, explains) |
+| `mise run pipeline` | execute notebooks 2 → 6 in order (trains the models, evaluates, explains), then rebuild the master notebook |
+| `mise run master` | rebuild `notebooks/0_RoadAnomaly_Master.ipynb` (all phases in one notebook) from the phase notebooks |
 | `mise run notebook <path>` | execute one notebook in place |
 | `mise run models` / `evaluate <model> [split]` | list the trained models / evaluate one from the command line |
 | `mise run api` / `app` / `landing` | FastAPI on :8000, Streamlit demo on :8501, landing page on :4321 |
 | `mise run landing:build` / `landing:preview` / `landing:deploy` | build the landing page, serve the build on :4329, deploy it to Vercel (`landing:deploy:preview` for a preview URL) |
 | `mise run docker:build` / `docker:up` | build and start the API + demo containers |
-| `mise run gpu` / `check` / `clean` | GPU check, repository hygiene, remove caches |
+| `mise run lint` | ruff on the code and the notebooks (`ruff check . --fix` sorts the imports) |
+| `mise run gpu` / `check` / `clean` | GPU check, quality gate (no absolute paths, master notebook up to date, lint clean), remove caches |
 
 The modeling notebooks download ImageNet weights once into `~/.keras/models` (ResNet50 for A and C, VGG16 / VGG19 for B; about 250 MB); their first run needs internet.
 
@@ -141,6 +146,9 @@ Other hardware (CPU, RTX 2060, Colab) has not been measured.
 > - **AMD or Apple GPU:** the pinned TensorFlow 2.20 build here targets NVIDIA CUDA, so these cards are not used and the code falls back to the CPU. (Vendor plug-ins exist, `tensorflow-rocm` and `tensorflow-metal`, but they need other TensorFlow versions and we have not tried them.)
 > - **A smaller NVIDIA card (under 6 GB)?** If training runs out of memory, lower the batch size in the modeling notebook (`BATCH_SIZE` in notebook 4A, `PIXEL_BATCH_SIZE` in 4B, the `batch_size` argument of `train(...)` in 4C); the results then differ a little from the reported ones.
 > - Whatever you use, `mise run gpu` shows what TensorFlow can see.
+
+### VS Code
+Open the **repository root** (`code RoadAnomaly-CRISPDM`), not a subfolder such as `notebooks/`: only then does VS Code read the workspace settings (`.vscode/settings.json`: the `.venv` interpreter, pip instead of uv, pytest) and Pylance read `pyproject.toml` (type checking in `basic` mode, with the rules that only flag working TensorFlow / NumPy code turned off). If you open `notebooks/` on its own, `notebooks/pyrightconfig.json` still gives Pylance the project's rules (it extends `pyproject.toml`), but the interpreter and the other workspace settings then have to be chosen by hand; without a project configuration, Pylance would apply your personal settings, e.g. a global `strict` mode, and show many false errors. For notebooks, pick the kernel **Python (roadanomaly)**, the same `.venv` registered by `mise run setup`, so that the notebooks' metadata stays unchanged. The recommended extensions are listed in `.vscode/extensions.json` (Python, Pylance, Jupyter, Ruff, Astro, TOML).
 
 ### GPU notes (RTX 4060 8 GB and RTX 2060 6 GB)
 - **TensorFlow is pinned to 2.20.0.** The 2.21.0 wheel cannot find `libcusolver` and silently runs on CPU. On Windows, TensorFlow runs on CPU (use WSL2 for the GPU).
