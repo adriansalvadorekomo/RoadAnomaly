@@ -1,0 +1,7 @@
+,"parameters, total (M)",trained parameters (M),model file (MB),"latency (ms / image, NVIDIA GeForce RTX 4060 Laptop GPU)",training labels needed
+A: DeepLabV3+ (frozen ImageNet ResNet50 encoder),12.838721,4.247649,51.997426,21.082777888902154,pixel masks
+B: Feature-space autoencoder on frozen VGG16 block5_conv3,16.04692,1.332232,16.020657,39.67271629631728,normal regions only (masks used to exclude obstacles)
+"B: Pixel autoencoder (mae_vgg19 loss), baseline",0.786053,0.786053,3.193364,26.486059481478016,normal regions only (masks used to exclude obstacles)
+"C: CNN baseline (encoder-decoder, no skips)",0.186225,0.185553,0.847846,12.872058444406354,pixel masks
+C: U-Net from scratch,1.946993,1.944049,8.03855,15.624219259296767,pixel masks
+C: U-Net with ImageNet ResNet50 encoder,30.550753,30.442529,122.998646,48.477373481445184,pixel masks

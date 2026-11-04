@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "roadanomaly"
 version = "0.1.0"
-description = "Shared data pipeline, metrics and GPU setup for the RoadAnomaly Deep Learning project (ESPRIT)"
+description = "Shared code of the RoadAnomaly CRISP-DM project (ESPRIT): data, protocol, models, evaluation, inference, XAI"
 requires-python = ">=3.10"
 
 [project.optional-dependencies]
@@ -13,3 +13,26 @@ test = ["pytest>=8,<10"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests", "."]
+markers = ["slow: regenerates the split from the raw data (about 20 s)"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+# Editor type checking (Pylance / pyright). TensorFlow, Keras and NumPy are only partly typed, so "strict"
+# would flag almost every line of working code; "basic" keeps real mistakes (undefined names, wrong calls).
+[tool.pyright]
+include = ["src", "deployment", "scripts", "tests"]
+extraPaths = ["src"]
+typeCheckingMode = "basic"
+reportMissingModuleSource = false
+# These rules mostly flag working TensorFlow / Keras / NumPy / pandas code (Optional returns, partial stubs):
+reportAttributeAccessIssue = false
+reportArgumentType = false
+reportGeneralTypeIssues = false
+reportOperatorIssue = false
+reportOptionalMemberAccess = false
+reportOptionalSubscript = false
+reportOptionalOperand = false
+reportCallIssue = false

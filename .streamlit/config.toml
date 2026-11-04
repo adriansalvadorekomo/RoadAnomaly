@@ -1,0 +1,48 @@
+# Streamlit theme of the RoadAnomaly demo: the landing page's "Frost and slate" palette and Albert Sans,
+# self-hosted from deployment/app/static (no external font requests).
+[server]
+enableStaticServing = true
+headless = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"
+primaryColor = "#0d7480"
+backgroundColor = "#f7f9fa"
+secondaryBackgroundColor = "#ecf0f2"
+textColor = "#1f3038"
+linkColor = "#0d7480"
+borderColor = "#dde5e9"
+showWidgetBorder = true
+baseRadius = "6px"
+font = "Albert Sans, system-ui, sans-serif"
+headingFont = "Albert Sans, system-ui, sans-serif"
+headingFontWeights = [600, 600, 600]
+metricValueFontSize = "1.9rem"
+chartCategoricalColors = ["#0d7480", "#e5484d", "#1f3038", "#7fb3ba", "#c9a227", "#5d6b72"]
+
+[[theme.fontFaces]]
+family = "Albert Sans"
+url = "app/static/fonts/albert-sans-latin-400-normal.woff2"
+weight = "400"
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Albert Sans"
+url = "app/static/fonts/albert-sans-latin-500-normal.woff2"
+weight = "500"
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Albert Sans"
+url = "app/static/fonts/albert-sans-latin-600-normal.woff2"
+weight = "600"
+style = "normal"
+
+[theme.sidebar]
+backgroundColor = "#1f3038"
+textColor = "#f7f9fa"
+secondaryBackgroundColor = "#2b4752"
+borderColor = "#2b4752"
