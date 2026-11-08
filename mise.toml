@@ -119,6 +119,11 @@ run = "uvicorn deployment.api.main:app --reload --port 8000"
 description = "Streamlit demo on http://localhost:8501"
 run = "streamlit run deployment/app/streamlit_app.py"
 
+[tasks.product]
+description = "The RoadAnomaly product (MVP for customers: plans, two modes, explanation, reports) on http://localhost:8502"
+dir = "{{config_root}}/deployment/product"   # its own theme lives in deployment/product/.streamlit
+run = "streamlit run app.py --server.port 8502"
+
 [tasks."landing:data"]
 description = "Export the real data the landing page shows (score maps, photos, credits) after the notebooks ran"
 run = "python deployment/landing/scripts/export_demo.py"

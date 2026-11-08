@@ -1,6 +1,7 @@
 # docker compose -f deployment/docker-compose.yml up --build
 #   API  -> http://localhost:8000/docs   (another port: API_PORT=18000 docker compose ... up)
 #   Demo -> http://localhost:8501        (another port: DEMO_PORT=18501)
+#   Product -> http://localhost:8502     (another port: PRODUCT_PORT=18502)
 #   Landing -> http://localhost:4321     (another port: LANDING_PORT=4329)
 #   The landing needs its data once:  mise run landing:data
 # The trained models come from ../models (produced by the modeling notebooks), mounted read-only.
@@ -32,6 +33,21 @@ services:
     ports: ["${DEMO_PORT:-8501}:8501"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+
+  product:
+    <<: *common
+    # started from its folder so Streamlit reads the product theme (deployment/product/.streamlit/config.toml);
+    # the Integration page checks the API through the compose network
+    working_dir: /app/deployment/product
+    environment:
+      ROADANOMALY_API_URL: http://api:8000
+    command: ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8502"]
+    ports: ["${PRODUCT_PORT:-8502}:8502"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8502/_stcore/health')"]
       interval: 30s
       timeout: 5s
       start_period: 60s
