@@ -44,7 +44,7 @@
    "id": "subtitle",
    "x": 52,
    "y": 70,
-   "width": 1344.0,
+   "width": 1497.6,
    "height": 20.0,
    "angle": 0,
    "strokeColor": "#64748b",
@@ -65,8 +65,8 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "Pixel-level detection of unexpected road obstacles  ·  CRISP-DM  ·  TensorFlow / Keras  ·  6 models  ·  FastAPI + Streamlit + Astro + Docker",
-   "originalText": "Pixel-level detection of unexpected road obstacles  ·  CRISP-DM  ·  TensorFlow / Keras  ·  6 models  ·  FastAPI + Streamlit + Astro + Docker",
+   "text": "Pixel-level detection of unexpected road obstacles  ·  CRISP-DM  ·  TensorFlow / Keras  ·  6 models  ·  FastAPI + Streamlit (demo, product) + Astro + Docker",
+   "originalText": "Pixel-level detection of unexpected road obstacles  ·  CRISP-DM  ·  TensorFlow / Keras  ·  6 models  ·  FastAPI + Streamlit (demo, product) + Astro + Docker",
    "fontSize": 16,
    "fontFamily": 3,
    "textAlign": "left",
@@ -804,7 +804,7 @@
    "id": "crisp6",
    "x": 2510,
    "y": 105,
-   "width": 340,
+   "width": 570,
    "height": 50,
    "angle": 0,
    "strokeColor": "#047857",
@@ -840,7 +840,7 @@
   {
    "type": "text",
    "id": "crisp6_t",
-   "x": 2626.0,
+   "x": 2741.0,
    "y": 118.75,
    "width": 108.0,
    "height": 22.5,
@@ -4944,7 +4944,7 @@
    "id": "lane_dep",
    "x": 2380,
    "y": 230,
-   "width": 480,
+   "width": 710,
    "height": 820,
    "angle": 0,
    "strokeColor": "#64748b",
@@ -5009,7 +5009,7 @@
    "id": "svc",
    "x": 2400,
    "y": 300,
-   "width": 440,
+   "width": 670,
    "height": 100,
    "angle": 0,
    "strokeColor": "#047857",
@@ -5044,6 +5044,10 @@
     {
      "id": "a_i1_svc",
      "type": "arrow"
+    },
+    {
+     "id": "a_svc_product",
+     "type": "arrow"
     }
    ],
    "updated": 1,
@@ -5053,10 +5057,10 @@
   {
    "type": "text",
    "id": "svc_t",
-   "x": 2461.6,
+   "x": 2528.6,
    "y": 320.0,
-   "width": 316.8,
-   "height": 60.0,
+   "width": 412.8,
+   "height": 60,
    "angle": 0,
    "strokeColor": "#374151",
    "backgroundColor": "transparent",
@@ -5076,8 +5080,8 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "deployment/service.py\nanalyse() · explain() · overlay()\nshared by the API and the demo",
-   "originalText": "deployment/service.py\nanalyse() · explain() · overlay()\nshared by the API and the demo",
+   "text": "deployment/service.py\nanalyse() · explain() · overlay()\nshared by the API, the demo and the product",
+   "originalText": "deployment/service.py\nanalyse() · explain() · overlay()\nshared by the API, the demo and the product",
    "fontSize": 16,
    "fontFamily": 3,
    "textAlign": "center",
@@ -5244,10 +5248,88 @@
   },
   {
    "type": "rectangle",
+   "id": "product",
+   "x": 2860,
+   "y": 450,
+   "width": 210,
+   "height": 160,
+   "angle": 0,
+   "strokeColor": "#047857",
+   "backgroundColor": "#a7f3d0",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 0,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 3
+   },
+   "seed": 1758868035,
+   "version": 1,
+   "versionNonce": 1074817455,
+   "isDeleted": false,
+   "boundElements": [
+    {
+     "id": "product_t",
+     "type": "text"
+    },
+    {
+     "id": "a_svc_product",
+     "type": "arrow"
+    },
+    {
+     "id": "a_user_product",
+     "type": "arrow"
+    }
+   ],
+   "updated": 1,
+   "link": null,
+   "locked": false
+  },
+  {
+   "type": "text",
+   "id": "product_t",
+   "x": 2883.4,
+   "y": 490.0,
+   "width": 163.2,
+   "height": 80,
+   "angle": 0,
+   "strokeColor": "#374151",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 0,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": null,
+   "seed": 1777362376,
+   "version": 1,
+   "versionNonce": 66136097,
+   "isDeleted": false,
+   "boundElements": null,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "text": "Product (MVP)\n:8502\nAnalyser · Offres\nRapport · Guide",
+   "originalText": "Product (MVP)\n:8502\nAnalyser · Offres\nRapport · Guide",
+   "fontSize": 16,
+   "fontFamily": 3,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "product",
+   "lineHeight": 1.25,
+   "autoResize": false
+  },
+  {
+   "type": "rectangle",
    "id": "web",
    "x": 2400,
    "y": 820,
-   "width": 440,
+   "width": 670,
    "height": 100,
    "angle": 0,
    "strokeColor": "#047857",
@@ -5287,10 +5369,10 @@
   {
    "type": "text",
    "id": "web_t",
-   "x": 2485.6,
+   "x": 2600.6,
    "y": 840.0,
    "width": 268.8,
-   "height": 60.0,
+   "height": 60,
    "angle": 0,
    "strokeColor": "#374151",
    "backgroundColor": "transparent",
@@ -5380,10 +5462,39 @@
   },
   {
    "type": "rectangle",
+   "id": "product_docker",
+   "x": 2852,
+   "y": 442,
+   "width": 226,
+   "height": 176,
+   "angle": 0,
+   "strokeColor": "#047857",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 1,
+   "strokeStyle": "dashed",
+   "roughness": 0,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 3
+   },
+   "seed": 2104730809,
+   "version": 1,
+   "versionNonce": 1544761887,
+   "isDeleted": false,
+   "boundElements": [],
+   "updated": 1,
+   "link": null,
+   "locked": false
+  },
+  {
+   "type": "rectangle",
    "id": "web_docker",
    "x": 2392,
    "y": 812,
-   "width": 456,
+   "width": 686,
    "height": 116,
    "angle": 0,
    "strokeColor": "#047857",
@@ -5410,7 +5521,7 @@
   {
    "type": "ellipse",
    "id": "user",
-   "x": 2520,
+   "x": 2635.0,
    "y": 670,
    "width": 200,
    "height": 70,
@@ -5445,6 +5556,10 @@
     {
      "id": "a_user_web",
      "type": "arrow"
+    },
+    {
+     "id": "a_user_product",
+     "type": "arrow"
     }
    ],
    "updated": 1,
@@ -5454,10 +5569,10 @@
   {
    "type": "text",
    "id": "user_t",
-   "x": 2543.2,
+   "x": 2658.2,
    "y": 695.0,
    "width": 153.6,
-   "height": 20.0,
+   "height": 20,
    "angle": 0,
    "strokeColor": "#374151",
    "backgroundColor": "transparent",
@@ -5594,9 +5709,9 @@
   {
    "type": "arrow",
    "id": "a_user_api",
-   "x": 2560,
-   "y": 674,
-   "width": 55,
+   "x": 2675.0,
+   "y": 676,
+   "width": 140.0,
    "height": 64,
    "angle": 0,
    "strokeColor": "#c2410c",
@@ -5625,7 +5740,7 @@
      0
     ],
     [
-     -55,
+     -140.0,
      -64
     ]
    ],
@@ -5646,10 +5761,10 @@
   {
    "type": "arrow",
    "id": "a_user_demo",
-   "x": 2680,
-   "y": 674,
-   "width": 55,
-   "height": 64,
+   "x": 2735.0,
+   "y": 668,
+   "width": 0.0,
+   "height": 56,
    "angle": 0,
    "strokeColor": "#c2410c",
    "backgroundColor": "transparent",
@@ -5677,8 +5792,8 @@
      0
     ],
     [
-     55,
-     -64
+     0.0,
+     -56
     ]
    ],
    "lastCommittedPoint": null,
@@ -5697,11 +5812,115 @@
   },
   {
    "type": "arrow",
+   "id": "a_svc_product",
+   "x": 2965.0,
+   "y": 400,
+   "width": 0.0,
+   "height": 50,
+   "angle": 0,
+   "strokeColor": "#047857",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 0,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 2
+   },
+   "seed": 1603719407,
+   "version": 1,
+   "versionNonce": 1645371706,
+   "isDeleted": false,
+   "boundElements": [],
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0.0,
+     50
+    ]
+   ],
+   "lastCommittedPoint": null,
+   "startArrowhead": null,
+   "endArrowhead": "arrow",
+   "startBinding": {
+    "elementId": "svc",
+    "focus": 0,
+    "gap": 4
+   },
+   "endBinding": {
+    "elementId": "product",
+    "focus": 0,
+    "gap": 4
+   }
+  },
+  {
+   "type": "arrow",
+   "id": "a_user_product",
+   "x": 2795.0,
+   "y": 676,
+   "width": 140.0,
+   "height": 64,
+   "angle": 0,
+   "strokeColor": "#c2410c",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 0,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "roundness": {
+    "type": 2
+   },
+   "seed": 273780038,
+   "version": 1,
+   "versionNonce": 733351467,
+   "isDeleted": false,
+   "boundElements": [],
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     140.0,
+     -64
+    ]
+   ],
+   "lastCommittedPoint": null,
+   "startArrowhead": null,
+   "endArrowhead": "arrow",
+   "startBinding": {
+    "elementId": "user",
+    "focus": 0,
+    "gap": 4
+   },
+   "endBinding": {
+    "elementId": "product",
+    "focus": 0,
+    "gap": 4
+   }
+  },
+  {
+   "type": "arrow",
    "id": "a_user_web",
-   "x": 2620,
-   "y": 740,
-   "width": 0,
-   "height": 80,
+   "x": 2735.0,
+   "y": 742,
+   "width": 0.0,
+   "height": 76,
    "angle": 0,
    "strokeColor": "#c2410c",
    "backgroundColor": "transparent",
@@ -5729,8 +5948,8 @@
      0
     ],
     [
-     0,
-     80
+     0.0,
+     76
     ]
    ],
    "lastCommittedPoint": null,
@@ -5898,7 +6117,7 @@
    "id": "dep_note",
    "x": 2400,
    "y": 960,
-   "width": 344.4,
+   "width": 432.0,
    "height": 35.0,
    "angle": 0,
    "strokeColor": "#64748b",
@@ -5919,8 +6138,8 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "dashed frame = one Docker Compose service\nmise run docker:up · landing:deploy",
-   "originalText": "dashed frame = one Docker Compose service\nmise run docker:up · landing:deploy",
+   "text": "dashed frame = one Docker Compose service\nmise run docker:up · product · landing:deploy",
+   "originalText": "dashed frame = one Docker Compose service\nmise run docker:up · product · landing:deploy",
    "fontSize": 14,
    "fontFamily": 3,
    "textAlign": "left",

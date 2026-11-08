@@ -40,7 +40,7 @@ How to read it, left to right (the ribbon on top is the CRISP-DM phases; every b
 3. **Shared format.** Training ends with `inference.save_artifact`, which writes one folder per model, `models/<name>/`, with `model.keras` and a `config.json` holding the input size, the post-processing settings and the threshold chosen on validation (the feature autoencoder adds `feature_stats.npz`).
 4. **Inference.** One `Predictor` reads any of those folders: `prepare_image`, the model's raw score map, post-processing (upsample, Gaussian smoothing, per-image z-score), then the validation threshold and minimum blob size. The notebooks, the API and the demo all use this single code path.
 5. **Evaluation and XAI.** Notebook 5 opens the test split once and writes `reports/results/`; notebook 6 explains every model with Grad-CAM++ (where) and exact SHAP over five image factors (what) and writes `xai_summary.json`.
-6. **Deployment.** `deployment/service.py` imports the `Predictor` and `xai` and serves two front ends: the FastAPI service (`/health`, `/models`, `/predict`, `/explain`) and the Streamlit demo. The Astro landing page is static and reads `reports/results/`. The three run as Docker Compose services (`mise run docker:up`); the landing page is also deployed to Vercel (`mise run landing:deploy`).
+6. **Deployment.** `deployment/service.py` imports the `Predictor` and `xai` and serves three front ends: the FastAPI service (`/health`, `/models`, `/predict`, `/explain`), the Streamlit technical demo (:8501) and the RoadAnomaly product, the customer MVP (:8502, `mise run product`). The Astro landing page is static and reads `reports/results/`. The four run as Docker Compose services (`mise run docker:up`); the landing page is also deployed to Vercel (`mise run landing:deploy`).
 
 ## CRISP-DM layout
 ```
@@ -114,15 +114,16 @@ With [mise](https://mise.jdx.dev) the same is `mise run setup`. Main tasks (`mis
 | `mise run notebook <path>` | execute one notebook in place |
 | `mise run models` / `evaluate <model> [split]` | list the trained models / evaluate one from the command line |
 | `mise run api` / `app` / `landing` | FastAPI on :8000, Streamlit demo on :8501, landing page on :4321 |
+| `mise run product` | the RoadAnomaly product (customer MVP, in French) on :8502 |
 | `mise run landing:build` / `landing:preview` / `landing:deploy` | build the landing page, serve the build on :4329, deploy it to Vercel (`landing:deploy:preview` for a preview URL) |
-| `mise run docker:build` / `docker:up` | build and start the API + demo containers |
+| `mise run docker:build` / `docker:up` | build and start the API, demo, product and landing containers |
 | `mise run lint` | ruff on the code and the notebooks (`ruff check . --fix` sorts the imports) |
 | `mise run gpu` / `check` / `clean` | GPU check, quality gate (no absolute paths, master notebook up to date, lint clean), remove caches |
 
 The modeling notebooks download ImageNet weights once into `~/.keras/models` (ResNet50 for A and C, VGG16 / VGG19 for B; about 250 MB); their first run needs internet.
 
 ### Get the trained models, then explain and serve them
-`models/` is git-ignored, so a fresh clone has no trained model. Either run `mise run train`, or copy the `models/` folder from a teammate. `mise run models` lists what is there; with the models in place, `mise run notebook notebooks/5_Evaluation.ipynb`, `mise run api`, `mise run app` and `mise run docker:up` all work.
+`models/` is git-ignored, so a fresh clone has no trained model. Either run `mise run train`, or copy the `models/` folder from a teammate. `mise run models` lists what is there; with the models in place, `mise run notebook notebooks/5_Evaluation.ipynb`, `mise run api`, `mise run app`, `mise run product` and `mise run docker:up` all work.
 
 **Training time** (measured from the notebooks' own cell timestamps, RTX 4060 Laptop GPU, TensorFlow 2.20, without the one-off ImageNet download of about 250 MB):
 
@@ -194,9 +195,15 @@ Mean share of each model's Shapley attribution over the nine validation photogra
 
 ## Deployment
 - **API** (`deployment/api/main.py`, default model `A_deeplabv3plus`): `GET /health`, `GET /models`, `POST /predict` (image → mask, overlay, score map, statistics), `POST /explain?model=…&method=gradcampp|gradcam` (the paired explanation: a Grad-CAM++ / Grad-CAM heatmap as base64 PNG, and the exact Shapley value of each image factor with its efficiency check and a one-sentence summary). Interactive docs at `http://localhost:8000/docs`.
+- **Product, the customer MVP** (`deployment/product/`, in French like the marketing deck; `mise run product`, :8502). The technical demo below is for the jury; the product is what a customer of the deck would use:
+  - **Positioning** (deck slide 19, unexpected obstacles *with* an explanation): no closed list of objects, a pixel mask, and on demand "Pourquoi ce signalement ?" (a Grad-CAM++ heatmap and the exact SHAP factors, in plain French).
+  - **The two modes of the targeting slide** (22): *Détection maximale* = DeepLabV3+ and *Peu de fausses alarmes* = the feature autoencoder. Each mode quotes its own test numbers, read from `reports/results/test_results.json` (20/22 obstacles found with 38 false alarms, against 16/22 with 10).
+  - **The plans of slides 14–15**: free trial (20 images), Bronze 50 DT, Silver 200 DT, Gold 600 DT, with quotas and features gated by the plan (explanation and report from Silver, API integration in Gold). The plan choice is simulated: no account, no payment. Prices and features have one source, `deployment/product/offer.py`.
+  - Pages: *Analyser* (batch upload or validation examples; obstacles in orange, framed, numbered and located in the image), *Rapport* (CSV for spreadsheets and an illustrated HTML report to print as PDF), *Intégration* (live status of the API and code samples), *Offres*, *Guide* (with its limits stated).
+  - Brand: the team's logo (`assets/`, cropped above its tagline, which is set as text), navy for actions and orange only for the obstacles, as in the deck's visual identity; theme in `deployment/product/.streamlit/config.toml`. Tests: `tests/test_product.py`.
 - **Demo** (`deployment/app/streamlit_app.py`): upload an image or pick a validation example, Detect (every model side by side), Explain (where + what for one model), Compare (detections and factor shares of all models), Test results and Method tabs. Theme in `.streamlit/config.toml`.
 - **Landing page** (`deployment/landing/`, Astro): static page whose numbers are read from `reports/results/test_results.json` and `xai_summary.json` at build time.
-- **Docker:** `docker compose -f deployment/docker-compose.yml up --build` starts the API and the demo (CPU TensorFlow; `models/` mounted read-only).
+- **Docker:** `docker compose -f deployment/docker-compose.yml up --build` starts the API, the demo, the product (:8502) and the landing page (CPU TensorFlow; `models/` mounted read-only).
 - **Video:** `python scripts/infer_video.py video.mp4` (DeepLabV3+ by default, or `--model B_feature_ae`) writes an overlay video and prints the measured latency and FPS.
 
 ## Dataset and licences
