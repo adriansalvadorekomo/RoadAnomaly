@@ -10,14 +10,14 @@ import sys
 from pathlib import Path
 
 import altair as alt
-import numpy as np
 import pandas as pd
-from matplotlib.colors import LinearSegmentedColormap
 import streamlit as st
+from matplotlib.colors import LinearSegmentedColormap
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))   # make `deployment` importable
 from deployment import service  # noqa: E402
-from roadanomaly import data_pipeline as dp, xai  # noqa: E402
+from roadanomaly import data_pipeline as dp  # noqa: E402
+from roadanomaly import xai
 
 RESULTS = dp.REPO_ROOT / "reports" / "results"
 TEAL, RED, INK, MUTED = "#0d7480", "#e5484d", "#1f3038", "#5d6b72"
@@ -95,8 +95,12 @@ def latency(ms):
 
 def shap_chart(what, step=40):
     """Horizontal bars of the exact Shapley values; teal raises the anomaly score, red lowers it."""
-    df = pd.DataFrame([{"factor": xai.FACTOR_LABELS[f], "value": v, "effect": "raises the score" if v >= 0 else "lowers the score"}
-                       for f, v in what["phi"].items()])
+    df = pd.DataFrame(
+        [
+            {"factor": xai.FACTOR_LABELS[f], "value": v, "effect": "raises the score" if v >= 0 else "lowers the score"}
+            for f, v in what["phi"].items()
+        ]
+    )
     order = df.reindex(df["value"].abs().sort_values(ascending=False).index)["factor"].tolist()
     bars = alt.Chart(df).mark_bar(cornerRadiusEnd=3).encode(
         x=alt.X("value:Q", title="contribution to the score (Shapley value)"),
@@ -109,14 +113,24 @@ def shap_chart(what, step=40):
     return (bars + rule).properties(height=alt.Step(step))
 
 
-# the key test metrics and their column labels (the full names are in the help tooltips and the "All test metrics" table)
-KEY_METRICS = {"AuPRC (main)": "AuPRC", "AUROC": "AUROC", "F1 = Dice (per-image mean)": "F1", "IoU (per-image mean)": "IoU",
-               "FPR95 (lower is better)": "FPR95 ↓", "Boundary IoU (15 px band)": "Boundary IoU",
-               "objects detected": "Obstacles found", "false alarms / predicted blobs": "False alarms"}
-METRIC_HELP = {"AuPRC (main)": "area under the pixel precision-recall curve; the main score (obstacles are 9 % of pixels)",
-               "FPR95 (lower is better)": "false-positive rate at 95 % pixel recall",
-               "objects detected": "annotated obstacles with at least half of their pixels flagged",
-               "false alarms / predicted blobs": "predicted blobs with less than half of their pixels on an obstacle"}
+# the key test metrics and their column labels
+# (the full names are in the help tooltips and in the "All test metrics" table)
+KEY_METRICS = {
+    "AuPRC (main)": "AuPRC",
+    "AUROC": "AUROC",
+    "F1 = Dice (per-image mean)": "F1",
+    "IoU (per-image mean)": "IoU",
+    "FPR95 (lower is better)": "FPR95 ↓",
+    "Boundary IoU (15 px band)": "Boundary IoU",
+    "objects detected": "Obstacles found",
+    "false alarms / predicted blobs": "False alarms",
+}
+METRIC_HELP = {
+    "AuPRC (main)": "area under the pixel precision-recall curve; the main score (obstacles are 9 % of pixels)",
+    "FPR95 (lower is better)": "false-positive rate at 95 % pixel recall",
+    "objects detected": "annotated obstacles with at least half of their pixels flagged",
+    "false alarms / predicted blobs": "predicted blobs with less than half of their pixels on an obstacle",
+}
 # the landing page's light teal ramp (at most 55 % teal), so the slate text stays readable on every cell
 SHARE_CMAP = LinearSegmentedColormap.from_list("teal", ["#f7f9fa", "#76b0b7"])
 
@@ -162,15 +176,22 @@ with st.sidebar:
     st.markdown("**Models**")
     chosen = st.multiselect("Models", names, default=names, format_func=display_name, label_visibility="collapsed")
     st.markdown("**Explanation**")
-    method_label = st.segmented_control("Where method", list(METHODS), default="Grad-CAM++",
-                                        help="Grad-CAM++ localises several objects and whole objects better; Grad-CAM is the classic.")
+    method_label = st.segmented_control(
+        "Where method",
+        list(METHODS),
+        default="Grad-CAM++",
+        help="Grad-CAM++ localises several objects and whole objects better; Grad-CAM is the classic.",
+    )
     method = METHODS[method_label or "Grad-CAM++"]
     st.divider()
     st.caption("Explanations describe a model; they are not causal proof and never replace the test metrics.")
 
 if source == "Upload" and label is None:
     st.title("Find the unexpected on the road")
-    st.markdown('<p class="ra-kicker">Upload a road photograph in the sidebar, or switch back to the examples.</p>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="ra-kicker">Upload a road photograph in the sidebar, or switch back to the examples.</p>',
+        unsafe_allow_html=True,
+    )
     st.stop()
 if not chosen:
     st.warning("Choose at least one model in the sidebar.")
@@ -178,8 +199,11 @@ if not chosen:
 
 # ------------------------------------------------------------------ header
 st.title("Find the unexpected on the road")
-st.markdown(f'<p class="ra-kicker">{len(chosen)} of {len(names)} models on <b>{label}</b>. '
-            f"Each model marks the pixels it did not expect; ask any of them why in the Explain tab.</p>", unsafe_allow_html=True)
+st.markdown(
+    f'<p class="ra-kicker">{len(chosen)} of {len(names)} models on <b>{label}</b>. '
+    f"Each model marks the pixels it did not expect; ask any of them why in the Explain tab.</p>",
+    unsafe_allow_html=True,
+)
 
 detect_tab, explain_tab, compare_tab, results_tab, method_tab = st.tabs(
     ["Detect", "Explain", "Compare", "Test results", "Method"])
@@ -189,12 +213,14 @@ with detect_tab:
     left, right = st.columns(2, gap="medium")
     left.image(image, caption="Input photograph", width="stretch")
     if ground_truth is not None:
-        right.image(service.overlay(image, ground_truth, color=(47, 211, 196)), caption="Human annotation", width="stretch")
+        right.image(
+            service.overlay(image, ground_truth, color=(47, 211, 196)), caption="Human annotation", width="stretch"
+        )
     else:
         right.info("Uploaded photographs have no annotation: compare the models with each other instead.")
     for row in range(0, len(chosen), 2):
         cols = st.columns(2, gap="medium")
-        for col, name in zip(cols, chosen[row:row + 2]):
+        for col, name in zip(cols, chosen[row:row + 2], strict=False):
             with col.container(border=True):
                 with st.spinner(f"Running {model_title(name)}…"):
                     r = analysed(name, image)
@@ -204,14 +230,21 @@ with detect_tab:
                 m = st.columns(4)
                 m[0].metric("Flagged", f"{s['anomaly_percent']:.1f} %")
                 m[1].metric("Blobs", s["blobs"])
-                m[2].metric("Peak score", f"{s['max_score']:.2f}", help=f"Threshold {s['threshold']:.3f}, chosen on validation")
-                m[3].metric("Latency", latency(s["latency_ms"]), help="One forward pass on this machine, after a warm-up call")
+                m[2].metric(
+                    "Peak score", f"{s['max_score']:.2f}", help=f"Threshold {s['threshold']:.3f}, chosen on validation"
+                )
+                m[3].metric(
+                    "Latency", latency(s["latency_ms"]), help="One forward pass on this machine, after a warm-up call"
+                )
 
 # ------------------------------------------------------------------ EXPLAIN
 with explain_tab:
     st.markdown("Every explanation pairs two methods on the same target, the model's score on the region it flagged: "
                 "**where** (a Grad-CAM family heatmap) and **what** (exact Shapley values over five image factors).")
-    name = st.pills("Model to explain", chosen, default=chosen[0], format_func=model_title, selection_mode="single") or chosen[0]
+    name = (
+        st.pills("Model to explain", chosen, default=chosen[0], format_func=model_title, selection_mode="single")
+        or chosen[0]
+    )
     with st.spinner(f"Explaining {model_title(name)}: one gradient pass and 32 factor combinations…"):
         shown, e = explained(name, image, method)
     where_col, what_col = st.columns([1.05, 1], gap="large")
@@ -226,9 +259,12 @@ with explain_tab:
         st.altair_chart(shap_chart(e["what"]), width="stretch")
         st.success(e["sentence"])
         w = e["what"]
-        st.markdown(f'<span class="ra-check">Exact: Σφ = {sum(w["phi"].values()):+.3f} = f(x) − f(all removed) '
-                    f'= {signed(w["full"])} − ({signed(w["base"])}) · gap {gap_text(w["efficiency_gap"])} · {w["evaluations"]} evaluations</span>',
-                    unsafe_allow_html=True)
+        st.markdown(
+            f'<span class="ra-check">Exact: Σφ = {sum(w["phi"].values()):+.3f} = f(x) − f(all removed) '
+            f"= {signed(w['full'])} − ({signed(w['base'])}) · gap {gap_text(w['efficiency_gap'])} · "
+            f"{w['evaluations']} evaluations</span>",
+            unsafe_allow_html=True,
+        )
         with st.expander("How each factor is removed"):
             st.dataframe(pd.DataFrame([{"factor": xai.FACTOR_LABELS[f], "removed by": xai.FACTOR_REMOVAL[f],
                                         "Shapley value": round(w["phi"][f], 4)} for f in xai.FACTORS]),
@@ -242,14 +278,29 @@ with compare_tab:
         rows.append({"Model": model_title(name), "Flagged": s["anomaly_percent"], "Blobs": s["blobs"],
                      "Peak score": s["max_score"], "Threshold": s["threshold"], "Latency": s["latency_ms"]})
     st.subheader("Detection on this photograph")
-    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", column_config={
-        "Flagged": st.column_config.ProgressColumn("Flagged", format="%.1f %%", min_value=0, max_value=max(r["Flagged"] for r in rows) or 1,
-                                                   help="share of the image's pixels flagged as obstacle"),
-        "Peak score": st.column_config.NumberColumn(format="%.2f", help="anomaly probability (A, C) or reconstruction error (B)"),
-        "Threshold": st.column_config.NumberColumn(format="%.3f", help="chosen on the validation split"),
-        "Latency": st.column_config.NumberColumn(format="%.0f ms", help="one forward pass, after a warm-up call")})
+    st.dataframe(
+        pd.DataFrame(rows),
+        hide_index=True,
+        width="stretch",
+        column_config={
+            "Flagged": st.column_config.ProgressColumn(
+                "Flagged",
+                format="%.1f %%",
+                min_value=0,
+                max_value=max(r["Flagged"] for r in rows) or 1,
+                help="share of the image's pixels flagged as obstacle",
+            ),
+            "Peak score": st.column_config.NumberColumn(
+                format="%.2f", help="anomaly probability (A, C) or reconstruction error (B)"
+            ),
+            "Threshold": st.column_config.NumberColumn(format="%.3f", help="chosen on the validation split"),
+            "Latency": st.column_config.NumberColumn(format="%.0f ms", help="one forward pass, after a warm-up call"),
+        },
+    )
     st.subheader("What each model relies on, on this photograph")
-    st.caption("Share of each factor in the model's total Shapley attribution (units differ between models, shares do not).")
+    st.caption(
+        "Share of each factor in the model's total Shapley attribution (units differ between models, shares do not)."
+    )
     if st.button("Explain all selected models", type="primary"):
         st.session_state["compare_key"] = (label, tuple(chosen), method)
     if st.session_state.get("compare_key") == (label, tuple(chosen), method):
@@ -274,19 +325,29 @@ with compare_tab:
 with results_tab:
     summary = RESULTS / "test_summary.csv"
     if summary.exists():
-        st.markdown("Frozen test split (9 photographs, 22 obstacles), evaluated once in `notebooks/5_Evaluation.ipynb`.")
+        st.markdown(
+            "Frozen test split (9 photographs, 22 obstacles), evaluated once in `notebooks/5_Evaluation.ipynb`."
+        )
         table = test_table(summary)
         key = [c for c in KEY_METRICS if c in table.columns]
-        st.dataframe(table[key], width="stretch", column_config={
-            c: st.column_config.NumberColumn(KEY_METRICS[c], format="%.3f", help=METRIC_HELP.get(c, c))
-            if pd.api.types.is_float_dtype(table[c]) else st.column_config.TextColumn(KEY_METRICS[c], help=METRIC_HELP.get(c, c))
-            for c in key})
+        st.dataframe(
+            table[key],
+            width="stretch",
+            column_config={
+                c: st.column_config.NumberColumn(KEY_METRICS[c], format="%.3f", help=METRIC_HELP.get(c, c))
+                if pd.api.types.is_float_dtype(table[c])
+                else st.column_config.TextColumn(KEY_METRICS[c], help=METRIC_HELP.get(c, c))
+                for c in key
+            },
+        )
         with st.expander("All test metrics"):
             # one column per model mixes scores and "20/22" counts, so the cells are shown as text
             st.dataframe(table.T.map(lambda v: f"{v:.3f}" if isinstance(v, float) else str(v)), width="stretch")
         paired = RESULTS / "test_paired_differences.csv"
         if paired.exists():
-            with st.expander("Paired bootstrap differences (a difference is established when its 95 % interval excludes 0)"):
+            with st.expander(
+                "Paired bootstrap differences (a difference is established when its 95 % interval excludes 0)"
+            ):
                 diffs = pd.read_csv(paired)
                 diffs["A - B"] = diffs["A - B"].map(lambda pair: " − ".join(display_name(n) for n in pair.split(" - ")))
                 st.dataframe(diffs.rename(columns={"A - B": "Comparison"}), hide_index=True, width="stretch",
@@ -300,8 +361,12 @@ with results_tab:
         df.index = [model_title(n) if n in names else n for n in df.index]
         st.caption("Mean share of each factor in the model's exact Shapley attribution, nine validation photographs "
                    "(notebooks/6_XAI.ipynb). The largest factor of each model is in bold.")
-        st.dataframe(df.style.format("{:.0%}").background_gradient(cmap=SHARE_CMAP, axis=None, vmin=0, vmax=0.6, text_color_threshold=0)
-                     .apply(lambda row: ["font-weight: 700" if v == row.max() else "" for v in row], axis=1), width="stretch")
+        st.dataframe(
+            df.style.format("{:.0%}")
+            .background_gradient(cmap=SHARE_CMAP, axis=None, vmin=0, vmax=0.6, text_color_threshold=0)
+            .apply(lambda row: ["font-weight: 700" if v == row.max() else "" for v in row], axis=1),
+            width="stretch",
+        )
     if not summary.exists():
         st.info("Run `notebooks/5_Evaluation.ipynb` to produce the test results.")
 
@@ -314,7 +379,8 @@ with method_tab:
 - **A · DeepLabV3+**: supervised segmentation, frozen ImageNet ResNet50 encoder, ASPP and decoder.
 - **B · Autoencoders**: trained on normal road only; an obstacle is what they cannot rebuild
   (pixel autoencoder, and a feature-space autoencoder on frozen VGG16 features).
-- **C · CNN and U-Nets**: supervised segmentation, from a simple encoder–decoder to a U-Net with an ImageNet ResNet50 encoder.
+- **C · CNN and U-Nets**: supervised segmentation, from a simple encoder–decoder to a U-Net with an
+  ImageNet ResNet50 encoder.
 
 Thresholds were chosen on the validation split; the test split was opened once, for all models together.
 """)
@@ -326,6 +392,9 @@ Thresholds were chosen on the validation split; the test split was opened once, 
 - **What — exact SHAP**: the same score is recomputed with every combination of five image factors removed
   (32 combinations), giving exact Shapley values that add up to the score change.
 """)
-        st.dataframe(pd.DataFrame([{"factor": xai.FACTOR_LABELS[f], "removed by": xai.FACTOR_REMOVAL[f]} for f in xai.FACTORS]),
-                     hide_index=True, width="stretch")
+        st.dataframe(
+            pd.DataFrame([{"factor": xai.FACTOR_LABELS[f], "removed by": xai.FACTOR_REMOVAL[f]} for f in xai.FACTORS]),
+            hide_index=True,
+            width="stretch",
+        )
     st.caption("Research prototype. 60 photographs in total, 9 for the test: results are uncertain, see the intervals.")

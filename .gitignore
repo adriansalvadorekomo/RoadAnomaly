@@ -48,5 +48,8 @@ reports/video/
 
 # OS / editors
 .DS_Store
-.vscode/
+# VS Code: the shared workspace settings are tracked, personal files are not
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/

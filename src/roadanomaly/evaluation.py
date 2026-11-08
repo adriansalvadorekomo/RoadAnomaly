@@ -20,8 +20,16 @@ from sklearn.metrics import roc_auc_score, roc_curve
 
 from roadanomaly import metrics
 from roadanomaly.postprocessing import auprc
-from roadanomaly.protocol import (BOOTSTRAP_ALPHA, BOOTSTRAP_SAMPLES, BOUNDARY_BAND_PX, FPR_LIMIT,
-                                  MIN_OBJECT_PX, OBJECT_OVERLAP, SEED, SMALL_OBJECT_PX)
+from roadanomaly.protocol import (
+    BOOTSTRAP_ALPHA,
+    BOOTSTRAP_SAMPLES,
+    BOUNDARY_BAND_PX,
+    FPR_LIMIT,
+    MIN_OBJECT_PX,
+    OBJECT_OVERLAP,
+    SEED,
+    SMALL_OBJECT_PX,
+)
 
 PIXEL_KEYS = ("precision", "recall", "f1", "iou", "dice")
 
@@ -46,13 +54,15 @@ def mask_report(gt, masks):
     """Every thresholded metric of the protocol for a set of predicted masks."""
     gt = np.asarray(gt).astype(bool)
     pixel = metrics.evaluate_masks(list(gt), list(masks))
-    objects = pd.DataFrame([metrics.object_scores(g, m, MIN_OBJECT_PX, OBJECT_OVERLAP) for g, m in zip(gt, masks)])
+    objects = pd.DataFrame(
+        [metrics.object_scores(g, m, MIN_OBJECT_PX, OBJECT_OVERLAP) for g, m in zip(gt, masks, strict=True)]
+    )
     sizes = pd.DataFrame([metrics.object_recall_by_size(g, m, MIN_OBJECT_PX, SMALL_OBJECT_PX, OBJECT_OVERLAP)
-                          for g, m in zip(gt, masks)]).sum()
+                          for g, m in zip(gt, masks, strict=True)]).sum()
     tp, fp, fn, tn = metrics.confusion_counts(gt, np.asarray(masks))
     # Boundary metrics on speckle-free masks (both sides), in px at the working resolution
     clean = [(metrics.remove_small_components(g, MIN_OBJECT_PX), metrics.remove_small_components(m, MIN_OBJECT_PX))
-             for g, m in zip(gt, masks)]
+             for g, m in zip(gt, masks, strict=True)]
     hd = np.array([metrics.hd95(g, m) for g, m in clean])
     boundary = {"boundary_iou": [metrics.boundary_iou(g, m, BOUNDARY_BAND_PX) for g, m in clean],
                 "hd95_px": hd.tolist(), "hd95_undefined_images": int(np.isnan(hd).sum())}

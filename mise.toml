@@ -41,8 +41,12 @@ description = "Run the tests except the slow split regeneration"
 run = "python -m pytest -q -m 'not slow'"
 
 [tasks.check]
-description = "Repository hygiene: no absolute / Windows paths in tracked notebooks and code"
-run = "! git grep -nIE 'C:\\\\\\\\Users|/home/[a-z]+/|Downloads' -- ':!archive' ':!mise.toml'"
+description = "Quality gate: no absolute / Windows paths, master notebook up to date, ruff lint clean"
+run = [
+  "! git grep -nIE 'C:\\\\\\\\Users|/home/[a-z]+/|Downloads' -- ':!archive' ':!mise.toml'",
+  "python scripts/build_master_notebook.py --check",
+  "ruff check .",
+]
 
 # ---------------------------------------------------------------- CRISP-DM notebooks
 [tasks.lab]
@@ -54,7 +58,7 @@ description = "Execute one notebook in place, e.g. mise run notebook notebooks/2
 run = "jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=roadanomaly {{arg(name='path')}}"
 
 [tasks.pipeline]
-description = "Run the CRISP-DM pipeline end to end: data -> modeling (A, B, C) -> evaluation -> XAI"
+description = "Run the CRISP-DM pipeline end to end: data -> modeling (A, B, C) -> evaluation -> XAI, then rebuild the master notebook"
 run = """
 set -e
 for nb in notebooks/2_Data_Understanding.ipynb notebooks/3_Data_Preparation.ipynb \
@@ -63,7 +67,16 @@ for nb in notebooks/2_Data_Understanding.ipynb notebooks/3_Data_Preparation.ipyn
   jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 \
     --ExecutePreprocessor.kernel_name=roadanomaly "$nb"
 done
+python scripts/build_master_notebook.py
 """
+
+[tasks.lint]
+description = "Lint the code and the notebooks with ruff (rules in pyproject.toml); add --fix to sort imports"
+run = "ruff check ."
+
+[tasks.master]
+description = "Rebuild notebooks/0_RoadAnomaly_Master.ipynb (all CRISP-DM phases in one notebook) from the phase notebooks"
+run = "python scripts/build_master_notebook.py"
 
 [tasks.train]
 description = "Train all six models (notebooks 4A, 4B, 4C) and save them in models/; needs a GPU for reasonable times"
@@ -105,6 +118,11 @@ run = "uvicorn deployment.api.main:app --reload --port 8000"
 [tasks.app]
 description = "Streamlit demo on http://localhost:8501"
 run = "streamlit run deployment/app/streamlit_app.py"
+
+[tasks.product]
+description = "The RoadAnomaly product (MVP for customers: plans, two modes, explanation, reports) on http://localhost:8502"
+dir = "{{config_root}}/deployment/product"   # its own theme lives in deployment/product/.streamlit
+run = "streamlit run app.py --server.port 8502"
 
 [tasks."landing:data"]
 description = "Export the real data the landing page shows (score maps, photos, credits) after the notebooks ran"

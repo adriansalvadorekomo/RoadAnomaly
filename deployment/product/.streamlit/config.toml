@@ -1,0 +1,32 @@
+# Theme of the RoadAnomaly product (deployment/product/app.py), from the brand guide of the marketing deck:
+# navy = trust and seriousness (actions), orange = alert (only the obstacles), cream and peach backgrounds,
+# a humanist sans-serif (Lato when installed, then the system's humanist sans). Streamlit reads this file
+# because the product is started from this folder (mise run product).
+[server]
+headless = true
+
+[client]
+toolbarMode = "viewer"   # a product: no developer menu
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"
+primaryColor = "#2d3a5a"
+backgroundColor = "#fbf7ee"
+secondaryBackgroundColor = "#f3ead6"
+textColor = "#1f2a44"
+linkColor = "#b8460b"
+borderColor = "#e6dcc3"
+showWidgetBorder = true
+baseRadius = "10px"
+font = "Lato, 'Noto Sans', 'Segoe UI', system-ui, sans-serif"
+headingFont = "Lato, 'Noto Sans', 'Segoe UI', system-ui, sans-serif"
+headingFontWeights = [700, 700, 700]
+chartCategoricalColors = ["#ee6011", "#2d3a5a", "#f7cc9f", "#7a879f"]
+
+[theme.sidebar]
+backgroundColor = "#f3ead6"
+secondaryBackgroundColor = "#fbf7ee"
+borderColor = "#e6dcc3"

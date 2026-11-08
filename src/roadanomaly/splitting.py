@@ -104,7 +104,7 @@ def make_split(stats, seed):
         target = {s: max(1, round(n * f)) if (s != "train" and n >= 3) else 0 for s, f in SPLIT_FRACTIONS.items()}
         target["train"] = n - target["val"] - target["test"]
         rng.shuffle(groups)
-        count = {s: 0 for s in SPLIT_FRACTIONS}
+        count = dict.fromkeys(SPLIT_FRACTIONS, 0)
         for group in groups:
             room = {s: target[s] - count[s] for s in ("val", "test") if target[s] - count[s] >= len(group)}
             split = max(room, key=room.get) if room else "train"

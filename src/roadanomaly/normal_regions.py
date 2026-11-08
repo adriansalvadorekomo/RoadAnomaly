@@ -29,7 +29,7 @@ def normal_patches(images, masks, patch=64, stride=32, margin=MASK_MARGIN):
     if masks.shape != (*images.shape[:3], 1):
         raise ValueError(f"masks {masks.shape} do not match images {images.shape}")
     normal, total = [], 0
-    for image, mask in zip(images, masks):
+    for image, mask in zip(images, masks, strict=True):
         unsafe = unsafe_mask(mask[..., 0], margin)
         for y in range(0, image.shape[0] - patch + 1, stride):
             for x in range(0, image.shape[1] - patch + 1, stride):

@@ -4,13 +4,12 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from conftest import SIZE
 
 from roadanomaly import data_pipeline as dp
 from roadanomaly.inference import Predictor, available_models, prepare_image, validate_config
 from roadanomaly.postprocessing import auprc
 from roadanomaly.protocol import IMG_SIZE
-
-from conftest import SIZE
 
 
 @pytest.mark.parametrize("fixture", ["segmentation_dir", "pixel_ae_dir"])

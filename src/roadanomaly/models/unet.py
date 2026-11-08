@@ -44,7 +44,7 @@ def build_unet(input_shape=(352, 640, 3), filters=(16, 32, 64, 128), bottleneck=
         skips.append(x)
         x = layers.MaxPooling2D(2, name=f"enc{i}_pool")(x)
     x = double_conv(x, bottleneck, "bottleneck")
-    for i, (f, skip) in enumerate(zip(reversed(filters), reversed(skips)), start=1):
+    for i, (f, skip) in enumerate(zip(reversed(filters), reversed(skips), strict=True), start=1):
         x = up_block(x, skip, f, f"dec{i}")
     return keras.Model(inputs, segmentation_head(x), name="unet")
 
@@ -61,7 +61,7 @@ def build_unet_resnet50(input_shape=(352, 640, 3), weights="imagenet", decoder_f
     encoder = keras.Model(backbone.input, [backbone.get_layer(n).output for n in (*RESNET50_SKIPS, RESNET50_BRIDGE)],
                           name="resnet50_encoder")
     *skips, x = encoder(x)
-    for i, (f, skip) in enumerate(zip(decoder_filters, reversed(skips)), start=1):
+    for i, (f, skip) in enumerate(zip(decoder_filters[:-1], reversed(skips), strict=True), start=1):
         x = up_block(x, skip, f, f"dec{i}")
     x = layers.Conv2DTranspose(decoder_filters[-1], 2, strides=2, name="dec5_up")(x)   # stride 2 -> full size
     x = double_conv(x, decoder_filters[-1], "dec5")

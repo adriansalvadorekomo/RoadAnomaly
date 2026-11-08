@@ -55,7 +55,7 @@ def evaluate_masks(y_trues, y_preds):
     """
     per_image = []
     totals = np.zeros(3, dtype=np.int64)
-    for y_true, y_pred in zip(y_trues, y_preds):
+    for y_true, y_pred in zip(y_trues, y_preds, strict=True):
         tp, fp, fn, _ = confusion_counts(y_true, y_pred)
         totals += (tp, fp, fn)
         per_image.append(scores_from_counts(tp, fp, fn))
@@ -167,11 +167,11 @@ def aupro(y_trues, score_maps, min_size, fpr_limit=0.3, n_thresholds=100):
     all_scores = np.concatenate([s.ravel() for s in score_maps])
     thresholds = np.quantile(all_scores, np.linspace(1.0, 0.0, n_thresholds))  # high -> low
 
-    background = np.concatenate([s[~y] for s, y in zip(score_maps, y_trues)])
+    background = np.concatenate([s[~y] for s, y in zip(score_maps, y_trues, strict=True)])
     fprs, pros = [], []
     for t in thresholds:
         fprs.append(float((background >= t).mean()))
-        overlaps = [(s[obj] >= t).mean() for s, objs in zip(score_maps, objects) for obj in objs]
+        overlaps = [(s[obj] >= t).mean() for s, objs in zip(score_maps, objects, strict=True) for obj in objs]
         pros.append(float(np.mean(overlaps)))
 
     # Keep the part of the curve with FPR <= fpr_limit (add the exact end point by interpolation)

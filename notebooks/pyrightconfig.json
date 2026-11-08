@@ -1,0 +1,5 @@
+{
+  // Used only when VS Code opens notebooks/ on its own (the repository root uses pyproject.toml directly):
+  // the same Pylance settings as the rest of the project, instead of the editor's own (e.g. a global "strict").
+  "extends": "../pyproject.toml"
+}
