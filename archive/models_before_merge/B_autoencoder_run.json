@@ -1,0 +1,68 @@
+{
+  "seed": 1337,
+  "tensorflow_version": "2.20.0",
+  "keras_version": "3.12.4",
+  "python_version": "3.10.9",
+  "device": {
+    "gpu_name": "CPU",
+    "physical_devices": [
+      "/physical_device:CPU:0"
+    ]
+  },
+  "split": {
+    "train_frames": 42,
+    "validation_frames": 9
+  },
+  "preprocessing": {
+    "image_size_height_width": [
+      352,
+      640
+    ],
+    "image_channels": "RGB",
+    "image_resize": "bilinear (shared data pipeline)",
+    "image_dtype_range": "float32 [0, 1]",
+    "mask_resize": "nearest-neighbour (shared data pipeline)",
+    "mask_labels": {
+      "normal": 0,
+      "anomaly": 1
+    },
+    "patch_size": 64,
+    "patch_stride": 32,
+    "mask_dilation_margin_px": 4,
+    "training_augmentation": "random horizontal flip only",
+    "validation_augmentation": "none",
+    "normal_patches": {
+      "train": 5325,
+      "validation": 1128
+    }
+  },
+  "model": {
+    "architecture": "fully convolutional convolutional autoencoder",
+    "encoder_filters": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "code_channels": 2,
+    "code_activation": "linear",
+    "output_activation": "sigmoid",
+    "loss": "mean squared error",
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "batch_size": 64,
+    "maximum_epochs": 150,
+    "early_stopping_patience": 8,
+    "epochs_ran": 47,
+    "best_epoch": 39,
+    "best_validation_mse": 0.006874782964587212
+  },
+  "anomaly_score": {
+    "pixel_error": "mean squared RGB reconstruction error",
+    "gaussian_sigma_selected_on_validation": 16,
+    "per_image_z_score": true,
+    "threshold_selected_on_validation_for_mean_f1": 0.6262087894496271,
+    "validation_auprc": 0.15143551411302075
+  },
+  "test_split_policy": "Previously consulted during an earlier iteration; excluded from all model, threshold, and XAI choices."
+}
