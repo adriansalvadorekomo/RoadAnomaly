@@ -1,4 +1,4 @@
-# Project tasks: `mise tasks` lists them, `mise run <task>` runs one.
+# Project tasks: `mise run help` lists them by purpose, `mise run <task>` runs one.
 # mise only provides Python / Node and these shortcuts; Python packages are installed with pip
 # (team rule), inside .venv. Without mise, every task is a plain shell command you can copy.
 
@@ -9,6 +9,12 @@ node = "22"          # only for the Astro landing page (deployment/landing)
 [env]
 _.python.venv = { path = ".venv", create = false }
 TF_CPP_MIN_LOG_LEVEL = "3"
+
+# ---------------------------------------------------------------- help
+[tasks.help]
+description = "List every project command, grouped by purpose, with its arguments; `mise run help <task>` shows one in full"
+run = "python scripts/mise_help.py"
+quiet = true
 
 # ---------------------------------------------------------------- setup
 [tasks.setup]
@@ -40,6 +46,10 @@ run = "python -m pytest -q"
 description = "Run the tests except the slow split regeneration"
 run = "python -m pytest -q -m 'not slow'"
 
+[tasks.lint]
+description = "Lint the code and the notebooks with ruff (rules in pyproject.toml); add --fix to sort imports"
+run = "ruff check ."
+
 [tasks.check]
 description = "Quality gate: no absolute / Windows paths, master notebook up to date, ruff lint clean"
 run = [
@@ -70,14 +80,11 @@ done
 python scripts/build_master_notebook.py
 """
 
-[tasks.lint]
-description = "Lint the code and the notebooks with ruff (rules in pyproject.toml); add --fix to sort imports"
-run = "ruff check ."
-
 [tasks.master]
 description = "Rebuild notebooks/0_RoadAnomaly_Master.ipynb (all CRISP-DM phases in one notebook) from the phase notebooks"
 run = "python scripts/build_master_notebook.py"
 
+# ---------------------------------------------------------------- models
 [tasks.train]
 description = "Train all six models (notebooks 4A, 4B, 4C) and save them in models/; needs a GPU for reasonable times"
 run = """
@@ -124,6 +131,15 @@ description = "The RoadAnomaly product (MVP for customers: plans, two modes, exp
 dir = "{{config_root}}/deployment/product"   # its own theme lives in deployment/product/.streamlit
 run = "streamlit run app.py --server.port 8502"
 
+[tasks."docker:build"]
+description = "Build the API + Streamlit images"
+run = "docker compose -f deployment/docker-compose.yml build"
+
+[tasks."docker:up"]
+description = "Start the API (8000) and the demo (8501) in Docker; models/ is mounted read-only"
+run = "docker compose -f deployment/docker-compose.yml up"
+
+# ---------------------------------------------------------------- landing page
 [tasks."landing:data"]
 description = "Export the real data the landing page shows (score maps, photos, credits) after the notebooks ran"
 run = "python deployment/landing/scripts/export_demo.py"
@@ -158,14 +174,6 @@ run = [
   "vercel link --yes --project roadanomaly-landing",
   "vercel deploy --yes",
 ]
-
-[tasks."docker:build"]
-description = "Build the API + Streamlit images"
-run = "docker compose -f deployment/docker-compose.yml build"
-
-[tasks."docker:up"]
-description = "Start the API (8000) and the demo (8501) in Docker; models/ is mounted read-only"
-run = "docker compose -f deployment/docker-compose.yml up"
 
 # ---------------------------------------------------------------- housekeeping
 [tasks.clean]
