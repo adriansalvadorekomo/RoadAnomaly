@@ -146,12 +146,15 @@ def phase_cells(key, relative_path, binome):
     return cells
 
 
-def readme_section(title):
-    """One '## title' section of the README, with its links rewritten for notebooks/."""
-    text = (ROOT / "README.md").read_text(encoding="utf-8")
+def intro_section(title):
+    """One '## title' section of notebooks/master_intro.md (links already relative to notebooks/).
+
+    These sections used to be read from the README; they now have their own file, so a README edit
+    never changes the submitted notebook."""
+    text = (NOTEBOOKS / "master_intro.md").read_text(encoding="utf-8")
     start = text.index(f"## {title}\n")
     end = text.find("\n## ", start + 1)
-    return relink(text[start:end if end != -1 else None].strip(), "..")
+    return text[start:end if end != -1 else None].strip()
 
 
 def business_cells():
@@ -235,8 +238,8 @@ def build():
         "language_info": first.metadata.get("language_info", {"name": "python"}),
     })
     cells = [markdown("cover", cover()),
-             markdown("architecture", readme_section("Architecture")),
-             markdown("tldr", readme_section("TL;DR")),
+             markdown("architecture", intro_section("Architecture")),
+             markdown("tldr", intro_section("TL;DR")),
              *business_cells()]
     for position, (key, path, binome, label, _) in enumerate(PHASES):
         if key == "p4a":
