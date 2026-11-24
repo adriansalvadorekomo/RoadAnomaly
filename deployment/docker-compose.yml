@@ -1,4 +1,4 @@
-# docker compose -f deployment/docker-compose.yml up --build
+# docker compose -f deployment/docker-compose.yml up --build   (or `pull`, then `up`: images on Docker Hub, twelvy1400/*)
 #   API  -> http://localhost:8000/docs   (another port: API_PORT=18000 docker compose ... up)
 #   Demo -> http://localhost:8501        (another port: DEMO_PORT=18501)
 #   Product -> http://localhost:8502     (another port: PRODUCT_PORT=18502)
@@ -8,7 +8,7 @@
 name: roadanomaly
 
 x-common: &common
-  image: roadanomaly:latest
+  image: twelvy1400/roadanomaly:latest   # docker compose pull, or --build from source
   build:
     context: ..
     dockerfile: deployment/Dockerfile
@@ -56,6 +56,6 @@ services:
     build:
       context: ..
       dockerfile: deployment/landing/Dockerfile
-    image: roadanomaly-landing:latest
+    image: twelvy1400/roadanomaly-landing:latest
     ports: ["${LANDING_PORT:-4321}:80"]
     restart: unless-stopped
