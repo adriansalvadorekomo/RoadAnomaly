@@ -145,9 +145,9 @@ def explanation_chart(rows):
         y=alt.Y("Facteur:N", sort=None, title=None, axis=alt.Axis(labelFontSize=13, labelLimit=240)),
         color=alt.Color("Effet:N", scale=alt.Scale(domain=["renforce l'alerte", "atténue l'alerte"],
                                                    range=["#ee6011", "#2d3a5a"]),
-                        legend=alt.Legend(orient="bottom", title=None)),
+                        legend=alt.Legend(orient="bottom", direction="vertical", title=None)),
         tooltip=["Facteur", alt.Tooltip("Part:Q", format=".0%"), "Effet"],
-    ).properties(height=210)
+    ).properties(height=alt.Step(34))   # one band per factor: a fixed height hid labels when they overlapped
 
 
 def show_explanation(key, analysis):
